@@ -10,11 +10,12 @@ LDR_LOAD_ADDR := 0x40007000
 
 ################################################################################
 
-TARGET := loader
-BUILDDIR := ../build
+TARGET    := loader
+BUILDDIR  := ../build
 OUTPUTDIR := ../output
-BDKDIR := bdk
-BDKINC := -I../$(BDKDIR)
+BDKDIR    := bdk
+BDKINC    := -I../$(BDKDIR)
+
 VPATH += $(dir $(wildcard ../$(BDKDIR)/*/)) $(dir $(wildcard ../$(BDKDIR)/*/*/))
 
 # Main and graphics.
