@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 CTCaer
+ * Copyright (c) 2019-2024 CTCaer
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -22,14 +22,22 @@
 
 #include <memory_map.h>
 #include <libs/compr/lz.h>
+#include <soc/bpmp.h>
 #include <soc/clock.h>
 #include <soc/t210.h>
 
 // 0x4003D000: Safe for panic preserving, 0x40038000: Safe for debugging needs.
-#define IPL_RELOC_TOP  0x40038000
+#define IPL_RELOC_TOP        0x40038000
 #define IPL_PATCHED_RELOC_SZ 0x94
+#define IPL_VERSION_RCFG_OFF 0x120
 
-boot_cfg_t __attribute__((section ("._boot_cfg"))) b_cfg;
+const volatile ipl_ver_meta_t __attribute__((section ("._ipl_version"))) ipl_ver = {
+	.magic             = BL_MAGIC,
+	.version           = (BL_VER_MJ + '0') | ((BL_VER_MN + '0') << 8) | ((BL_VER_HF + '0') << 16) | ((BL_VER_RL) << 24),
+	.rcfg.rsvd_flags   = 0,
+	.rcfg.bclk_t210    = BPMP_CLK_LOWER_BOOST,
+	.rcfg.bclk_t210b01 = BPMP_CLK_DEFAULT_BOOST
+};
 
 void loader_main()
 {
@@ -75,8 +83,8 @@ void loader_main()
 	// Uncompress second part.
 	LZ_Uncompress((const u8 *)src_addr, (u8 *)IPL_LOAD_ADDR + dst_pos, sizeof(payload_01));
 
-	// Copy over boot configuration storage.
-	memcpy((u8 *)(IPL_LOAD_ADDR + IPL_PATCHED_RELOC_SZ), &b_cfg, sizeof(boot_cfg_t));
+	// Copy new reserved configuration.
+	memcpy((u8 *)(IPL_LOAD_ADDR + IPL_VERSION_RCFG_OFF), (rsvd_cfg_t *)&ipl_ver.rcfg, sizeof(rsvd_cfg_t));
 
 	// Chainload into uncompressed payload.
 	void (*ipl_ptr)() = (void *)IPL_LOAD_ADDR;
