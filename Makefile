@@ -6,12 +6,12 @@ include $(DEVKITARM)/base_rules
 
 ################################################################################
 
-IPL_LOAD_ADDR := 0x40008000
-IPL_MAGIC     := 0x54454558 # TEEX
+IPL_LOAD_ADDR   := 0x40008000
+IPL_MAGIC       := 0x54454558 # TEEX
 TEVERSION_MAJOR := 5
 TEVERSION_MINOR := 0
 TEVERSION_BUGFX := 0
-TEVERSION := \"$(TEVERSION_MAJOR).$(TEVERSION_MINOR).$(TEVERSION_BUGFX)\"
+TEVERSION       := \"$(TEVERSION_MAJOR).$(TEVERSION_MINOR).$(TEVERSION_BUGFX)\"
 
 ################################################################################
 
@@ -30,31 +30,31 @@ VPATH += $(dir $(wildcard ./$(BDKDIR)/)) $(dir $(wildcard ./$(BDKDIR)/*/))    $(
 
 # !TODO: add objs when needed
 
-OBJS  = start exception_handlers main heap gfx menu
+OBJS  = start exception_handlers main heap gfx
 
 OBJS += bpmp ccplex clock di irq timer \
 		mc sdram minerva smmu \
 		gpio pinmux pmc se tsec uart \
 		fuse kfuse \
-		sdmmc sdmmc_driver emmc sd emummc nx_emmc_bis \
+		sdmmc sdmmc_driver emmc sd nx_emmc_bis \
 		bq24193 max17050 max7762x \
-		hw_init hid regulator_5v joycon
+		hw_init regulator_5v joycon
 
-OBJS += btn dirlist util config ianos tools ini \
-		i2c ramdisk err gfxutils sprintf utils
+OBJS += btn dirlist util ianos ini \
+		i2c ramdisk sprintf
 
 #OBJS += arrayClass arrayReferenceClass dictionaryClass \
 #		else eval functionClass garbageCollector genericClass \
 #		intClass model parser saveClass StringClass scriptError \
 #		standardLibrary unsolvedArrayClass
 #
-#OBJS += keyfile nca emmcfile \
+#OBJS += keyfile nca emmcfile emummc hid config menu tools err gfxutils utils vector \
 #		fsutils mountmanager fscopy folderReader \
 #		keys
 #
 #OBJS += mainmenu filemenu foldermenu gptmenu explorer
 
-OBJS += diskio ff ffunicode ffsystem elfload elfreloc_arm vector
+OBJS += diskio ff ffunicode ffsystem elfload elfreloc_arm
 
 OBJS := $(addsuffix .o, $(OBJS))
 OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
