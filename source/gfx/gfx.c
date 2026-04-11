@@ -366,6 +366,83 @@ static void _gfx_putn(u32 v, int base, char fill, int fcnt)
 	gfx_puts(p);
 }
 
+void gfx_printf(const char *fmt, ...)
+{
+	if (gfx_con.mute)
+		return;
+
+	va_list ap;
+	int fill, fcnt;
+
+	va_start(ap, fmt);
+	while (*fmt)
+	{
+		if (*fmt == '%')
+		{
+			fmt++;
+			fill = 0;
+			fcnt = 0;
+			if ((*fmt >= '0' && *fmt <= '9') || *fmt == ' ')
+			{
+				fcnt = *fmt;
+				fmt++;
+				if (*fmt >= '0' && *fmt <= '9')
+				{
+					fill = fcnt;
+					fcnt = *fmt - '0';
+					fmt++;
+				}
+				else
+				{
+					fill = ' ';
+					fcnt -= '0';
+				}
+			}
+			switch(*fmt)
+			{
+				case 'c':
+					gfx_putc(va_arg(ap, u32));
+					break;
+				case 's':
+					gfx_puts(va_arg(ap, char *));
+					break;
+				case 'd':
+					_gfx_putn(va_arg(ap, u32), 10, fill, fcnt);
+					break;
+				case 'p':
+				case 'P':
+				case 'x':
+				case 'X':
+					_gfx_putn(va_arg(ap, u32), 16, fill, fcnt);
+					break;
+				case 'k':
+					gfx_con.fgcol = va_arg(ap, u32);
+					break;
+				case 'K':
+					gfx_con.bgcol = va_arg(ap, u32);
+					gfx_con.fillbg = 1;
+					break;
+				case '%':
+					gfx_putc('%');
+					break;
+				case '\0':
+					goto out;
+				default:
+					gfx_putc('%');
+					gfx_putc(*fmt);
+					break;
+			}
+		}
+		else
+			gfx_putc(*fmt);
+		fmt++;
+	}
+
+	out:
+	va_end(ap);
+}
+
+
 void gfx_cputs(u32 color, const char *s)
 {
 	gfx_con.fgcol = color;
