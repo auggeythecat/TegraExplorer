@@ -6,9 +6,12 @@ include $(DEVKITARM)/base_rules
 
 ################################################################################
 
-LDR_LOAD_ADDR := 0x40007000
-IPL_MAGIC     := 0x54454558 #"ICTC"
-include ../Versions.inc
+LDR_LOAD_ADDR   := 0x40007000
+IPL_MAGIC       := 0x54454558 # TEEX
+TEVERSION_MAJOR := 5
+TEVERSION_MINOR := 0
+TEVERSION_BUGFX := 0
+TEVERSION       := \"$(TEVERSION_MAJOR).$(TEVERSION_MINOR).$(TEVERSION_BUGFX)\"
 
 ################################################################################
 
@@ -27,8 +30,8 @@ OBJS = $(addprefix $(BUILDDIR)/, \
 
 ################################################################################
 
-CUSTOMDEFINES := -DBL_MAGIC=$(IPL_MAGIC)
-CUSTOMDEFINES += -DBL_VER_MJ=$(BLVERSION_MAJOR) -DBL_VER_MN=$(BLVERSION_MINOR) -DBL_VER_HF=$(BLVERSION_HOTFX) -DBL_VER_RL=$(BLVERSION_REL)
+CUSTOMDEFINES := -DTE_MAGIC=$(IPL_MAGIC)
+CUSTOMDEFINES += -DTE_VER_MJ=$(TEVERSION_MAJOR) -DTE_VER_MN=$(TEVERSION_MINOR) -DTE_VER_HF=$(TEVERSION_BUGFX) -DTE_VER=$(TEVERSION)
 
 #TODO: Considering reinstating some of these when pointer warnings have been fixed.
 WARNINGS := -Wall -Wsign-compare -Wno-array-bounds -Wno-stringop-overflow

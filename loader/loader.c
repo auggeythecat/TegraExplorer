@@ -32,8 +32,8 @@
 #define IPL_VERSION_RCFG_OFF 0x120
 
 const volatile ipl_ver_meta_t __attribute__((section ("._ipl_version"))) ipl_ver = {
-	.magic             = BL_MAGIC,
-	.version           = (BL_VER_MJ + '0') | ((BL_VER_MN + '0') << 8) | ((BL_VER_HF + '0') << 16) | ((BL_VER_RL) << 24),
+	.magic             = TE_MAGIC,
+	.version           = (TE_VER_MJ + '0') | ((TE_VER_MN + '0') << 8) | ((TE_VER_HF + '0') << 16),
 	.rcfg.rsvd_flags   = 0,
 	.rcfg.bclk_t210    = BPMP_CLK_LOWER_BOOST,
 	.rcfg.bclk_t210b01 = BPMP_CLK_DEFAULT_BOOST
