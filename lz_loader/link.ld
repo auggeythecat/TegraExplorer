@@ -11,7 +11,8 @@ SECTIONS {
 	.data : {
 		*(.data*);
 		*(.rodata*);
-		*(._payload);
+		*(._payload_00);
+		*(._payload_01);
 
 		/*
 		 * To mitigate bad injectors/chainloaders,

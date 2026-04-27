@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "blz.h"
+#include "../blz.h"
 
 const blz_footer *blz_get_footer(const u8 *comp_data, u32 comp_data_size, blz_footer *out_footer)
 {

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019-2024 CTCaer
+ * Copyright (c) 2019-2024 CTCaer
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -20,7 +20,7 @@
 #include "../loader/payload.h"
 
 #include <memory_map.h>
-#include <../bdk/libs/compr/nrv/nrv2e.h>
+#include <../bdk/libs/compr/lz/lz.h>
 #include <soc/bpmp.h>
 #include <soc/clock.h>
 #include <soc/t210.h>
@@ -55,9 +55,10 @@ void loader_main()
 	ARB_PRI(ARB_PRIO_DMA_PRIORITY) = 0x320369B;
 
 	// Get Payload size.
-	u32 payload_size  = sizeof(payload);               // Actual payload size.
-	payload_size      = ALIGN(payload_size, 4);        // Align size to 4 bytes.
-	u32 *payload_addr = (u32 *)payload;
+	u32 payload_size  = sizeof(payload_00) + sizeof(payload_01);                // Actual payload size.
+	payload_size     += (u32)payload_01 - (u32)payload_00 - sizeof(payload_00); // Add compiler alignment.
+	payload_size      = ALIGN(payload_size, 4);                                 // Align size to 4 bytes.
+	u32 *payload_addr = (u32 *)payload_00;
 
 	// Relocate payload to a safer place.
 	u32 words = payload_size >> 2;
@@ -73,10 +74,13 @@ void loader_main()
 
 	// Set source address of the first part.
 	u8 *src_addr = (void *)(IPL_RELOC_TOP - payload_size);
+	// Uncompress first part.
+	u32 dst_pos = LZ_Uncompress((const u8 *)src_addr, (u8 *)IPL_LOAD_ADDR, sizeof(payload_00));
 
-	// Uncompress.
-	u32 out_len;
-	nrv2e_decompress_8(src_addr, sizeof(payload), (u8 *)IPL_LOAD_ADDR, &out_len);
+	// Set source address of the second part. Includes compiler alignment.
+	src_addr += (u32)payload_01 - (u32)payload_00;
+	// Uncompress second part.
+	LZ_Uncompress((const u8 *)src_addr, (u8 *)IPL_LOAD_ADDR + dst_pos, sizeof(payload_01));
 
 	// Copy new reserved configuration.
 	memcpy((u8 *)(IPL_LOAD_ADDR + IPL_VERSION_RCFG_OFF), (rsvd_cfg_t *)&ipl_ver.rcfg, sizeof(rsvd_cfg_t));
@@ -89,3 +93,44 @@ void loader_main()
 	while (true)
 		;
 }
+
+/*
+ * Copyright (c) 2019-2024 CTCaer
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <string.h>
+#include <stdlib.h>
+
+#include "../lz_loader/payload_00.h"
+#include "../lz_loader/payload_01.h"
+
+#include <memory_map.h>
+#include <../bdk/libs/compr/lz/lz.h>
+#include <soc/bpmp.h>
+#include <soc/clock.h>
+#include <soc/t210.h>
+
+// 0x4003D000: Safe for panic preserving, 0x40038000: Safe for debugging needs.
+#define IPL_RELOC_TOP        0x40038000
+#define IPL_PATCHED_RELOC_SZ 0x94
+#define IPL_VERSION_RCFG_OFF 0x120
+
+const volatile ipl_ver_meta_t __attribute__((section ("._ipl_version"))) ipl_ver = {
+	.magic             = TE_MAGIC,
+	.version           = (TE_VER_MJ + '0') | ((TE_VER_MN + '0') << 8) | ((TE_VER_HF + '0') << 16),
+	.rcfg.rsvd_flags   = 0,
+	.rcfg.bclk_t210    = BPMP_CLK_LOWER_BOOST,
+	.rcfg.bclk_t210b01 = BPMP_CLK_DEFAULT_BOOST
+};

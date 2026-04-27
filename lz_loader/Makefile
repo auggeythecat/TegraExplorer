@@ -21,11 +21,11 @@ OUTPUTDIR := ../output
 BDKDIR    := bdk
 BDKINC    := -I../$(BDKDIR)
 
-VPATH += $(dir $(wildcard ../$(BDKDIR)/*/)) $(dir $(wildcard ../$(BDKDIR)/*/*/)) $(dir $(wildcard ../$(BDKDIR)/*/*/*/))
+VPATH += $(dir $(wildcard ../$(BDKDIR)/*/)) $(dir $(wildcard ../$(BDKDIR)/*/*/))
 
 # Main and graphics.
 OBJS = $(addprefix $(BUILDDIR)/, \
-	start.o loader.o nrv2e.o \
+	start.o loader.o lz.o \
 )
 
 ################################################################################
@@ -37,7 +37,7 @@ CUSTOMDEFINES += -DTE_VER_MJ=$(TEVERSION_MAJOR) -DTE_VER_MN=$(TEVERSION_MINOR) -
 WARNINGS := -Wall -Wsign-compare -Wno-array-bounds -Wno-stringop-overflow
 
 ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb-interwork
-CFLAGS  = $(ARCH) -Oz: -g -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -std=gnu11 $(WARNINGS) $(CUSTOMDEFINES)
+CFLAGS  = $(ARCH) -O2 -g -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -std=gnu11 $(WARNINGS) $(CUSTOMDEFINES)
 LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=LDR_LOAD_ADDR=$(LDR_LOAD_ADDR)
 
 ################################################################################
@@ -47,7 +47,8 @@ LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defs
 all: $(TARGET).bin $(TOOLSLZ) $(TOOLSB2C)
 
 clean:
-	@rm -f payload.h
+	@rm -f payload_00.h
+	@rm -f payload_01.h
 
 $(TARGET).bin: $(BUILDDIR)/$(TARGET).elf
 	@$(OBJCOPY) -S -O binary $< $(OUTPUTDIR)/$(PAYLOAD_NAME).bin
