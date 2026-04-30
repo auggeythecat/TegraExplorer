@@ -48,6 +48,8 @@ OBJS += btn dirlist util ianos ini \
 #		intClass model parser saveClass StringClass scriptError \
 #		standardLibrary unsolvedArrayClass
 #
+
+OBJS += emummc config
 #OBJS += keyfile nca emmcfile emummc hid config menu tools err gfxutils utils vector \
 #		fsutils mountmanager fscopy folderReader \
 #		keys
