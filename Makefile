@@ -49,7 +49,7 @@ OBJS += btn dirlist util ianos ini \
 #		standardLibrary unsolvedArrayClass
 #
 
-OBJS += emummc config
+OBJS += emummc config vector
 #OBJS += keyfile nca emmcfile emummc hid config menu tools err gfxutils utils vector \
 #		fsutils mountmanager fscopy folderReader \
 #		keys
@@ -83,6 +83,7 @@ CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC)
 
 ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
 CFLAGS  = $(ARCH) -Os -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-inline -std=gnu11 $(CUSTOMDEFINES)
+CFLAGS += -I./bdk
 LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
 
 ################################################################################
