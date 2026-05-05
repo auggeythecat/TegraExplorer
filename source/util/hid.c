@@ -21,10 +21,10 @@ input_t *hidRead(){
 
     if (controller != NULL){
         if (controller->home && !TEConfig.t210b01)
-            RebootToPayloadOrRcm();
+            // RebootToPayloadOrRcm();
 
         if (controller->cap)
-            TakeScreenshot();
+            // TakeScreenshot();
 
         inputs.buttons = controller->buttons;
 

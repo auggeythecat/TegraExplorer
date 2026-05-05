@@ -5,6 +5,8 @@
 #include "util/config.h"
 #include "util/hid.h"
 
+#include "pikapython/pikascript-api/pikaScript.h"
+
 
 extern void pivot_stack(u32 stack_top);
 
@@ -49,9 +51,11 @@ void ipl_main() {
 
 	minerva_change_freq(FREQ_800);
 
+	PikaObj* pikaObj = pikaScriptInit();
+	pikaScriptShell(pikaObj);
+
 	btn_wait();
 	power_set_state(POWER_OFF_RESET);
-
 
 	while (true)
         bpmp_halt();

@@ -25,7 +25,7 @@ LOADERDIR := ./loader
 LZ77DIR   := ./tools/nrv
 BIN2CDIR  := ./tools/bin2c
 
-VPATH  = $(dir ./$(SOURCEDIR)/)          $(dir $(wildcard ./$(SOURCEDIR)/*/)) $(dir $(wildcard ./$(SOURCEDIR)/*/*/))
+VPATH  = $(dir ./$(SOURCEDIR)/)          $(dir $(wildcard ./$(SOURCEDIR)/*/)) $(dir $(wildcard ./$(SOURCEDIR)/*/*/) $(dir $(wildcard ./$(SOURCEDIR)/*/*/*/)))
 VPATH += $(dir $(wildcard ./$(BDKDIR)/)) $(dir $(wildcard ./$(BDKDIR)/*/))    $(dir $(wildcard ./$(BDKDIR)/*/*/))
 
 # !TODO: add objs when needed
@@ -43,13 +43,23 @@ OBJS += bpmp ccplex clock di irq timer \
 OBJS += btn dirlist util ianos ini \
 		i2c ramdisk sprintf
 
+OBJS += BaseObj dataArg dataArgs dataLink \
+		dataLinkNode dataMemory dataQueue dataStack \
+		dataString dataStrs dataQueueObj PikaCompiler PikaObj \
+		PikaParser pikaScript PikaPlatform PikaVM TinyObj \
+		PikaDebuger_Debuger PikaStdData_Dict PikaStdData_List \
+		PikaStdData_Utils PikaStdLib_RangeObj PikaStdLib_SysObj \
+        PikaStdData_ByteArray PikaStdData_FILEIO PikaStdData_String \
+        PikaStdData_Tuple PikaStdLib_MemChecker PikaStdLib_StringObj \
+        PikaStdTask_Task __pikaBinding __asset_pikaModules_py_a
+
 #OBJS += arrayClass arrayReferenceClass dictionaryClass \
 #		else eval functionClass garbageCollector genericClass \
 #		intClass model parser saveClass StringClass scriptError \
 #		standardLibrary unsolvedArrayClass
 #
 
-OBJS += emummc config vector hid
+OBJS += emummc config vector
 #OBJS += keyfile nca emmcfile emummc hid config menu tools err gfxutils utils vector \
 #		fsutils mountmanager fscopy folderReader \
 #		keys
@@ -98,8 +108,8 @@ all: $(OUTPUTDIR)/$(TARGET)_small.bin
 	@echo "Compressed Payload size is $(COMPR_BIN_SIZE)"
 
 	@echo "Max size is 126296 Bytes."
-	@if [ ${BIN_SIZE} -gt 140288 ]; then echo "\e[1;33mUncompressed Payload size exceeds limit!\e[0m"; fi
-	@if [ ${COMPR_BIN_SIZE} -gt 126296 ]; then echo "\e[1;33mCompressed Payload size exceeds limit!\e[0m"; fi
+	@if [ ${BIN_SIZE} -gt 140288 ]; then echo -e "\e[1;33mUncompressed Payload size exceeds limit!\e[0m"; fi
+	@if [ ${COMPR_BIN_SIZE} -gt 126296 ]; then echo -e "\e[1;33mCompressed Payload size exceeds limit!\e[0m"; fi
 	@echo "--------------------------------------"
 
 clean:
