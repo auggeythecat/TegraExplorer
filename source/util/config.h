@@ -12,6 +12,7 @@
 typedef struct TEConfig_t {
     bool emummcForceDisable;
     bool minervaEnabled;
+    bool t210b01;
 
     u32 FSBuffSize;
     u32 errors;
