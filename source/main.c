@@ -13,7 +13,7 @@ extern void pivot_stack(u32 stack_top);
 void ipl_main() {
     hw_init();
 
-    hidInit();
+    jc_init_hw();
 
     pivot_stack(IPL_LOAD_ADDR);
 
@@ -51,8 +51,8 @@ void ipl_main() {
 
 	minerva_change_freq(FREQ_800);
 
-	PikaObj* pikaObj = pikaScriptInit();
-	pikaScriptShell(pikaObj);
+	// PikaObj* pikaObj = pikaScriptInit();
+	// pikaScriptShell(pikaObj);
 
 	btn_wait();
 	power_set_state(POWER_OFF_RESET);
