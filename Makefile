@@ -51,7 +51,7 @@ OBJS += BaseObj dataArg dataArgs dataLink \
 		PikaStdData_Utils PikaStdLib_RangeObj PikaStdLib_SysObj \
         PikaStdData_ByteArray PikaStdData_FILEIO PikaStdData_String \
         PikaStdData_Tuple PikaStdLib_MemChecker PikaStdLib_StringObj \
-        PikaStdTask_Task __pikaBinding __asset_pikaModules_py_a
+        PikaStdTask_Task __pikaBinding __asset_pikaModules_py_a pika_config
 
 #OBJS += arrayClass arrayReferenceClass dictionaryClass \
 #		else eval functionClass garbageCollector genericClass \
@@ -79,7 +79,7 @@ FFCFG_INC := '"../$(SOURCEDIR)/libs/fatfs/ffconf.h"'
 CUSTOMDEFINES := -DIPL_LOAD_ADDR=$(IPL_LOAD_ADDR) -DTE_MAGIC=$(IPL_MAGIC)
 CUSTOMDEFINES += -DTE_VER_MJ=$(TEVERSION_MAJOR) -DTE_VER_MN=$(TEVERSION_MINOR) -DTE_VER_HF=$(TEVERSION_BUGFX) -DTE_VER=$(TEVERSION)
 # CUSTOMDEFINES += -DBDK_WATCHDOG_FIQ_ENABLE -DBDK_RESTART_BL_ON_WDT -DBDK_MALLOC_NO_DEFRAG #TODO: Look into these options from hekate and see if they should be
-CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC)
+CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC) -DPIKA_CONFIG_ENABLE
 
 #CUSTOMDEFINES += -DDEBUG
 
@@ -92,9 +92,9 @@ CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC)
 #WARNINGS += -fno-delete-null-pointer-checks -fstack-usage
 
 ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
-CFLAGS  = $(ARCH) -Os -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-inline -std=gnu11 $(CUSTOMDEFINES)
+CFLAGS  = $(ARCH) -flto -Os -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -fno-jump-tables -std=gnu11 $(CUSTOMDEFINES)
 CFLAGS += -I./bdk
-LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
+LDFLAGS = $(ARCH) -flto -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
 
 ################################################################################
 
