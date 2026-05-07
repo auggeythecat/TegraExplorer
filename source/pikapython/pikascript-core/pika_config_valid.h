@@ -47,7 +47,7 @@
 
     /* use user config */
     #ifdef PIKA_CONFIG_ENABLE
-        #include "pika_config.h"
+        #include "../../libs/pikapython/pika_config.h"
     #endif
 
     /* default pika_nano_enabled */
