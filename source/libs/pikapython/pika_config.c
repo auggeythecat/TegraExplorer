@@ -1,11 +1,17 @@
 #include <bdk.h>
+#include <stdio.h>
 #include <string.h>
 
 
 #include "../../gfx/gfx.h"
 
-// void pika_platform_enable_irq_handle(void);
-// void pika_platform_disable_irq_handle(void);
+void pika_platform_enable_irq_handle(void) {
+    return;
+}
+
+void pika_platform_disable_irq_handle(void) {
+    return;
+}
 // TODO: figure out what to do here?
 
 
@@ -14,28 +20,34 @@ void pika_platform_printf(char* fmt, ...) {
 }
 int pika_platform_sprintf(char* buff, char* fmt, ...) {
     gfx_printf("I don't want sprintf used!");
+    return 0;
 }
 int pika_platform_vsprintf(char* buff, char* fmt, va_list args) {
     gfx_printf("I don't want vsprintf used!");
+    return 0;
 }
 int pika_platform_vsnprintf(char* buff,
                             u32 size,
                             const char* fmt,
                             va_list args) {
     gfx_printf("I don't want vsnprintf used!");
+    return 0;
 }
 int pika_platform_snprintf(char* buff, u32 size, const char* fmt, ...) {
     gfx_printf("I don't want snprintf used!");
+    return 0;
 }
 
 char* pika_platform_strdup(const char* src) {
-    char* dst = (char*)malloc(strlen(src) + 1);
-    if (dst) {
-        strcpy(dst, src);
-    }
-    return dst;
+    // char* dst = (char*)malloc(strlen(src) + 1);
+    // if (dst) {
+    //     strcpy(dst, src);
+    // }
+    return "\0";
 }
-u32 pika_platform_tick_from_millisecond(u32 ms);
+u32 pika_platform_tick_from_millisecond(u32 ms) {
+    return 0;
+}
 
 /* libc config */
 void* pika_platform_malloc(u32 size) {
@@ -63,19 +75,40 @@ void pika_platform_wait(void) {
 }
 
 /* support shell */
-char pika_platform_getchar(void);
-int pika_platform_putchar(char ch);
+char pika_platform_getchar(void) {
+    return '\0';
+}
+
+int pika_platform_putchar(char ch) {
+    return 0;
+}
 
 // TODO: file stuff
-// FIL* pika_platform_fopen(const char* filename, const char* modes);
-// int pika_platform_fclose(FIL* stream);
-// u32 pika_platform_fwrite(const void* ptr,
-//                             u32 size,
-//                             u32 n,
-//                             FIL* stream);
-// u32 pika_platform_fread(void* ptr, u32 size, u32 n, FIL* stream);
-// int pika_platform_fseek(FIL* stream, long offset, int whence);
-// long pika_platform_ftell(FIL* stream);
+FIL* pika_platform_fopen(const char* filename, const char* modes) {
+    FIL* file = NULL;
+    f_open(file, filename, *modes);
+    return file;
+}
+
+int pika_platform_fclose(FIL* stream) {
+    return f_close(stream);
+}
+
+u32 pika_platform_fwrite(const void* ptr, u32 size, u32 n, FIL* stream) {
+    return f_write(stream, ptr, size, &n);
+}
+
+u32 pika_platform_fread(void* ptr, u32 size, u32 n, FIL* stream) {
+    return f_read(stream, ptr, size, &n);
+}
+
+int pika_platform_fseek(FIL* stream, long offset, int whence) {
+    return f_lseek(stream, offset);
+}
+
+long pika_platform_ftell(FILE* stream) {
+    return ftell(stream);
+}
 
 void pika_platform_error_handle(void) {
     EPRINTF("PIKAPYTHON: Error has occured!");
@@ -99,8 +132,13 @@ void pika_platform_sleep_s(u32 s) {
 }
 
 // I'm only pretty sure I don't need these.
-// void pika_hook_instruct(void);
-// bool pika_hook_arg_cache_filter(void* self);
+void pika_hook_instruct(void) {
+    return;
+}
+
+bool pika_hook_arg_cache_filter(void* self) {
+    return true;
+}
 
 void* pika_user_malloc(u32 size) {
     return malloc(size);
@@ -111,21 +149,39 @@ void pika_user_free(void* ptr, u32 size) {
 }
 
 // I'm only pretty sure I don't need this.
-// u8 pika_is_locked_pikaMemory(void);
+u8 pika_is_locked_pikaMemory(void) {
+    return 0;
+}
 
 
 // TODO: What the hell am I going to to with this?
-// typedef struct pika_platform_timer {
-//     void* platform_data;
-// } pika_platform_timer_t;
-//
-// void pika_platform_timer_init(pika_platform_timer_t* timer);
-// void pika_platform_timer_cutdown(pika_platform_timer_t* timer,
-//                                  unsigned int timeout);
-// char pika_platform_timer_is_expired(pika_platform_timer_t* timer);
-// int pika_platform_timer_remain(pika_platform_timer_t* timer);
-// unsigned long pika_platform_timer_now(void);
-// void pika_platform_timer_usleep(unsigned long usec);
+typedef struct pika_platform_timer {
+    void* platform_data;
+} pika_platform_timer_t;
+
+void pika_platform_timer_init(pika_platform_timer_t* timer) {
+    return;
+}
+
+void pika_platform_timer_cutdown(pika_platform_timer_t* timer, unsigned int timeout) {
+    return;
+}
+
+char pika_platform_timer_is_expired(pika_platform_timer_t* timer) {
+    return '\0';
+}
+
+int pika_platform_timer_remain(pika_platform_timer_t* timer) {
+    return 0;
+}
+
+unsigned long pika_platform_timer_now(void) {
+    return 0;
+}
+
+void pika_platform_timer_usleep(unsigned long usec) {
+    return;
+}
 
 void pika_platform_reboot(void) {
     power_set_state(POWER_OFF_REBOOT);

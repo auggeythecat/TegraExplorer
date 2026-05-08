@@ -95,6 +95,7 @@ ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
 CFLAGS  = $(ARCH) -flto -Os -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -fno-jump-tables -std=gnu11 $(CUSTOMDEFINES)
 CFLAGS += -I./bdk
 LDFLAGS = $(ARCH) -flto -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
+LDFLAGS += -Wl,-Map=./output.map,--cref
 
 ################################################################################
 

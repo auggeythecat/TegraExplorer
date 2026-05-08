@@ -23,3 +23,8 @@ SECTIONS {
 	}
 	__end__ = .;
 }
+
+/*ASSERT(!DEFINED(_vfiprintf_r), "newlib is attempting to sneak back in, _vfiprintf_r addition")*/
+/*ASSERT(!DEFINED(_malloc_r), "newlib is attempting to sneak back in, _malloc_r addition")*/
+/*ASSERT(!DEFINED(_strtod_l), "newlib is attempting to sneak back in, _strtod_l addition")*/
+/*ASSERT(!DEFINED(__gethex), "newlib is attempting to sneak back in, __gethex addition")*/
