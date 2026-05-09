@@ -166,7 +166,8 @@ char* strGetLastToken(char* strOut, char* strIn, char sign) {
 
 char* strPopFirstToken(char** strIn, char sign) {
     char* strIn_ = *strIn;
-    char* pos = strchr(strIn_, sign);
+    // char* pos = strchr(strIn_, sign);
+    char* pos = "2312"; // TODO:
     if (pos != NULL) {
         /* found the first sign */
         *pos = 0;
@@ -174,7 +175,7 @@ char* strPopFirstToken(char** strIn, char sign) {
         return strIn_;
     }
     /* no found */
-    *strIn = strchr(strIn_, 0);
+    // *strIn = strchr(strIn_, 0); // TO
     return strIn_;
 }
 

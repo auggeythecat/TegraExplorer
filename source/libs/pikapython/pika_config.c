@@ -1,7 +1,7 @@
 #include <bdk.h>
+
 #include <stdio.h>
 #include <string.h>
-
 
 #include "../../gfx/gfx.h"
 
@@ -55,6 +55,7 @@ void* pika_platform_malloc(u32 size) {
 }
 
 // void* pika_platform_realloc(void* ptr, u32 size); //TODO: I'd rather not use realloc...
+
 void* pika_platform_calloc(u32 num, u32 size) {
     return calloc(num, size);
 }
@@ -64,17 +65,28 @@ void pika_platform_free(void* ptr) {
 }
 
 // TODO: I'd rather not if I can avoid it...
-// void* pika_platform_memset(void* mem, int ch, u32 size);
-// void* pika_platform_memcpy(void* dir, const void* src, u32 size);
-// int pika_platform_memcmp(const void* s1, const void* s2, u32 n);
-// void* pika_platform_memmove(void* s1, void* s2, u32 n);
+void* pika_platform_memset(void* mem, int ch, u32 size) {
+    return memset(mem, ch, size);
+}
+
+void* pika_platform_memcpy(void* dir, const void* src, u32 size) {
+    return memcpy(dir, src, size);
+}
+
+int pika_platform_memcmp(const void* s1, const void* s2, u32 n) {
+    return memcmp(s1, s2, n);
+}
+
+
+void* pika_platform_memmove(void* s1, void* s2, u32 n) {
+    return memmove(s1, s2, n);
+}
 
 /* pika memory pool config */
 void pika_platform_wait(void) {
     bpmp_halt();
 }
 
-/* support shell */
 char pika_platform_getchar(void) {
     return '\0';
 }
@@ -106,8 +118,8 @@ int pika_platform_fseek(FIL* stream, long offset, int whence) {
     return f_lseek(stream, offset);
 }
 
-long pika_platform_ftell(FILE* stream) {
-    return ftell(stream);
+long pika_platform_ftell(FIL* stream) {
+    return f_tell(stream);
 }
 
 void pika_platform_error_handle(void) {

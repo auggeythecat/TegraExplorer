@@ -1971,7 +1971,8 @@ static Arg* VM_instruction_handler_NUM(PikaObj* self,
     /* float */
     if (strIsContain(data, '.') ||
         (strIsContain(data, 'e') || strIsContain(data, 'E'))) {
-        return arg_setFloat(arg_ret_reg, "", strtod(data, NULL));
+        // return arg_setFloat(arg_ret_reg, "", strtod(data, NULL));
+        return NULL; // TODO:
     }
     /* int */
     return arg_setInt(arg_ret_reg, "", fast_atoi(data));

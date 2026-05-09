@@ -42,15 +42,18 @@ PIKA_WEAK void* pika_platform_malloc(size_t size) {
 }
 
 PIKA_WEAK void* pika_platform_realloc(void* ptr, size_t size) {
-    return realloc(ptr, size);
+    // return realloc(ptr, size);
+    return NULL; //TODO:
 }
 
 PIKA_WEAK void* pika_platform_calloc(size_t num, size_t size) {
-    return calloc(num, size);
+    // return calloc(num, size);
+    return NULL; //TODO:
 }
 
 PIKA_WEAK void pika_platform_free(void* ptr) {
-    free(ptr);
+    // free(ptr);
+    return; //TODO:
 }
 
 PIKA_WEAK void* pika_user_malloc(size_t size) {
@@ -114,7 +117,8 @@ PIKA_WEAK int pika_platform_snprintf(char* buff,
 }
 
 PIKA_WEAK int pika_platform_putchar(char ch) {
-    return putchar(ch);
+    // return putchar(ch);
+    return 0; //TODO:
 }
 
 PIKA_WEAK int pika_platform_vprintf(char* fmt, va_list args) {
@@ -130,48 +134,51 @@ PIKA_WEAK int pika_platform_vprintf(char* fmt, va_list args) {
 
 #ifndef pika_platform_printf
 PIKA_WEAK void pika_platform_printf(char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    pika_platform_vprintf(fmt, args);
-    va_end(args);
+    // va_list args;
+    // va_start(args, fmt);
+    // pika_platform_vprintf(fmt, args);
+    // va_end(args);
+    return; //TODO:
 }
 #endif
 
 PIKA_WEAK char* pika_platform_strdup(const char* src) {
-    char* dst = (char*)pika_platform_malloc(strlen(src) + 1);
-    if (dst) {
-        strcpy(dst, src);
-    }
-    return dst;
+    // char* dst = (char*)pika_platform_malloc(strlen(src) + 1);
+    // if (dst) {
+        // strcpy(dst, src);
+    // }
+    // return dst;
+    return NULL; //TODO:
 }
 
 PIKA_WEAK size_t pika_platform_tick_from_millisecond(size_t ms) {
-    return ms;
+    return 0;
 }
 
 PIKA_WEAK int pika_platform_vsnprintf(char* buff,
                                       size_t size,
                                       const char* fmt,
                                       va_list args) {
-    return vsnprintf(buff, size, fmt, args);
+    // return vsnprintf(buff, size, fmt, args);
+    return 0; //TODO:
 }
 
 PIKA_WEAK int pika_platform_sprintf(char* buff, char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    int res = pika_platform_vsnprintf(buff, PIKA_SPRINTF_BUFF_SIZE, fmt, args);
-    va_end(args);
-    if (res >= PIKA_SPRINTF_BUFF_SIZE) {
-        pika_platform_printf(
-            "OverflowError: sprintf buff size overflow, please use bigger "
-            "PIKA_SPRINTF_BUFF_SIZE\r\n");
-        pika_platform_printf("Info: buff size request: %d\r\n", res);
-        pika_platform_printf("Info: buff size now: %d\r\n",
-                             PIKA_SPRINTF_BUFF_SIZE);
-        while (1)
-            ;
-    }
-    return res;
+    // va_list args;
+    // va_start(args, fmt);
+    // int res = pika_platform_vsnprintf(buff, PIKA_SPRINTF_BUFF_SIZE, fmt, args);
+    // va_end(args);
+    // if (res >= PIKA_SPRINTF_BUFF_SIZE) {
+    //     pika_platform_printf(
+    //         "OverflowError: sprintf buff size overflow, please use bigger "
+    //         "PIKA_SPRINTF_BUFF_SIZE\r\n");
+    //     pika_platform_printf("Info: buff size request: %d\r\n", res);
+    //     pika_platform_printf("Info: buff size now: %d\r\n",
+    //                          PIKA_SPRINTF_BUFF_SIZE);
+    //     while (1)
+    //         ;
+    // }
+    // return res;
 }
 
 PIKA_WEAK void pika_platform_wait(void) {
@@ -180,19 +187,23 @@ PIKA_WEAK void pika_platform_wait(void) {
 }
 
 PIKA_WEAK void* pika_platform_memset(void* mem, int ch, size_t size) {
-    return memset(mem, ch, size);
+    // return memset(mem, ch, size);
+    return NULL; //TODO:
 }
 
 PIKA_WEAK void* pika_platform_memcpy(void* dir, const void* src, size_t size) {
-    return memcpy(dir, src, size);
+    // return memcpy(dir, src, size);
+    return NULL; //TODO:
 }
 
 PIKA_WEAK int pika_platform_memcmp(const void* s1, const void* s2, size_t n) {
-    return memcmp(s1, s2, n);
+    // return memcmp(s1, s2, n);
+    return 0; //TODO:
 }
 
 PIKA_WEAK void* pika_platform_memmove(void* s1, void* s2, size_t n) {
-    return memmove(s1, s2, n);
+    // return memmove(s1, s2, n);
+    return NULL; //TODO:
 }
 
 PIKA_WEAK char pika_platform_getchar(void) {
