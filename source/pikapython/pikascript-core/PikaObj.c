@@ -28,7 +28,6 @@
 #include "PikaObj.h"
 #include <stdint.h>
 #include "BaseObj.h"
-#include "PikaCompiler.h"
 #include "PikaPlatform.h"
 #include "dataArgs.h"
 #include "dataMemory.h"
@@ -1482,26 +1481,6 @@ PikaObj* obj_importModuleWithByteCodeFrame(PikaObj* self,
     return self;
 }
 
-PikaObj* obj_linkLibraryFile(PikaObj* self, char* input_file_name) {
-    obj_newMetaObj(self, "@lib", New_LibObj);
-    LibObj* lib = obj_getObj(self, "@lib");
-    LibObj_loadLibraryFile(lib, input_file_name);
-    return self;
-}
-
-PikaObj* obj_linkLibrary(PikaObj* self, uint8_t* library_bytes) {
-    obj_newMetaObj(self, "@lib", New_LibObj);
-    LibObj* lib = obj_getObj(self, "@lib");
-    LibObj_loadLibrary(lib, library_bytes);
-    obj_setPtr(self, "@libraw", library_bytes);
-    return self;
-}
-
-void obj_printModules(PikaObj* self) {
-    LibObj* lib = obj_getObj(self, "@lib");
-    pika_platform_printf(arg_getStr((Arg*)_help_modules_cmodule));
-    LibObj_printModules(lib);
-}
 
 PikaObj* obj_linkLibObj(PikaObj* self, LibObj* library) {
     obj_setPtr(self, "@lib", library);

@@ -27,7 +27,6 @@
 
 #include "PikaVM.h"
 #include "BaseObj.h"
-#include "PikaCompiler.h"
 #include "PikaObj.h"
 #include "PikaParser.h"
 #include "PikaPlatform.h"
@@ -3556,23 +3555,4 @@ void byteCodeFrame_printAsArray(ByteCodeFrame* self) {
     constPool_printAsArray(&(self->const_pool));
     pika_platform_printf("};\n");
     pika_platform_printf("pikaVM_runByteCode(self, (uint8_t*)bytes);\n");
-}
-
-PikaObj* pikaVM_runFile(PikaObj* self, char* file_name) {
-    Args buffs = {0};
-    char* module_name = strsCopy(&buffs, file_name);
-    strPopLastToken(module_name, '.');
-
-    pika_platform_printf("(pikascript) pika compiler:\r\n");
-    PikaMaker* maker = New_PikaMaker();
-    pikaMaker_compileModuleWithDepends(maker, module_name);
-    pikaMaker_linkCompiledModules(maker, "pikaModules_cache.py.a");
-    pikaMaker_deinit(maker);
-    pika_platform_printf("(pikascript) all succeed.\r\n\r\n");
-
-    pikaMemMaxReset();
-    obj_linkLibraryFile(self, "pikascript-api/pikaModules_cache.py.a");
-    self = pikaVM_runSingleFile(self, file_name);
-    strsDeinit(&buffs);
-    return self;
 }

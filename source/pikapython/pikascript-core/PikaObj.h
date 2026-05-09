@@ -327,7 +327,6 @@ int32_t obj_newObj(PikaObj* self,
 
 Arg* arg_newMetaObj(NewFun objPtr);
 PikaObj* obj_linkLibObj(PikaObj* self, LibObj* library);
-PikaObj* obj_linkLibrary(PikaObj* self, uint8_t* library_bytes);
 int obj_importModule(PikaObj* self, char* module_name);
 int32_t obj_newMetaObj(PikaObj* self, char* objName, NewFun newFunPtr);
 int32_t obj_newDirectObj(PikaObj* self, char* objName, NewFun newFunPtr);
@@ -367,7 +366,6 @@ PikaObj* pks_eventListener_getEventHandleObj(PikaEventListener* self,
 void pks_eventListener_init(PikaEventListener** p_self);
 void pks_eventListener_deinit(PikaEventListener** p_self);
 PikaObj* methodArg_getDefContext(Arg* method_arg);
-PikaObj* obj_linkLibraryFile(PikaObj* self, char* input_file_name);
 NewFun obj_getClass(PikaObj* obj);
 
 void pks_printVersion(void);
@@ -515,7 +513,6 @@ Arg* pks_eventListener_sendSignalAwaitResult(PikaEventListener* self,
                                              uint32_t eventId,
                                              int eventSignal);
 
-void obj_printModules(PikaObj* self);
 #if PIKA_DEBUG_ENABLE
 #define pika_debug(fmt, ...) \
     pika_platform_printf("PikaDBG: " fmt "\r\n", ##__VA_ARGS__)

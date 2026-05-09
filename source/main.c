@@ -52,7 +52,8 @@ void ipl_main() {
 	minerva_change_freq(FREQ_800);
 
 	PikaObj* pikaObj = pikaScriptInit();
-	pikaScriptShell(pikaObj);
+	// pikaScriptShell(pikaObj);
+	pikaVM_runByteCode(pikaObj, _gfx_font);
 
 	btn_wait();
 	power_set_state(POWER_OFF_RESET);

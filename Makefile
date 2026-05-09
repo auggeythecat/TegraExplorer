@@ -45,7 +45,7 @@ OBJS += btn dirlist util ianos ini \
 
 OBJS += BaseObj dataArg dataArgs dataLink \
 		dataLinkNode dataMemory dataQueue dataStack \
-		dataString dataStrs dataQueueObj PikaCompiler PikaObj \
+		dataString dataStrs dataQueueObj PikaObj \
 		PikaParser pikaScript PikaPlatform PikaVM TinyObj \
 		PikaDebuger_Debuger PikaStdData_Dict PikaStdData_List \
 		PikaStdData_Utils PikaStdLib_RangeObj PikaStdLib_SysObj \
@@ -96,7 +96,7 @@ ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
 CFLAGS  = $(ARCH) -Os -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -fno-jump-tables -std=gnu11 $(CUSTOMDEFINES)
 CFLAGS += -I./bdk
 LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
-LDFLAGS += -Wl,-Map=./output.map,--cref -Wl,--trace-symbol=fiprintf
+LDFLAGS += -Wl,-Map=./output.map,--cref -Wl,--print-gc-sections
 
 ################################################################################
 
