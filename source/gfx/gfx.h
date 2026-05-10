@@ -65,6 +65,7 @@ void gfx_con_setpos(u32 x, u32 y);
 void gfx_putc(char c);
 void gfx_puts(const char *s);
 void gfx_cputs(u32 color, const char *s);
+void gfx_vprintf(const char *fmt, va_list ap);
 void gfx_printf(const char *fmt, ...);
 void gfx_hexdump(u32 base, const void *buf, u32 len);
 
