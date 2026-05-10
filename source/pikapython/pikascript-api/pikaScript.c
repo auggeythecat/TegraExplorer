@@ -22,7 +22,7 @@ PikaObj *pikaScriptInit(void){
     PikaObj* pikaMain = newRootObj("pikaMain", New_PikaMain);
     __pikaMain = pikaMain;
     extern unsigned char pikaModules_py_a[];
-    // obj_linkLibrary(pikaMain, pikaModules_py_a);
+    obj_linkLibrary(pikaMain, pikaModules_py_a);
 #if PIKA_INIT_STRING_ENABLE
     obj_run(pikaMain,
             "import PikaStdLib\n"

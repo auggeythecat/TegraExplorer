@@ -280,6 +280,7 @@ InstructUnit* instructArray_getNext(InstructArray* self);
 VMParameters* pikaVM_runSingleFile(PikaObj* self, char* filename);
 VMParameters* pikaVM_runByteCodeFile(PikaObj* self, char* filename);
 Arg* obj_runMethodArg(PikaObj* self, PikaObj* method_args_obj, Arg* method_arg);
+PikaObj* pikaVM_runFile(PikaObj* self, char* file_name);
 Arg* _vm_slice(VMState* vm,
                PikaObj* self,
                Arg* end,
