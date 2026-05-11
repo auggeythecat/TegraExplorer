@@ -1,6 +1,7 @@
 #include <bdk.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "../../gfx/gfx.h"
@@ -16,7 +17,10 @@ void pika_platform_disable_irq_handle(void) {
 
 
 void pika_platform_printf(char* fmt, ...) {
-    gfx_printf(fmt);
+    va_list args;
+    va_start(args, fmt);
+    gfx_vprintf(fmt, args);
+    va_end(args);
 }
 int pika_platform_sprintf(char* buff, char* fmt, ...) {
     gfx_printf("I don't want sprintf used!");
@@ -39,11 +43,11 @@ int pika_platform_snprintf(char* buff, u32 size, const char* fmt, ...) {
 }
 
 char* pika_platform_strdup(const char* src) {
-    // char* dst = (char*)malloc(strlen(src) + 1);
-    // if (dst) {
-    //     strcpy(dst, src);
-    // }
-    return "\0";
+    char* dst = (char*)malloc(strlen(src) + 1);
+    if (dst) {
+        strcpy(dst, src);
+    }
+    return dst;
 }
 u32 pika_platform_tick_from_millisecond(u32 ms) {
     return 0;
@@ -54,7 +58,9 @@ void* pika_platform_malloc(u32 size) {
     return malloc(size);
 }
 
-// void* pika_platform_realloc(void* ptr, u32 size); //TODO: I'd rather not use realloc...
+void* pika_platform_realloc(void* ptr, u32 size) {
+    return realloc(ptr, size);
+}
 
 void* pika_platform_calloc(u32 num, u32 size) {
     return calloc(num, size);
@@ -95,7 +101,7 @@ int pika_platform_putchar(char ch) {
     return 0;
 }
 
-// TODO: file stuff
+// TODO: rewrite all file stuff and stop being stupid: https://github.com/pikasTech/PikaPython/blob/9bca87e6b44095d19e0140c6e7142a931ae0382e/package/pika_fatfs/pika_fatfs.C
 FIL* pika_platform_fopen(const char* filename, const char* modes) {
     FIL* file = NULL;
     f_open(file, filename, *modes);
@@ -153,11 +159,11 @@ bool pika_hook_arg_cache_filter(void* self) {
 }
 
 void* pika_user_malloc(u32 size) {
-    return malloc(size);
+    return pika_platform_malloc(size);
 }
 
 void pika_user_free(void* ptr, u32 size) {
-    free(ptr);
+    pika_platform_free(ptr);
 }
 
 // I'm only pretty sure I don't need this.

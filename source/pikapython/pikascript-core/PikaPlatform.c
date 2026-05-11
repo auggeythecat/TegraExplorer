@@ -42,18 +42,15 @@ PIKA_WEAK void* pika_platform_malloc(size_t size) {
 }
 
 PIKA_WEAK void* pika_platform_realloc(void* ptr, size_t size) {
-    // return realloc(ptr, size);
-    return NULL; //TODO:
+    return realloc(ptr, size);
 }
 
 PIKA_WEAK void* pika_platform_calloc(size_t num, size_t size) {
-    // return calloc(num, size);
-    return NULL; //TODO:
+    return calloc(num, size);
 }
 
 PIKA_WEAK void pika_platform_free(void* ptr) {
-    // free(ptr);
-    return; //TODO:
+    free(ptr);
 }
 
 PIKA_WEAK void* pika_user_malloc(size_t size) {
@@ -117,38 +114,29 @@ PIKA_WEAK int pika_platform_snprintf(char* buff,
 }
 
 PIKA_WEAK int pika_platform_putchar(char ch) {
-    // return putchar(ch);
-    return 0; //TODO:
+    return putchar(ch);
 }
 
 PIKA_WEAK int pika_platform_vprintf(char* fmt, va_list args) {
-    /* vsprintf to vprintf */
-    char buff[PIKA_SPRINTF_BUFF_SIZE];
-    pika_platform_vsprintf(buff, fmt, args);
-    /* putchar */
-    for (int i = 0; i < strlen(buff); i++) {
-        pika_platform_putchar(buff[i]);
-    }
+    gfx_vprintf(fmt, args);
     return 0;
 }
 
 #ifndef pika_platform_printf
 PIKA_WEAK void pika_platform_printf(char* fmt, ...) {
-    // va_list args;
-    // va_start(args, fmt);
-    // pika_platform_vprintf(fmt, args);
-    // va_end(args);
-    return; //TODO:
+    va_list args;
+    va_start(args, fmt);
+    pika_platform_vprintf(fmt, args);
+    va_end(args);
 }
 #endif
 
 PIKA_WEAK char* pika_platform_strdup(const char* src) {
-    // char* dst = (char*)pika_platform_malloc(strlen(src) + 1);
-    // if (dst) {
-        // strcpy(dst, src);
-    // }
-    // return dst;
-    return NULL; //TODO:
+    char* dst = (char*)pika_platform_malloc(strlen(src) + 1);
+    if (dst) {
+        strcpy(dst, src);
+    }
+    return dst;
 }
 
 PIKA_WEAK size_t pika_platform_tick_from_millisecond(size_t ms) {
@@ -178,7 +166,7 @@ PIKA_WEAK int pika_platform_sprintf(char* buff, char* fmt, ...) {
     //     while (1)
     //         ;
     // }
-    // return res;
+    // return res; // TODO:
 }
 
 PIKA_WEAK void pika_platform_wait(void) {
@@ -187,23 +175,19 @@ PIKA_WEAK void pika_platform_wait(void) {
 }
 
 PIKA_WEAK void* pika_platform_memset(void* mem, int ch, size_t size) {
-    // return memset(mem, ch, size);
-    return NULL; //TODO:
+    return memset(mem, ch, size);
 }
 
 PIKA_WEAK void* pika_platform_memcpy(void* dir, const void* src, size_t size) {
-    // return memcpy(dir, src, size);
-    return NULL; //TODO:
+    return memcpy(dir, src, size);
 }
 
 PIKA_WEAK int pika_platform_memcmp(const void* s1, const void* s2, size_t n) {
-    // return memcmp(s1, s2, n);
-    return 0; //TODO:
+    return memcmp(s1, s2, n);
 }
 
 PIKA_WEAK void* pika_platform_memmove(void* s1, void* s2, size_t n) {
-    // return memmove(s1, s2, n);
-    return NULL; //TODO:
+    return memmove(s1, s2, n);
 }
 
 PIKA_WEAK char pika_platform_getchar(void) {

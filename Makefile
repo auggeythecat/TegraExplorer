@@ -91,12 +91,12 @@ CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC) -DPIKA_CONFIG_ENA
 #WARNINGS := -Wall -Wsign-compare -Wtype-limits -Wno-array-bounds -Wno-stringop-overread -Wno-stringop-overflow
 #WARNINGS += -fno-delete-null-pointer-checks -fstack-usage
 
-#TODO: Add back lto when I don't need to be able to read, additionally, remove no-inline -
+#TODO: Investigate what causes lto to break?
 ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
 CFLAGS  = $(ARCH) -Os -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -fno-jump-tables -std=gnu11 $(CUSTOMDEFINES)
 CFLAGS += -I./bdk
 LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
-LDFLAGS += -Wl,-Map=./output.map,--cref -Wl,--trace-symbol=fiprintf
+LDFLAGS += -Wl,-Map=./output.map,--cref
 
 ################################################################################
 

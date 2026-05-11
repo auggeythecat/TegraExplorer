@@ -87,7 +87,9 @@ pika_float PikaStdLib_SysObj_float(PikaObj* self, Arg* arg) {
     }
     if (ARG_TYPE_STRING == type) {
         // return strtod(arg_getStr(arg), NULL);
-        return 0.0f; // TODO:
+        obj_setSysOut(self, "[error] string arg type not supported.");
+        obj_setErrorCode(self, 1);
+        return -99999.99999;
     }
     obj_setSysOut(self, "[error] convert to pika_float type failed.");
     obj_setErrorCode(self, 1);
