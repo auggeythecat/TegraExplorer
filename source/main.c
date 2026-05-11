@@ -4,6 +4,7 @@
 #include "storage/emummc.h"
 #include "util/config.h"
 #include "util/hid.h"
+#include "test_script.h"
 
 #include "pikapython/pikascript-api/pikaScript.h"
 
@@ -51,11 +52,12 @@ void ipl_main() {
 
 	minerva_change_freq(FREQ_800);
 
-	const u8 nothing[128] = {};
+	btn_wait();
 
 	PikaObj* pikaObj = pikaScriptInit();
-	pikaVM_runByteCode(pikaObj, nothing);
+	pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_pika_test_py_o);
 
+	gfx_printf("%cout into the post!", COLOR_GREEN);
 	btn_wait();
 	power_set_state(POWER_OFF_RESET);
 
