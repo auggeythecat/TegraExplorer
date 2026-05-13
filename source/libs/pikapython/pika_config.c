@@ -23,32 +23,37 @@ void pika_platform_printf(char* fmt, ...) {
     gfx_vprintf(fmt, args);
     va_end(args);
 }
-int pika_platform_sprintf(char* buff, char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    s_vprintf(buff, fmt, args);
-    va_end(args);
-    return 0;
-}
+
 int pika_platform_vsprintf(char* buff, char* fmt, va_list args) {
     s_vprintf(buff, fmt, args);
     return 0;
 }
+
+int pika_platform_sprintf(char* buff, char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    pika_platform_vsprintf(buff, fmt, args);
+    va_end(args);
+    return 0;
+}
+
+int pika_platform_snprintf(char* buff, u32 size, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    // Where we are going, we don't need safety...
+    pika_platform_vsprintf(buff, fmt, args);
+    va_end(args);
+    return 0;
+}
+
 int pika_platform_vsnprintf(char* buff,
                             u32 size,
                             const char* fmt,
                             va_list args) {
-    // Where we are going, we don't need safety...
-    pika_platform_vsprintf(buff, fmt, args);
+    pika_platform_vsnprintf(buff, buff, fmt, args);
     return 0;
 }
-int pika_platform_snprintf(char* buff, u32 size, const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    pika_platform_vsnprintf(buff, size, fmt, args);
-    va_end(args);
-    return 0;
-}
+
 
 char* pika_platform_strdup(const char* src) {
     char* dst = (char*)malloc(strlen(src) + 1);
