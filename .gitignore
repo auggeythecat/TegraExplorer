@@ -2,20 +2,14 @@
 .idea
 build
 output
-research
 
 loader/payload.h
 
-source/script/Debug
-source/script/*.te
-source/script/.vs
+
+*.py.*
 
 *.exe
 
-source/script/builtin.c
-source/script/builtin.h
-
-tools/lz/lz77
 tools/bin2c/bin2c
 tools/nrv/nrv2e
 tools/*.bin
