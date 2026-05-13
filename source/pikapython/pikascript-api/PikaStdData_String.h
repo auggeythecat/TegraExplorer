@@ -13,7 +13,7 @@
 #define __PikaStdData_String__H
 #include <stdio.h>
 #include <stdlib.h>
-#include "../pikascript-core/PikaVM.h"
+#include "PikaObj.h"
 
 PikaObj *New_PikaStdData_String(Args *args);
 
@@ -33,6 +33,7 @@ int PikaStdData_String_isalpha(PikaObj *self);
 int PikaStdData_String_isdigit(PikaObj *self);
 int PikaStdData_String_islower(PikaObj *self);
 int PikaStdData_String_isspace(PikaObj *self);
+char* PikaStdData_String_join(PikaObj *self, Arg* val);
 char* PikaStdData_String_replace(PikaObj *self, char* old, char* new);
 void PikaStdData_String_set(PikaObj *self, char* s);
 PikaObj* PikaStdData_String_split(PikaObj *self, char* s);

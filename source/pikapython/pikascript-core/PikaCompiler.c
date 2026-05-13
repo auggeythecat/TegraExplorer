@@ -1,6 +1,6 @@
 /*
- * This file is part of the PikaScript project.
- * http://github.com/pikastech/pikascript
+ * This file is part of the PikaPython project.
+ * http://github.com/pikastech/pikapython
  *
  * MIT License
  *
@@ -35,6 +35,11 @@
 
 const char magic_code_pyo[] = {0x0f, 'p', 'y', 'o'};
 
+/*
+ * @brief check magic code of pyo file
+ * @param bytecode
+ * @return PIKA_TRUE or PIKA_FALSE
+ */
 static PIKA_BOOL _check_magic_code_pyo(uint8_t* bytecode) {
     char* data = (char*)bytecode;
     if (data[0] == magic_code_pyo[0] && data[1] == magic_code_pyo[1] &&
@@ -44,6 +49,11 @@ static PIKA_BOOL _check_magic_code_pyo(uint8_t* bytecode) {
     return PIKA_FALSE;
 }
 
+/*
+ * @brief get bytecode from bytes arg
+ * @param self bytes arg
+ * @return bytecode
+ */
 static uint8_t* arg_getBytecode(Arg* self) {
     uint8_t* bytecode_file = arg_getBytes(self);
     if (_check_magic_code_pyo(bytecode_file)) {
@@ -52,6 +62,11 @@ static uint8_t* arg_getBytecode(Arg* self) {
     return bytecode_file;
 }
 
+/*
+ * @brief get bytecode size from bytes arg
+ * @param self bytes arg
+ * @return bytecode size
+ */
 static size_t arg_getBytecodeSize(Arg* self) {
     size_t size_all = arg_getBytesSize(self);
     uint8_t* bytecode_file = arg_getBytes(self);
@@ -204,7 +219,7 @@ PIKA_RES pikaCompileFile(char* input_file_name) {
 }
 
 LibObj* New_LibObj(Args* args) {
-    LibObj* self = New_TinyObj(NULL);
+    LibObj* self = New_PikaObj();
     return self;
 }
 
@@ -226,7 +241,14 @@ void LibObj_dynamicLink(LibObj* self, char* module_name, uint8_t* bytecode) {
     obj_setPtr(module_obj, "bytecode", bytecode);
 }
 
-/* add bytecode to lib, and copy the bytecode to the buff in the lib */
+/*
+ * @brief add bytecode to lib, and copy the bytecode to the buff in the lib
+ * @param self the lib obj
+ * @param module_name the module name
+ * @param bytecode the bytecode
+ * @param size the size of the bytecode
+ * @return error code
+ */
 int LibObj_staticLink(LibObj* self,
                       char* module_name,
                       uint8_t* bytecode,
@@ -278,8 +300,8 @@ int LibObj_staticLinkFile(LibObj* self, char* input_file_name) {
     return 0;
 }
 
-static int32_t __foreach_handler_listModules(Arg* argEach, Args* context) {
-    if (argType_isObject(arg_getType(argEach))) {
+static int32_t __foreach_handler_listModules(Arg* argEach, void* context) {
+    if (arg_isObject(argEach)) {
         PikaObj* module_obj = arg_getPtr(argEach);
         pika_platform_printf("%s\r\n", obj_getStr(module_obj, "name"));
     }
@@ -290,9 +312,9 @@ void LibObj_listModules(LibObj* self) {
     args_foreach(self->list, __foreach_handler_listModules, NULL);
 }
 
-static int32_t __foreach_handler_libWriteBytecode(Arg* argEach, Args* context) {
-    FILE* out_file = args_getPtr(context, "out_file");
-    if (argType_isObject(arg_getType(argEach))) {
+static int32_t __foreach_handler_libWriteBytecode(Arg* argEach, void* context) {
+    FILE* out_file = args_getPtr((Args*)context, "out_file");
+    if (arg_isObject(argEach)) {
         PikaObj* module_obj = arg_getPtr(argEach);
         char* bytecode = obj_getPtr(module_obj, "bytecode");
         size_t bytecode_size = obj_getBytesSize(module_obj, "buff");
@@ -305,10 +327,11 @@ static int32_t __foreach_handler_libWriteBytecode(Arg* argEach, Args* context) {
     return 0;
 }
 
-static int32_t __foreach_handler_libWriteIndex(Arg* argEach, Args* context) {
-    FILE* out_file = args_getPtr(context, "out_file");
+static int32_t __foreach_handler_libWriteIndex(Arg* argEach, void* context) {
+    Args* args = context;
+    FILE* out_file = args_getPtr(args, "out_file");
     Args buffs = {0};
-    if (argType_isObject(arg_getType(argEach))) {
+    if (arg_isObject(argEach)) {
         PikaObj* module_obj = arg_getPtr(argEach);
         uint32_t bytecode_size = obj_getBytesSize(module_obj, "buff");
         char buff[LIB_INFO_BLOCK_SIZE - sizeof(uint32_t)] = {0};
@@ -326,21 +349,22 @@ static int32_t __foreach_handler_libWriteIndex(Arg* argEach, Args* context) {
     return 0;
 }
 
-static int32_t __foreach_handler_libSumSize(Arg* argEach, Args* context) {
-    if (argType_isObject(arg_getType(argEach))) {
+static int32_t __foreach_handler_libSumSize(Arg* argEach, void* context) {
+    Args* args = context;
+    if (arg_isObject(argEach)) {
         PikaObj* module_obj = arg_getPtr(argEach);
         uint32_t bytecode_size = obj_getBytesSize(module_obj, "buff");
         bytecode_size = aline_by(bytecode_size, sizeof(uint32_t));
-        args_setInt(context, "sum_size",
-                    args_getInt(context, "sum_size") + bytecode_size);
+        args_setInt(args, "sum_size",
+                    args_getInt(args, "sum_size") + bytecode_size);
     }
     return 0;
 }
 
-static int32_t __foreach_handler_getModuleNum(Arg* argEach, Args* context) {
-    if (argType_isObject(arg_getType(argEach))) {
-        args_setInt(context, "module_num",
-                    args_getInt(context, "module_num") + 1);
+static int32_t __foreach_handler_getModuleNum(Arg* argEach, void* context) {
+    Args* args = (Args*)context;
+    if (arg_isObject(argEach)) {
+        args_setInt(args, "module_num", args_getInt(args, "module_num") + 1);
     }
     return 0;
 }
@@ -471,6 +495,40 @@ PIKA_RES _loadModuleDataWithName(uint8_t* library_bytes,
     return PIKA_RES_ERR_ARG_NO_FOUND;
 }
 
+/**
+ * @brief 打开 .pack 文件，并返回这个pack 文件的library_bytes
+ *
+ * @param pikafs_FILE** fp pikafs_FILE
+ * 二级文件指针，提供了文件加载内存中的地址以及大小等信息
+ * @param Arg** f_arg
+ * @param char* pack_name pack 文件的名字
+ * @return  PIKA_RES_OK when success, otherwise failed;
+ * @note  if failed *fp if freed
+ *
+ */
+PIKA_RES _getPack_libraryBytes(pikafs_FILE** fp, Arg** f_arg, char* pack_name) {
+    if (NULL == pack_name) {
+        return PIKA_RES_ERR_INVALID_PTR;
+    }
+
+    *fp = (pikafs_FILE*)pikaMalloc(sizeof(pikafs_FILE));
+    if (NULL == *fp) {
+        pika_platform_printf("Error: malloc failed \r\n");
+        return PIKA_RES_ERR_OUT_OF_RANGE;
+    }
+    memset(*fp, 0, sizeof(pikafs_FILE));
+
+    *f_arg = arg_loadFile(NULL, pack_name);
+    if (NULL == *f_arg) {
+        pika_platform_printf("Error: Could not load file \'%s\'\r\n",
+                             pack_name);
+        pikaFree(*fp, sizeof(pikafs_FILE));
+        // fp == NULL;
+        return PIKA_RES_ERR_IO_ERROR;
+    }
+    return PIKA_RES_OK;
+}
+
 int LibObj_loadLibrary(LibObj* self, uint8_t* library_bytes) {
     int module_num = _getModuleNum(library_bytes);
     if (module_num < 0) {
@@ -488,8 +546,8 @@ int LibObj_loadLibrary(LibObj* self, uint8_t* library_bytes) {
     return PIKA_RES_OK;
 }
 
-int32_t __foreach_handler_printModule(Arg* argEach, Args* context) {
-    if (argType_isObject(arg_getType(argEach))) {
+int32_t __foreach_handler_printModule(Arg* argEach, void* context) {
+    if (arg_isObject(argEach)) {
         PikaObj* module_obj = arg_getPtr(argEach);
         char* module_name = obj_getStr(module_obj, "name");
         if (NULL != module_name) {
@@ -521,6 +579,60 @@ int LibObj_loadLibraryFile(LibObj* self, char* lib_file_name) {
     return PIKA_RES_OK;
 }
 
+/**
+ * @brief unpack *.pack file to Specified path
+ *
+ * @param pack_name  the name of *.pack file
+ * @param out_path   output path
+ * @return
+ */
+PIKA_RES LibObj_unpackFileToPath(char* pack_name, char* out_path) {
+    PIKA_RES stat = PIKA_RES_OK;
+    Arg* file_arg = NULL;
+    uint8_t* library_bytes = NULL;
+    pikafs_FILE* fptr = NULL;
+
+    stat = _getPack_libraryBytes(&fptr, &file_arg, pack_name);
+    if (PIKA_RES_OK == stat) {
+        library_bytes = arg_getBytes(file_arg);
+    } else {
+        return stat;
+    }
+
+    int module_num = _getModuleNum(library_bytes);
+    if (module_num < 0) {
+        return (PIKA_RES)module_num;
+    }
+
+    Args buffs = {0};
+    char* output_file_path = NULL;
+    FILE* new_fp = NULL;
+
+    for (int i = 0; i < module_num; ++i) {
+        char* name = NULL;
+        uint8_t* addr = NULL;
+        size_t size = 0;
+        _loadModuleDataWithIndex(library_bytes, module_num, i, &name, &addr,
+                                 &size);
+        output_file_path = strsPathJoin(&buffs, out_path, name);
+        new_fp = pika_platform_fopen(output_file_path, "wb+");
+        if (NULL != new_fp) {
+            pika_platform_fwrite(addr, size, 1, new_fp);
+            pika_platform_fclose(new_fp);
+            pika_platform_printf("extract %s to %s\r\n", name,
+                                 output_file_path);
+        } else {
+            pika_platform_printf("can't open %s\r\n", output_file_path);
+            break;
+        }
+    }
+
+    arg_deinit(file_arg);
+    strsDeinit(&buffs);
+    pikaFree(fptr, sizeof(pikafs_FILE));
+    return PIKA_RES_OK;
+}
+
 size_t pika_fputs(char* str, FILE* fp) {
     size_t size = strGetSize(str);
     return pika_platform_fwrite(str, 1, size, fp);
@@ -541,8 +653,7 @@ int Lib_loadLibraryFileToArray(char* origin_file_name, char* out_folder) {
     output_file_name = strsReplace(&buffs, output_file_name, ".", "_");
     output_file_name = strsAppend(&buffs, output_file_name, ".c");
 
-    char* output_file_path = strsAppend(&buffs, out_folder, "/");
-    output_file_path = strsAppend(&buffs, output_file_path, output_file_name);
+    char* output_file_path = strsPathJoin(&buffs, out_folder, output_file_name);
 
     FILE* fp = pika_platform_fopen(output_file_path, "wb+");
     char* array_name = strsGetLastToken(&buffs, origin_file_name, '/');
@@ -580,13 +691,13 @@ static PIKA_RES __Maker_compileModuleWithInfo(PikaMaker* self,
     Args buffs = {0};
     char* input_file_name = strsAppend(&buffs, module_name, ".py");
     char* input_file_path =
-        strsAppend(&buffs, obj_getStr(self, "pwd"), input_file_name);
+        strsPathJoin(&buffs, obj_getStr(self, "pwd"), input_file_name);
     pika_platform_printf("  compiling %s...\r\n", input_file_name);
     char* output_file_name = strsAppend(&buffs, module_name, ".py.o");
     char* output_file_path = NULL;
     output_file_path =
-        strsAppend(&buffs, obj_getStr(self, "pwd"), "pikascript-api/");
-    output_file_path = strsAppend(&buffs, output_file_path, output_file_name);
+        strsPathJoin(&buffs, obj_getStr(self, "pwd"), "pikascript-api");
+    output_file_path = strsPathJoin(&buffs, output_file_path, output_file_name);
     PIKA_RES res =
         pikaCompileFileWithOutputName(output_file_path, input_file_path);
     strsDeinit(&buffs);
@@ -594,7 +705,7 @@ static PIKA_RES __Maker_compileModuleWithInfo(PikaMaker* self,
 }
 
 PikaMaker* New_PikaMaker(void) {
-    PikaMaker* self = New_TinyObj(NULL);
+    PikaMaker* self = New_PikaObj();
     obj_setStr(self, "pwd", "");
     obj_setInt(self, "err", 0);
     LibObj* lib = New_LibObj(NULL);
@@ -602,16 +713,34 @@ PikaMaker* New_PikaMaker(void) {
     return self;
 }
 
+/*
+ * @brief: deinit PikaMaker
+ * @param: self PikaMaker
+ * @return: void
+ */
 void pikaMaker_deinit(PikaMaker* self) {
     LibObj* lib = obj_getPtr(self, "lib");
     LibObj_deinit(lib);
     obj_deinit(self);
 }
 
+/*
+ * @brief: set pwd
+ * @param: self PikaMaker
+ * @param: pwd
+ * @return: void
+ */
 void pikaMaker_setPWD(PikaMaker* self, char* pwd) {
     obj_setStr(self, "pwd", pwd);
 }
 
+/*
+ * @brief: set state
+ * @param: self PikaMaker
+ * @param: module_name
+ * @param: state
+ * @return: void
+ */
 void pikaMaker_setState(PikaMaker* self, char* module_name, char* state) {
     obj_newMetaObj(self, module_name, New_TinyObj);
     PikaObj* module_obj = obj_getObj(self, module_name);
@@ -619,6 +748,12 @@ void pikaMaker_setState(PikaMaker* self, char* module_name, char* state) {
     obj_setStr(module_obj, "state", state);
 }
 
+/*
+ * @brief: compile module
+ * @param: self PikaMaker
+ * @param: module_name
+ * @return: PIKA_RES
+ */
 PIKA_RES pikaMaker_compileModule(PikaMaker* self, char* module_name) {
     PIKA_RES res = __Maker_compileModuleWithInfo(self, module_name);
     /* update compile info */
@@ -638,8 +773,8 @@ int pikaMaker_getDependencies(PikaMaker* self, char* module_name) {
     ConstPool* const_pool = NULL;
     InstructArray* ins_array = NULL;
     char* module_path =
-        strsAppend(&buffs, obj_getStr(self, "pwd"), "pikascript-api/");
-    module_path = strsAppend(&buffs, module_path, module_name);
+        strsPathJoin(&buffs, obj_getStr(self, "pwd"), "pikascript-api/");
+    module_path = strsPathJoin(&buffs, module_path, module_name);
     char* file_path = strsAppend(&buffs, module_path, ".py.o");
     Arg* file_arg = arg_loadFile(NULL, file_path);
     uint8_t offset_befor = 0;
@@ -658,11 +793,11 @@ int pikaMaker_getDependencies(PikaMaker* self, char* module_name) {
         if (NULL == ins_unit) {
             goto exit;
         }
-        if (instructUnit_getInstruct(ins_unit) == IMP) {
+        if (instructUnit_getInstructIndex(ins_unit) == IMP) {
             char* imp_module_name =
                 constPool_getByOffset(const_pool, ins_unit->const_pool_index);
             char* imp_module_path =
-                strsAppend(&buffs, obj_getStr(self, "pwd"), imp_module_name);
+                strsPathJoin(&buffs, obj_getStr(self, "pwd"), imp_module_name);
             /* check if compiled the module */
             if (obj_isArgExist(self, imp_module_name)) {
                 /* module info is exist, do nothing */
@@ -680,12 +815,13 @@ int pikaMaker_getDependencies(PikaMaker* self, char* module_name) {
                                          imp_module_path);
                     /* found *.py.o, push to compiled list */
                     pikaMaker_setState(self, imp_module_name, "compiled");
-                    char* imp_api_path = strsAppend(
+                    char* imp_api_path = strsPathJoin(
                         &buffs, obj_getStr(self, "pwd"), "pikascript-api/");
                     imp_api_path =
-                        strsAppend(&buffs, imp_api_path, imp_module_name);
+                        strsPathJoin(&buffs, imp_api_path, imp_module_name);
                     FILE* imp_file_pyo_api = pika_platform_fopen(
                         strsAppend(&buffs, imp_api_path, ".py.o"), "wb+");
+                    pika_assert(imp_file_pyo_api != NULL);
                     /* copy imp_file_pyo to imp_api_path */
                     uint8_t* buff = (uint8_t*)pika_platform_malloc(128);
                     size_t read_size = 0;
@@ -737,8 +873,8 @@ exit:
     return res;
 }
 
-int32_t __foreach_handler_printStates(Arg* argEach, Args* context) {
-    if (argType_isObject(arg_getType(argEach))) {
+int32_t __foreach_handler_printStates(Arg* argEach, void* context) {
+    if (arg_isObject(argEach)) {
         PikaObj* module_obj = arg_getPtr(argEach);
         pika_platform_printf("%s: %s\r\n", obj_getStr(module_obj, "name"),
                              obj_getStr(module_obj, "state"));
@@ -750,17 +886,17 @@ void pikaMaker_printStates(PikaMaker* self) {
     args_foreach(self->list, __foreach_handler_printStates, NULL);
 }
 
-int32_t __foreach_handler_getFirstNocompiled(Arg* argEach, Args* context) {
-    if (argType_isObject(arg_getType(argEach))) {
+int32_t __foreach_handler_getFirstNocompiled(Arg* argEach, void* context) {
+    if (arg_isObject(argEach)) {
         PikaObj* module_obj = arg_getPtr(argEach);
         char* state = obj_getStr(module_obj, "state");
-        if (args_isArgExist(context, "res")) {
+        if (args_isArgExist((Args*)context, "res")) {
             /* already get method */
             return 0;
         }
         if (strEqu("nocompiled", state)) {
             /* push module */
-            args_setStr(context, "res", obj_getStr(module_obj, "name"));
+            args_setStr((Args*)context, "res", obj_getStr(module_obj, "name"));
             return 0;
         }
     }
@@ -781,6 +917,12 @@ char* pikaMaker_getFirstNocompiled(PikaMaker* self) {
     return obj_getStr(self, "res");
 }
 
+/*
+ * @brief compile module with depends
+ * @param self PikaMaker
+ * @param module_name
+ * @return PIKA_RES
+ */
 PIKA_RES pikaMaker_compileModuleWithDepends(PikaMaker* self,
                                             char* module_name) {
     PIKA_RES res = PIKA_RES_OK;
@@ -806,20 +948,20 @@ PIKA_RES pikaMaker_compileModuleWithDepends(PikaMaker* self,
     return PIKA_RES_OK;
 }
 
-int32_t __foreach_handler_linkCompiledModules(Arg* argEach, Args* context) {
+int32_t __foreach_handler_linkCompiledModules(Arg* argEach, void* context) {
     Args buffs = {0};
-    if (argType_isObject(arg_getType(argEach))) {
-        LibObj* lib = args_getPtr(context, "@lib");
-        PikaMaker* maker = args_getPtr(context, "__maker");
+    if (arg_isObject(argEach)) {
+        LibObj* lib = args_getPtr((Args*)context, "@lib");
+        PikaMaker* maker = args_getPtr((Args*)context, "__maker");
         PikaObj* module_obj = arg_getPtr(argEach);
         char* module_name = obj_getStr(module_obj, "name");
         char* state = obj_getStr(module_obj, "state");
         if (strEqu(state, "compiled")) {
             char* pwd = obj_getStr(maker, "pwd");
-            char* folder_path = strsAppend(&buffs, pwd, "pikascript-api/");
+            char* folder_path = strsPathJoin(&buffs, pwd, "pikascript-api/");
             char* module_file_name = strsAppend(&buffs, module_name, ".py.o");
             char* module_file_path =
-                strsAppend(&buffs, folder_path, module_file_name);
+                strsPathJoin(&buffs, folder_path, module_file_name);
             LibObj_staticLinkFile(lib, module_file_path);
         }
     }
@@ -827,8 +969,9 @@ int32_t __foreach_handler_linkCompiledModules(Arg* argEach, Args* context) {
     return 0;
 }
 
-PIKA_RES pikaMaker_linkCompiledModulesFullPath(PikaMaker* self,
-                                               char* lib_path) {
+PIKA_RES _do_pikaMaker_linkCompiledModulesFullPath(PikaMaker* self,
+                                                   char* lib_path,
+                                                   PIKA_BOOL gen_c_array) {
     PIKA_RES compile_err = (PIKA_RES)obj_getInt(self, "err");
     if (PIKA_RES_OK != compile_err) {
         pika_platform_printf("  Error: compile failed, link aborted.\r\n");
@@ -843,27 +986,129 @@ PIKA_RES pikaMaker_linkCompiledModulesFullPath(PikaMaker* self,
     args_foreach(self->list, __foreach_handler_linkCompiledModules, &context);
     args_deinit_stack(&context);
     char* pwd = obj_getStr(self, "pwd");
-    char* lib_path_folder = strsCopy(&buffs, lib_path);
-    strPopLastToken(lib_path_folder, '/');
-    char* folder_path = strsAppend(&buffs, pwd, lib_path_folder);
-    folder_path = strsAppend(&buffs, folder_path, "/");
-    char* lib_file_path = strsAppend(&buffs, pwd, lib_path);
+    char* lib_path_folder = strsPathGetFolder(&buffs, lib_path);
+    char* folder_path = strsPathJoin(&buffs, pwd, lib_path_folder);
+    char* lib_file_path = strsPathJoin(&buffs, pwd, lib_path);
     LibObj_saveLibraryFile(lib, lib_file_path);
-    Lib_loadLibraryFileToArray(lib_file_path, folder_path);
+    if (gen_c_array) {
+        Lib_loadLibraryFileToArray(lib_file_path, folder_path);
+    }
     strsDeinit(&buffs);
     return PIKA_RES_OK;
 }
 
-PIKA_RES pikaMaker_linkCompiledModules(PikaMaker* self, char* lib_name) {
+PIKA_RES pikaMaker_linkCompiledModulesFullPath(PikaMaker* self,
+                                               char* lib_path) {
+    return _do_pikaMaker_linkCompiledModulesFullPath(self, lib_path, PIKA_TRUE);
+}
+
+PIKA_RES _do_pikaMaker_linkCompiledModules(PikaMaker* self,
+                                           char* lib_name,
+                                           PIKA_BOOL gen_c_array) {
     Args buffs = {0};
-    char* lib_file_path = strsAppend(&buffs, "pikascript-api/", lib_name);
-    PIKA_RES res = pikaMaker_linkCompiledModulesFullPath(self, lib_file_path);
+    char* lib_file_path = strsPathJoin(&buffs, "pikascript-api/", lib_name);
+    PIKA_RES res = _do_pikaMaker_linkCompiledModulesFullPath(
+        self, lib_file_path, gen_c_array);
     strsDeinit(&buffs);
     return res;
 }
 
+PIKA_RES pikaMaker_linkCompiledModules(PikaMaker* self, char* lib_name) {
+    return _do_pikaMaker_linkCompiledModules(self, lib_name, PIKA_TRUE);
+}
+
+/*
+ * @brief link raw file to library
+ * @param self PikaMaker
+ * @param file_path
+ * @return PIKA_RES
+ */
 PIKA_RES pikaMaker_linkRaw(PikaMaker* self, char* file_path) {
     LibObj* lib = obj_getPtr(self, "lib");
     LibObj_staticLinkFile(lib, file_path);
     return PIKA_RES_OK;
+}
+
+/*
+ * @brief open file from library
+ * @param file_name
+ * @param mode "r" or "rb"
+ * @return pikafs_FILE* or NULL if failed
+ */
+pikafs_FILE* pikafs_fopen(char* file_name, char* mode) {
+    pikafs_FILE* f = (pikafs_FILE*)pikaMalloc(sizeof(pikafs_FILE));
+    memset(f, 0, sizeof(pikafs_FILE));
+    extern volatile PikaObj* __pikaMain;
+    uint8_t* library_bytes = obj_getPtr((PikaObj*)__pikaMain, "@libraw");
+    if (NULL == library_bytes) {
+        return NULL;
+    }
+    if (PIKA_RES_OK !=
+        _loadModuleDataWithName(library_bytes, file_name, &f->addr, &f->size)) {
+        return NULL;
+    }
+    return f;
+}
+
+pikafs_FILE* pikafs_fopen_pack(char* pack_name, char* file_name) {
+    pikafs_FILE* f = NULL;
+    Arg* file_arg = NULL;
+    PIKA_RES stat = PIKA_RES_OK;
+    uint8_t* library_bytes = NULL;
+    stat = _getPack_libraryBytes(&f, &file_arg, pack_name);
+    if (PIKA_RES_OK == stat) {
+        library_bytes = arg_getBytes(file_arg);
+    } else {
+        return NULL;
+    }
+
+    if (PIKA_RES_OK !=
+        _loadModuleDataWithName(library_bytes, file_name, &f->addr, &f->size)) {
+        return NULL;
+    }
+
+    arg_deinit(file_arg);
+    return f;
+}
+
+/*
+ * @brief read file
+ * @param buf the buffer to read
+ * @param size size of each item
+ * @param count count of items
+ * @param f file
+ * @return read count
+ */
+int pikafs_fread(void* buf, size_t size, size_t count, pikafs_FILE* f) {
+    if (f->pos >= f->size) {
+        return 0;
+    }
+    if (f->pos + size * count > f->size) {
+        count = (f->size - f->pos) / size;
+    }
+    __platform_memcpy(buf, f->addr + f->pos, size * count);
+    f->pos += size * count;
+    return count;
+}
+
+/*
+ * @brief write file
+ * @param buf the buffer to write
+ * @param size size of each item
+ * @param count count of items
+ * @param f file
+ * @return write count or -1 if failed
+ */
+int pikafs_fwrite(void* buf, size_t size, size_t count, pikafs_FILE* file) {
+    return -1;
+}
+
+/*
+ * @brief close file
+ * @param f file
+ * @return 0 if success
+ */
+int pikafs_fclose(pikafs_FILE* file) {
+    pikaFree(file, sizeof(pikafs_FILE));
+    return 0;
 }

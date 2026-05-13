@@ -13,7 +13,10 @@
 #define PIKA_SYNTAX_LEVEL_MAXIMAL         1
 #define PIKA_BYTECODE_ONLY_ENABLE         1
 #define PIKA_PRINT_LLD_ENABLE             0
+#define PIKA_EVENT_THREAD_ENABLE          0
+#define PIKA_TYPE_FULL_FEATURE_ENABLE     0
 
+#define PIKA_SPRINTF_BUFF_SIZE            0x1000
 #define PIKA_SHELL_SAVE_FILE_ENABLE       0
 #define PIKA_SHELL_SAVE_BYTECODE_ENABLE   1
 # define PIKA_SHELL_SAVE_BYTECODE_PATH    "tegraexplorer.py.o"

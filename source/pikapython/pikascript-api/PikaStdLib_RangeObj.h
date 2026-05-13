@@ -13,7 +13,7 @@
 #define __PikaStdLib_RangeObj__H
 #include <stdio.h>
 #include <stdlib.h>
-#include "../pikascript-core/PikaVM.h"
+#include "PikaObj.h"
 
 PikaObj *New_PikaStdLib_RangeObj(Args *args);
 

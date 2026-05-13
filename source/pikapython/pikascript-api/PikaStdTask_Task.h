@@ -13,7 +13,7 @@
 #define __PikaStdTask_Task__H
 #include <stdio.h>
 #include <stdlib.h>
-#include "../pikascript-core/PikaVM.h"
+#include "PikaObj.h"
 
 PikaObj *New_PikaStdTask_Task(Args *args);
 

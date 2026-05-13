@@ -19,14 +19,16 @@ TARGET    := TegraExplorer
 BUILDDIR  := build
 OUTPUTDIR := output
 SOURCEDIR  = source
+PIKADIR   := $(SOURCEDIR)/pikapython/pikascript-core
+PIKAINC   := -I./$(PIKADIR)
 BDKDIR    := bdk
 BDKINC    := -I./$(BDKDIR)
 LOADERDIR := ./loader
-LZ77DIR   := ./tools/nrv
+NRVDIR    := ./tools/nrv
 BIN2CDIR  := ./tools/bin2c
 
-VPATH  = $(dir ./$(SOURCEDIR)/)          $(dir $(wildcard ./$(SOURCEDIR)/*/)) $(dir $(wildcard ./$(SOURCEDIR)/*/*/) $(dir $(wildcard ./$(SOURCEDIR)/*/*/*/)))
-VPATH += $(dir $(wildcard ./$(BDKDIR)/)) $(dir $(wildcard ./$(BDKDIR)/*/))    $(dir $(wildcard ./$(BDKDIR)/*/*/))
+VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  $(dir $(wildcard ./$(SOURCEDIR)/*/*/) $(dir $(wildcard ./$(SOURCEDIR)/*/*/*/)))
+VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
 
 # !TODO: add objs when needed
 
@@ -94,7 +96,6 @@ CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC) -DPIKA_CONFIG_ENA
 #TODO: Investigate what causes lto to break?
 ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
 CFLAGS  = $(ARCH) -Os -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -fno-jump-tables -std=gnu11 $(CUSTOMDEFINES)
-CFLAGS += -I./bdk
 LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
 LDFLAGS += -Wl,-Map=./output.map,--cref
 
@@ -120,8 +121,8 @@ clean:
 	@rm -rf $(LOADERDIR)/payload.h
 
 $(OUTPUTDIR)/$(TARGET)_small.bin: $(OUTPUTDIR)/$(TARGET).bin
-	@$(MAKE) -C $(LZ77DIR)
-	@$(LZ77DIR)/nrv2e $(OUTPUTDIR)/$(TARGET).bin
+	@$(MAKE) -C $(NRVDIR)
+	@$(NRVDIR)/nrv2e $(OUTPUTDIR)/$(TARGET).bin
 	@$(MAKE) -C $(BIN2CDIR)
 	@$(BIN2CDIR)/bin2c $(OUTPUTDIR)/$(TARGET).bin.nrv payload > $(LOADERDIR)/payload.h
 	@rm -rf $(OUTPUTDIR)/$(TARGET).bin.nrv
@@ -137,7 +138,7 @@ $(BUILDDIR)/$(TARGET)/$(TARGET).elf: $(OBJS)
 
 $(BUILDDIR)/$(TARGET)/%.o: %.c
 	@mkdir -p "$(@D)"
-	$(CC) $(CFLAGS) $(BDKINC) -c $< -o $@
+	$(CC) $(CFLAGS) $(BDKINC) $(PIKAINC) -c $< -o $@
 
 $(BUILDDIR)/$(TARGET)/%.o: %.S
 	@mkdir -p "$(@D)"
@@ -145,7 +146,7 @@ $(BUILDDIR)/$(TARGET)/%.o: %.S
 
 $(BUILDDIR)/$(TARGET)/script/builtin.o: $(BUILDDIR)/$(TARGET)/script/builtin.c
 	@mkdir -p "$(@D)"
-	$(CC) $(CFLAGS) $(BDKINC) -c $< -o $@
+	$(CC) $(CFLAGS) $(BDKINC) $(PIKAINC) -c $< -o $@
     
 $(BUILDDIR)/$(TARGET)/script/builtin.c: scripts/*.te
 	@mkdir -p "$(@D)"

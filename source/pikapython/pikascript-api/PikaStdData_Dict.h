@@ -13,7 +13,7 @@
 #define __PikaStdData_Dict__H
 #include <stdio.h>
 #include <stdlib.h>
-#include "../pikascript-core/PikaVM.h"
+#include "PikaObj.h"
 
 PikaObj *New_PikaStdData_Dict(Args *args);
 

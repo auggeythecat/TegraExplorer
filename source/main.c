@@ -7,6 +7,7 @@
 #include "test_script.h"
 
 #include "pikapython/pikascript-api/pikaScript.h"
+#include "pikapython/pikascript-core/PikaVM.h"
 
 
 extern void pivot_stack(u32 stack_top);
@@ -55,9 +56,8 @@ void ipl_main() {
 	btn_wait();
 
 	PikaObj* pikaObj = pikaScriptInit();
-	pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_pika_test_py_o);
+	pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_main_py_o);
 
-	gfx_printf("%cout into the post!", COLOR_GREEN);
 	btn_wait();
 	power_set_state(POWER_OFF_RESET);
 

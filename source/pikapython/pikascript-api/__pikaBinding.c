@@ -11,107 +11,45 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../pikascript-core/BaseObj.h"
-#include "PikaDebug.h"
-#include "../pikascript-core/TinyObj.h"
-#include "PikaDebug_Debuger.h"
-#include "../pikascript-core/TinyObj.h"
+#include "BaseObj.h"
 #include "PikaMain.h"
 #include "PikaStdLib_SysObj.h"
 #include "PikaStdLib.h"
 #include "PikaStdData.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_ByteArray.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_Dict.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_FILEIO.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_List.h"
 #include "PikaStdData_Tuple.h"
 #include "PikaStdData_String.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_Tuple.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_Utils.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_dict_items.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdData_dict_keys.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdLib.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdLib_MemChecker.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdLib_RangeObj.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdLib_StringObj.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdLib_SysObj.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdTask.h"
-#include "../pikascript-core/TinyObj.h"
+#include "TinyObj.h"
 #include "PikaStdTask_Task.h"
 #include "PikaStdLib_SysObj.h"
 #include "PikaStdData_List.h"
-
-#ifndef PIKA_MODULE_PIKADEBUG_DISABLE
-void PikaDebug_DebugerMethod(PikaObj *self, Args *args){
-    Arg* res = PikaDebug_Debuger(self);
-    method_returnArg(args, res);
-}
-method_typedef(
-    PikaDebug_Debuger,
-    "Debuger", ""
-);
-
-class_def(PikaDebug){
-    __BEFORE_MOETHOD_DEF
-    constructor_def(PikaDebug_Debuger, 1761613187),
-};
-class_inhert(PikaDebug, TinyObj);
-
-PikaObj *New_PikaDebug(Args *args){
-    PikaObj *self = New_TinyObj(args);
-    obj_setClass(self, PikaDebug);
-    return self;
-}
-#endif
-
-#ifndef PIKA_MODULE_PIKADEBUG_DISABLE
-void PikaDebug_Debuger___init__Method(PikaObj *self, Args *args){
-    PikaDebug_Debuger___init__(self);
-}
-method_typedef(
-    PikaDebug_Debuger___init__,
-    "__init__", ""
-);
-
-void PikaDebug_Debuger_set_traceMethod(PikaObj *self, Args *args){
-    PikaDebug_Debuger_set_trace(self);
-}
-method_typedef(
-    PikaDebug_Debuger_set_trace,
-    "set_trace", ""
-);
-
-class_def(PikaDebug_Debuger){
-    __BEFORE_MOETHOD_DEF
-    method_def(PikaDebug_Debuger___init__, 904762485),
-    method_def(PikaDebug_Debuger_set_trace, 1131228543),
-};
-class_inhert(PikaDebug_Debuger, TinyObj);
-
-PikaObj *New_PikaDebug_Debuger(Args *args){
-    PikaObj *self = New_TinyObj(args);
-    obj_setClass(self, PikaDebug_Debuger);
-    return self;
-}
-
-Arg *PikaDebug_Debuger(PikaObj *self){
-    return obj_newObjInPackage(New_PikaDebug_Debuger);
-}
-#endif
 
 #ifndef PIKA_MODULE_MAIN_DISABLE
 class_def(PikaMain){
@@ -874,6 +812,16 @@ method_typedef(
     "isspace", ""
 );
 
+void PikaStdData_String_joinMethod(PikaObj *self, Args *args){
+    Arg* val = args_getArg(args, "val");
+    char* res = PikaStdData_String_join(self, val);
+    method_returnStr(args, res);
+}
+method_typedef(
+    PikaStdData_String_join,
+    "join", "val"
+);
+
 void PikaStdData_String_replaceMethod(PikaObj *self, Args *args){
     char* old = args_getStr(args, "old");
     char* new = args_getStr(args, "new");
@@ -946,6 +894,7 @@ class_def(PikaStdData_String){
     method_def(PikaStdData_String___len__, 2047989248),
     method_def(PikaStdData_String___str__, 2056834106),
     method_def(PikaStdData_String_encode, 2071380659),
+    method_def(PikaStdData_String_join, 2090407381),
     method_def(PikaStdData_String_format, 2112238766),
 };
 class_inhert(PikaStdData_String, TinyObj);
@@ -1428,8 +1377,8 @@ method_typedef(
 
 void PikaStdLib_SysObj_boolMethod(PikaObj *self, Args *args){
     Arg* arg = args_getArg(args, "arg");
-    int res = PikaStdLib_SysObj_bool(self, arg);
-    method_returnInt(args, res);
+    PIKA_BOOL res = PikaStdLib_SysObj_bool(self, arg);
+    method_returnBool(args, res);
 }
 method_typedef(
     PikaStdLib_SysObj_bool,
@@ -1465,6 +1414,14 @@ void PikaStdLib_SysObj_chrMethod(PikaObj *self, Args *args){
 method_typedef(
     PikaStdLib_SysObj_chr,
     "chr", "val"
+);
+
+void PikaStdLib_SysObj_clearMethod(PikaObj *self, Args *args){
+    PikaStdLib_SysObj_clear(self);
+}
+method_typedef(
+    PikaStdLib_SysObj_clear,
+    "clear", ""
 );
 
 void PikaStdLib_SysObj_dictMethod(PikaObj *self, Args *args){
@@ -1522,6 +1479,14 @@ void PikaStdLib_SysObj_floatMethod(PikaObj *self, Args *args){
 method_typedef(
     PikaStdLib_SysObj_float,
     "float", "arg"
+);
+
+void PikaStdLib_SysObj_gcdumpMethod(PikaObj *self, Args *args){
+    PikaStdLib_SysObj_gcdump(self);
+}
+method_typedef(
+    PikaStdLib_SysObj_gcdump,
+    "gcdump", ""
 );
 
 void PikaStdLib_SysObj_getattrMethod(PikaObj *self, Args *args){
@@ -1741,6 +1706,9 @@ class_def(PikaStdLib_SysObj){
 #if !PIKA_NANO_ENABLE
     method_def(PikaStdLib_SysObj_bytes, 254850636),
 #endif
+#if !PIKA_NANO_ENABLE
+    method_def(PikaStdLib_SysObj_clear, 255552908),
+#endif
     method_def(PikaStdLib_SysObj_float, 259121563),
 #if !PIKA_NANO_ENABLE
     method_def(PikaStdLib_SysObj_input, 262752949),
@@ -1789,6 +1757,9 @@ class_def(PikaStdLib_SysObj){
 #endif
 #if !PIKA_NANO_ENABLE
     method_def(PikaStdLib_SysObj_type, 2090777863),
+#endif
+#if PIKA_GC_MARK_SWEEP_ENABLE
+    method_def(PikaStdLib_SysObj_gcdump, 2136649093),
 #endif
 };
 class_inhert(PikaStdLib_SysObj, TinyObj);

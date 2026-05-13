@@ -17,7 +17,7 @@ volatile PikaObj *__pikaMain;
 PikaObj *pikaScriptInit(void){
     __platform_printf("======[pikascript packages installed]======\r\n");
     pks_printVersion();
-    __platform_printf("PikaStdLib==v1.12.0\r\n");
+    __platform_printf("PikaStdLib==v1.12.1\r\n");
     __platform_printf("===========================================\r\n");
     PikaObj* pikaMain = newRootObj("pikaMain", New_PikaMain);
     __pikaMain = pikaMain;
@@ -26,7 +26,8 @@ PikaObj *pikaScriptInit(void){
 #if PIKA_INIT_STRING_ENABLE
     obj_run(pikaMain,
             "import PikaStdLib\n"
-            "print('hello PikaScript!')\n"
+            "# TODO: put this in /scripts and either put it here in the build process or modify precompiler?\n"
+            "print(\"Testing!, Lets hope it has worked!\")\n"
             "mem = PikaStdLib.MemChecker()\n"
             "print('mem used max:')\n"
             "mem.max()\n"

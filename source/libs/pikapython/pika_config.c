@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "pika_config.h"
 #include "../../gfx/gfx.h"
 
 void pika_platform_enable_irq_handle(void) {
@@ -23,11 +24,14 @@ void pika_platform_printf(char* fmt, ...) {
     va_end(args);
 }
 int pika_platform_sprintf(char* buff, char* fmt, ...) {
-    gfx_printf("I don't want sprintf used!");
+    va_list args;
+    va_start(args, fmt);
+    s_vprintf(buff, fmt, args);
+    va_end(args);
     return 0;
 }
 int pika_platform_vsprintf(char* buff, char* fmt, va_list args) {
-    gfx_printf("I don't want vsprintf used!");
+    s_vprintf(buff, fmt, args);
     return 0;
 }
 int pika_platform_vsnprintf(char* buff,
