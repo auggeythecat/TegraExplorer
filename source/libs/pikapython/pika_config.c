@@ -38,11 +38,15 @@ int pika_platform_vsnprintf(char* buff,
                             u32 size,
                             const char* fmt,
                             va_list args) {
-    gfx_printf("I don't want vsnprintf used!");
+    // Where we are going, we don't need safety...
+    pika_platform_vsprintf(buff, fmt, args);
     return 0;
 }
 int pika_platform_snprintf(char* buff, u32 size, const char* fmt, ...) {
-    gfx_printf("I don't want snprintf used!");
+    va_list args;
+    va_start(args, fmt);
+    pika_platform_vsnprintf(buff, size, fmt, args);
+    va_end(args);
     return 0;
 }
 
@@ -86,7 +90,6 @@ void* pika_platform_memcpy(void* dir, const void* src, u32 size) {
 int pika_platform_memcmp(const void* s1, const void* s2, u32 n) {
     return memcmp(s1, s2, n);
 }
-
 
 void* pika_platform_memmove(void* s1, void* s2, u32 n) {
     return memmove(s1, s2, n);
@@ -133,7 +136,7 @@ long pika_platform_ftell(FIL* stream) {
 }
 
 void pika_platform_error_handle(void) {
-    EPRINTF("PIKAPYTHON: Error has occured!");
+    EPRINTF("PIKAPYTHON: Error has occurred!");
 }
 
 void pika_platform_panic_handle(void) {
@@ -202,7 +205,7 @@ unsigned long pika_platform_timer_now(void) {
 }
 
 void pika_platform_timer_usleep(unsigned long usec) {
-    return;
+    usleep(usec);
 }
 
 void pika_platform_reboot(void) {
