@@ -15,7 +15,9 @@ typedef struct TEConfig_t {
     bool t210b01;
 
     u32 FSBuffSize;
-    u32 errors;
+    u32 errors; // TODO: Union?
+    u8  MMCMounted;
+    u8  currentMMC;
     const char* Pkg1ID;
 } TEConfig_t;
 

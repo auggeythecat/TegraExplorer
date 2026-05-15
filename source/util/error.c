@@ -13,6 +13,7 @@
 #define leny 240
 
 const char* _TEErrors[] = {
+    [TE_SUCCESS]                      = "Success! Error should not have been drawn!",
     [TE_ERROR_IO]                     = "I/O error!",
     [TE_ERROR_NO_DISK]                = "No disk error!",
     [TE_ERROR_NOT_READY]              = "Not ready!",
@@ -56,7 +57,7 @@ const char* _getErrorString(int error) {
 }
 
 void drawError(error_t error) {
-    if (error.code == 0)
+    if (error.code == TE_SUCCESS)
         return;
 
     SETCOLOR(COLOR_ORANGE, COLOR_DARK_GREY);

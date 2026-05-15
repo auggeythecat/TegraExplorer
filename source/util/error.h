@@ -8,7 +8,8 @@
 #include <bdk.h>
 
 enum {
-    TE_ERROR_IO = 1,
+    TE_SUCCESS = 0,
+    TE_ERROR_IO,
     TE_ERROR_NO_DISK,
     TE_ERROR_NOT_READY,
     TE_ERROR_NO_FILE,
@@ -52,6 +53,5 @@ typedef struct _error_t {
 #define newError(code) (error_t) {code, __LINE__, __FILE__}
 
 void drawError(error_t error);
-void garbage();
 
 #endif //_ERROR_H
