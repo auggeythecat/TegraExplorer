@@ -4,6 +4,8 @@
 #include "storage/emummc.h"
 #include "util/config.h"
 #include "util/hid.h"
+#include "util/error.h"
+
 #include "test_script.h"
 
 #include "pikapython/pikascript-api/pikaScript.h"
@@ -53,12 +55,12 @@ void ipl_main() {
 
 	minerva_change_freq(FREQ_800);
 
-	btn_wait();
+	// PikaObj* pikaObj = pikaScriptInit();
+	// pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_main_py_o);
 
-	PikaObj* pikaObj = pikaScriptInit();
-	pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_main_py_o);
 
-	btn_wait();
+	drawError(newError(TE_ERROR_MEM_ALLOC_FAIL));
+
 	power_set_state(POWER_OFF_RESET);
 
 	while (true)

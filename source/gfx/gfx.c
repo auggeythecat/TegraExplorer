@@ -127,19 +127,16 @@ static const u8 _gfx_font[] = {
 
 u32 YLeftConfig = YLEFT;
 
-void gfx_clear_grey(u8 color)
-{
+void gfx_clear_grey(u8 color) {
 	memset(gfx_ctxt.fb, color, gfx_ctxt.width * gfx_ctxt.height * 4);
 }
 
-void gfx_clear_color(u32 color)
-{
+void gfx_clear_color(u32 color) {
 	for (u32 i = 0; i < gfx_ctxt.width * gfx_ctxt.height; i++)
 		gfx_ctxt.fb[i] = color;
 }
 
-void gfx_init_ctxt(u32 *fb, u32 width, u32 height, u32 stride)
-{
+void gfx_init_ctxt(u32 *fb, u32 width, u32 height, u32 stride) {
 	gfx_ctxt.fb = fb;
 	gfx_ctxt.width = width;
 	gfx_ctxt.height = height;
@@ -148,37 +145,33 @@ void gfx_init_ctxt(u32 *fb, u32 width, u32 height, u32 stride)
 	gfx_clear_grey(0); // TODO: should this be here?
 }
 
-void gfx_con_init()
-{
+void gfx_con_init() {
 	gfx_con.gfx_ctxt = &gfx_ctxt;
 	gfx_con.fntsz = 16;
 	gfx_con.x = 0;
 	gfx_con.y = 0;
 	gfx_con.savedx = 0;
 	gfx_con.savedy = 0;
-	gfx_con.fgcol = COLOR_WHITE;
+	gfx_con.fgcol = COLOR_BLUE;
 	gfx_con.fillbg = 1;
-	gfx_con.bgcol = COLOR_LIGHT_GREY;
+	gfx_con.bgcol = COLOR_DARKER_GREY;
 	gfx_con.mute = 0;
 
 	gfx_con_init_done = true;
 }
 
-void gfx_con_setcol(u32 fgcol, int fillbg, u32 bgcol)
-{
+void gfx_con_setcol(u32 fgcol, int fillbg, u32 bgcol){
 	gfx_con.fgcol = fgcol;
 	gfx_con.fillbg = fillbg;
 	gfx_con.bgcol = bgcol;
 }
 
-void gfx_con_getpos(u32 *x, u32 *y)
-{
+void gfx_con_getpos(u32 *x, u32 *y) {
 	*x = YLEFT - gfx_con.y;
 	*y = gfx_con.x;
 }
 
-void gfx_con_setpos(u32 x, u32 y)
-{
+void gfx_con_setpos(u32 x, u32 y) {
 	gfx_con.x = y;
 	gfx_con.y = YLEFT - x;
 
@@ -186,22 +179,18 @@ void gfx_con_setpos(u32 x, u32 y)
 
 // TODO: See if I can make this make more sense
 
-void gfx_putc(char c)
-{
+void gfx_putc(char c) {
 	// Duplicate code for performance reasons.
-	switch (gfx_con.fntsz)
-	{
+	switch (gfx_con.fntsz) {
 	case 16:
-		if (c >= 32 && c <= 129)
-		{
+		if (c >= 32 && c <= 129) {
 			u8 *cbuf = (u8 *)&_gfx_font[8 * (c - 32)];
 			u32 *fb = gfx_ctxt.fb + gfx_con.x + gfx_con.y * gfx_ctxt.stride;
 
-			for (u32 i = 0; i < 16; i+=2)
-			{
+			for (u32 i = 0; i < 16; i+=2) {
 				u8 v = *cbuf;
-				for (u32 t = 0; t < 8; t++){
-					if (v & 1 || gfx_con.fillbg){
+				for (u32 t = 0; t < 8; t++) {
+					if (v & 1 || gfx_con.fillbg) {
 						u32 setColor = (v & 1) ? gfx_con.fgcol : gfx_con.bgcol;
 						*fb = setColor;
 						*(fb + 1) = setColor;
@@ -214,24 +203,19 @@ void gfx_putc(char c)
 				fb += gfx_ctxt.stride * 16 + 2;
 				cbuf++;
 				/*
-				for (u32 k = 0; k < 2; k++)
-				{
-					for (u32 j = 0; j < 8; j++)
-					{
-						if (v & 1)
-						{
+				for (u32 k = 0; k < 2; k++) {
+					for (u32 j = 0; j < 8; j++) {
+						if (v & 1) {
 							*fb = gfx_con.fgcol;
 							fb -= gfx_ctxt.stride;
 							*fb = gfx_con.fgcol;
-						}
-						else if (gfx_con.fillbg)
-						{
+						} else if (gfx_con.fillbg) {
 							*fb = gfx_con.bgcol;
 							fb -= gfx_ctxt.stride;
 							*fb = gfx_con.bgcol;
-						}
-						else
+						} else
 							fb -= gfx_ctxt.stride;
+
 						v >>= 1;
 						fb -= gfx_ctxt.stride;
 					}
@@ -245,15 +229,13 @@ void gfx_putc(char c)
 			}
 
 			gfx_con.y -= 16;
-			if (gfx_con.y < 16){
+			if (gfx_con.y < 16) {
 				gfx_con.y = YLeftConfig;
 				gfx_con.x += 16;
 				if (gfx_con.x > 719)
 					gfx_con.x = 0;
 			}
-		}
-		else if (c == '\n')
-		{
+		} else if (c == '\n') {
 			gfx_con.y = YLeftConfig;
 			gfx_con.x += 16;
 			if (gfx_con.x > gfx_ctxt.width - 16)
@@ -269,15 +251,12 @@ void gfx_putc(char c)
 		break;
 	case 8:
 	default:
-		if (c >= 30 && c <= 129)
-		{
+		if (c >= 30 && c <= 129) {
 			u8 *cbuf = (u8 *)&_gfx_font[8 * (c - 32)];
 			u32 *fb = gfx_ctxt.fb + gfx_con.x + gfx_con.y * gfx_ctxt.stride;
-			for (u32 i = 0; i < 8; i++)
-			{
+			for (u32 i = 0; i < 8; i++) {
 				u8 v = *cbuf++;
-				for (u32 j = 0; j < 8; j++)
-				{
+				for (u32 j = 0; j < 8; j++) {
 					if (v & 1)
 						*fb = gfx_con.fgcol;
 					else if (gfx_con.fillbg)
@@ -289,14 +268,12 @@ void gfx_putc(char c)
 			}
 
 			gfx_con.y -= 8;
-			if (gfx_con.y < 8){
+			if (gfx_con.y < 8) {
 				gfx_con.y = YLeftConfig;
 				gfx_con.x += 8;
 			}
 
-		}
-		else if (c == '\n')
-		{
+		} else if (c == '\n') {
 			gfx_con.y = YLeftConfig;
 			gfx_con.x += 8;
 			if (gfx_con.x > gfx_ctxt.width - 8)
@@ -313,8 +290,7 @@ void gfx_putc(char c)
 	}
 }
 
-void gfx_puts(const char *s)
-{
+void gfx_puts(const char *s) {
 	if (!s || !gfx_con_init_done || gfx_con.mute)
 		return;
 
@@ -322,8 +298,7 @@ void gfx_puts(const char *s)
 		gfx_putc(*s);
 }
 
-static void _gfx_putn(u32 v, int base, char fill, int fcnt)
-{
+static void _gfx_putn(u32 v, int base, char fill, int fcnt) {
 	static const char digits[] = "0123456789ABCDEF";
 
 	char *p;
@@ -335,8 +310,7 @@ static void _gfx_putn(u32 v, int base, char fill, int fcnt)
 		return;
 
 	// Account for negative numbers.
-	if (base == 10 && v & 0x80000000)
-	{
+	if (base == 10 && v & 0x80000000) {
 		negative = true;
 		v = (int)v * -1;
 		c--;
@@ -344,8 +318,7 @@ static void _gfx_putn(u32 v, int base, char fill, int fcnt)
 
 	p = buf + 64;
 	*p = 0;
-	do
-	{
+	do {
 		c--;
 		*--p = digits[v % base];
 		v /= base;
@@ -354,10 +327,8 @@ static void _gfx_putn(u32 v, int base, char fill, int fcnt)
 	if (negative)
 		*--p = '-';
 
-	if (fill != 0)
-	{
-		while (c > 0 && p > buf)
-		{
+	if (fill != 0) {
+		while (c > 0 && p > buf) {
 			*--p = fill;
 			c--;
 		}
@@ -373,31 +344,23 @@ void gfx_vprintf(const char *fmt, va_list ap) {
 
 	int fill, fcnt;
 
-	while (*fmt)
-	{
-		if (*fmt == '%')
-		{
+	while (*fmt) {
+		if (*fmt == '%') {
 			fmt++;
 			fill = 0;
 			fcnt = 0;
-			if ((*fmt >= '0' && *fmt <= '9') || *fmt == ' ')
-			{
+			if ((*fmt >= '0' && *fmt <= '9') || *fmt == ' ') {
 				fcnt = *fmt;
 				fmt++;
-				if (*fmt >= '0' && *fmt <= '9')
-				{
+				if (*fmt >= '0' && *fmt <= '9') {
 					fill = fcnt;
 					fcnt = *fmt - '0';
 					fmt++;
-				}
-				else
-				{
+				} else {
 					fill = ' ';
 					fcnt -= '0';
 				}
-			}
-			switch(*fmt)
-			{
+			} switch(*fmt) {
 				case 'c':
 					gfx_putc(va_arg(ap, u32));
 					break;
@@ -420,6 +383,11 @@ void gfx_vprintf(const char *fmt, va_list ap) {
 					gfx_con.bgcol = va_arg(ap, u32);
 					gfx_con.fillbg = 1;
 					break;
+				case 'b':
+					u32 b = YLEFT - va_arg(ap, u32);
+					gfx_con.y = b;
+					YLeftConfig = gfx_con.y;
+					break;
 				case '%':
 					gfx_putc('%');
 					break;
@@ -430,15 +398,13 @@ void gfx_vprintf(const char *fmt, va_list ap) {
 					gfx_putc(*fmt);
 					break;
 			}
-		}
-		else
+		} else
 			gfx_putc(*fmt);
 		fmt++;
 	}
 }
 
-void gfx_printf(const char *fmt, ...)
-{
+void gfx_printf(const char *fmt, ...) {
 	if (gfx_con.mute)
 		return;
 
@@ -449,8 +415,7 @@ void gfx_printf(const char *fmt, ...)
 }
 
 
-void gfx_cputs(u32 color, const char *s)
-{
+void gfx_cputs(u32 color, const char *s) {
 	gfx_con.fgcol = color;
 	gfx_puts(s);
 	gfx_putc('\n');
@@ -459,8 +424,7 @@ void gfx_cputs(u32 color, const char *s)
 
 // TODO: Look into difference between this (hekates) and TEs
 
-void gfx_hexdump(u32 base, const void *buf, u32 len)
-{
+void gfx_hexdump(u32 base, const void *buf, u32 len) {
 	if (!gfx_con_init_done || gfx_con.mute)
 		return;
 
@@ -468,15 +432,11 @@ void gfx_hexdump(u32 base, const void *buf, u32 len)
 
 	u8 prevFontSize = gfx_con.fntsz;
 	gfx_con.fntsz = 8;
-	for (u32 i = 0; i < len; i++)
-	{
-		if (i % 0x10 == 0)
-		{
-			if (i != 0)
-			{
+	for (u32 i = 0; i < len; i++) {
+		if (i % 0x10 == 0) {
+			if (i != 0) {
 				gfx_puts("| ");
-				for (u32 j = 0; j < 0x10; j++)
-				{
+				for (u32 j = 0; j < 0x10; j++) {
 					u8 c = buff[i - 0x10 + j];
 					if (c >= 32 && c <= 126)
 						gfx_putc(c);
@@ -488,19 +448,16 @@ void gfx_hexdump(u32 base, const void *buf, u32 len)
 			gfx_printf("%08x: ", base + i);
 		}
 		gfx_printf("%02x ", buff[i]);
-		if (i == len - 1)
-		{
+		if (i == len - 1) {
 			int ln = len % 0x10 != 0;
 			u32 k = 0x10 - 1;
-			if (ln)
-			{
+			if (ln) {
 				k = (len & 0xF) - 1;
 				for (u32 j = 0; j < 0x10 - k; j++)
 					gfx_puts("   ");
 			}
 			gfx_puts("| ");
-			for (u32 j = 0; j < (ln ? k : k + 1); j++)
-			{
+			for (u32 j = 0; j < (ln ? k : k + 1); j++) {
 				u8 c = buff[i - k + j];
 				if (c >= 32 && c <= 126)
 					gfx_putc(c);
@@ -514,13 +471,11 @@ void gfx_hexdump(u32 base, const void *buf, u32 len)
 	gfx_con.fntsz = prevFontSize;
 }
 
-void gfx_set_pixel(u32 x, u32 y, u32 color)
-{
+void gfx_set_pixel(u32 x, u32 y, u32 color) {
 	gfx_ctxt.fb[x + y * gfx_ctxt.stride] = color;
 }
 
-static int _abs(int x)
-{
+static int _abs(int x) {
 	if (x < 0)
 		return -x;
 	return x;
@@ -530,54 +485,45 @@ void gfx_set_pixel_horz(int x, int y, u32 color) {
 	*(gfx_ctxt.fb + (YLEFT - x) * gfx_ctxt.stride + y) = color;
 }
 
-void gfx_line(int x0, int y0, int x1, int y1, u32 color)
-{
+void gfx_line(int x0, int y0, int x1, int y1, u32 color) {
 	int dx = _abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
 	int dy = _abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
 	int err = (dx > dy ? dx : -dy) / 2, e2;
 
-	while (1)
-	{
+	while (1) {
 		gfx_set_pixel(x0, y0, color);
 		if (x0 == x1 && y0 == y1)
 			break;
 		e2 = err;
-		if (e2 >-dx)
-		{
+		if (e2 >-dx) {
 			err -= dy;
 			x0 += sx;
 		}
-		if (e2 < dy)
-		{
+		if (e2 < dy) {
 			err += dx;
 			y0 += sy;
 		}
 	}
 }
 
-void gfx_set_rect_pitch(u32 *fb, const u32 *buf, u32 stride, u32 pos_x, u32 pos_y, u32 pos_x2, u32 pos_y2)
-{
+void gfx_set_rect_pitch(u32 *fb, const u32 *buf, u32 stride, u32 pos_x, u32 pos_y, u32 pos_x2, u32 pos_y2) {
 	u32 *ptr = (u32 *)buf;
 	u32 line_size = pos_x2 - pos_x + 1;
 	//ptr = gfx_debug_rect(buf, pos_x, pos_y, pos_x2, pos_y2);
-	for (u32 y = pos_y; y <= pos_y2; y++)
-	{
+	for (u32 y = pos_y; y <= pos_y2; y++) {
 		memcpy(&fb[pos_x + y * stride], ptr, line_size * sizeof(u32));
 		ptr += line_size;
 	}
 }
 
-void gfx_set_rect_land_pitch(u32 *fb, const u32 *buf, u32 stride, u32 pos_x, u32 pos_y, u32 pos_x2, u32 pos_y2)
-{
+void gfx_set_rect_land_pitch(u32 *fb, const u32 *buf, u32 stride, u32 pos_x, u32 pos_y, u32 pos_x2, u32 pos_y2) {
 	u32 *ptr = (u32 *)buf;
 
 	u32 pixels_w = pos_x2 - pos_x + 1;
 
-	if (!(pixels_w % 8))
-	{
+	if (!(pixels_w % 8)) {
 		for (u32 y = pos_y; y <= pos_y2; y++)
-			for (u32 x = pos_x; x <= pos_x2; x += 8)
-			{
+			for (u32 x = pos_x; x <= pos_x2; x += 8) {
 				u32 *fbx = &fb[x * stride + y];
 
 				fbx[0]          = *ptr++;
@@ -589,17 +535,14 @@ void gfx_set_rect_land_pitch(u32 *fb, const u32 *buf, u32 stride, u32 pos_x, u32
 				fbx[stride * 6] = *ptr++;
 				fbx[stride * 7] = *ptr++;
 			}
-	}
-	else
-	{
+	} else {
 		for (u32 y = pos_y; y < (pos_y2 + 1); y++)
 			for (u32 x = pos_x; x < (pos_x2 + 1); x++)
 				fb[x * stride + y] = *ptr++;
 	}
 }
 
-void gfx_set_rect_land_block(u32 *fb, const u32 *buf, u32 pos_x, u32 pos_y, u32 pos_x2, u32 pos_y2)
-{
+void gfx_set_rect_land_block(u32 *fb, const u32 *buf, u32 pos_x, u32 pos_y, u32 pos_x2, u32 pos_y2) {
 	u32 *ptr = (u32 *)buf;
 	u32 GOB_address = 0;
 	u32 addr = 0;
@@ -607,10 +550,8 @@ void gfx_set_rect_land_block(u32 *fb, const u32 *buf, u32 pos_x, u32 pos_y, u32 
 
 	// Optimized
 	u32 image_width_in_gobs = 655360; //1280
-	for (u32 y = pos_y; y <= pos_y2; y++)
-	{
-		for (u32 x = pos_x; x <= pos_x2; x++)
-		{
+	for (u32 y = pos_y; y <= pos_y2; y++) {
+		for (u32 x = pos_x; x <= pos_x2; x++) {
 			GOB_address = (y >> 7) * image_width_in_gobs + ((x >> 4) << 13) + (((y % 128) >> 3) << 9);
 
 			x2 = x << 2;
@@ -645,39 +586,39 @@ void gfx_set_rect_land_block(u32 *fb, const u32 *buf, u32 pos_x, u32 pos_y, u32 
 	// }
 }
 
-void gfx_box(int x0, int y0, int x1, int y1, u32 color){
-	for (int y = (YLEFT - x0); y >= (YLEFT - x1); y--){
-		for (int x = y0; x <= y1; x++){
+void gfx_box(int x0, int y0, int x1, int y1, u32 color) {
+	for (int y = (YLEFT - x0); y >= (YLEFT - x1); y--) {
+		for (int x = y0; x <= y1; x++) {
 			gfx_ctxt.fb[x + y * gfx_ctxt.stride] = color;
 		}
 	}
 }
 
-void gfx_set_rect_rgb(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y)
-{
+void gfx_boxGrey(int x0, int y0, int x1, int y1, u8 shade){
+	for (int y = (YLEFT - x0); y >= (YLEFT - x1); y--){
+		memset(gfx_ctxt.fb + y * gfx_ctxt.stride + y0, shade, (y1 - y0 + 1) * 4);
+	}
+}
+
+void gfx_set_rect_rgb(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y) {
 	u32 pos = 0;
-	for (u32 y = pos_y; y < (pos_y + size_y); y++)
-	{
-		for (u32 x = pos_x; x < (pos_x + size_x); x++)
-		{
+	for (u32 y = pos_y; y < (pos_y + size_y); y++) {
+		for (u32 x = pos_x; x < (pos_x + size_x); x++) {
 			gfx_ctxt.fb[x + y * gfx_ctxt.stride] = buf[pos + 2] | (buf[pos + 1] << 8) | (buf[pos] << 16);
 			pos+=3;
 		}
 	}
 }
 
-void gfx_set_rect_argb(const u32 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y)
-{
+void gfx_set_rect_argb(const u32 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y) {
 	u32 *ptr = (u32 *)buf;
 	for (u32 y = pos_y; y < (pos_y + size_y); y++)
 		for (u32 x = pos_x; x < (pos_x + size_x); x++)
 			gfx_ctxt.fb[x + y * gfx_ctxt.stride] = *ptr++;
 }
 
-void gfx_render_bmp_argb(const u32 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y)
-{
-	for (u32 y = pos_y; y < (pos_y + size_y); y++)
-	{
+void gfx_render_bmp_argb(const u32 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y) {
+	for (u32 y = pos_y; y < (pos_y + size_y); y++) {
 		for (u32 x = pos_x; x < (pos_x + size_x); x++)
 			gfx_ctxt.fb[x + y * gfx_ctxt.stride] = buf[(size_y + pos_y - 1 - y ) * size_x + x - pos_x];
 	}

@@ -24,12 +24,12 @@ void pika_platform_printf(char* fmt, ...) {
     va_end(args);
 }
 
-int pika_platform_vsprintf(char* buff, char* fmt, va_list args) {
+int pika_platform_vsprintf(char* buff, const char* fmt, va_list args) {
     s_vprintf(buff, fmt, args);
     return 0;
 }
 
-int pika_platform_sprintf(char* buff, char* fmt, ...) {
+int pika_platform_sprintf(char* buff, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     pika_platform_vsprintf(buff, fmt, args);
@@ -50,7 +50,7 @@ int pika_platform_vsnprintf(char* buff,
                             u32 size,
                             const char* fmt,
                             va_list args) {
-    pika_platform_vsnprintf(buff, buff, fmt, args);
+    pika_platform_vsprintf(buff, fmt, args);
     return 0;
 }
 
@@ -115,7 +115,7 @@ int pika_platform_putchar(char ch) {
 
 // TODO: rewrite all file stuff and stop being stupid: https://github.com/pikasTech/PikaPython/blob/9bca87e6b44095d19e0140c6e7142a931ae0382e/package/pika_fatfs/pika_fatfs.C
 FIL* pika_platform_fopen(const char* filename, const char* modes) {
-    FIL* file = NULL;
+    FIL* file;
     f_open(file, filename, *modes);
     return file;
 }

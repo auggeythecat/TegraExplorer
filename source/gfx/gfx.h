@@ -2,6 +2,7 @@
 #define _GFX_H_
 
 #include <bdk.h>
+
 #define GFX_COL_KEEP 0xFFFE
 #define GFX_COL_AUTO 0xFFFF
 
@@ -12,18 +13,25 @@
 #define COLOR_BLUE         0xFF00DDFF
 #define COLOR_VIOLET       0xFF8040FF
 
-#define COLOR_WHITE        0xFFFFFFFF
+#define COLOR_WHITE        0xFFF0F0F0
 #define COLOR_LIGHTER_GREY 0xFFD0D0D0
 #define COLOR_LIGHT_GREY   0xFFA0A0A0
+#define COLOR_GREY         0xFF808080
 #define COLOR_DARK_GREY    0xFF606060
 #define COLOR_DARKER_GREY  0xFF303030
 #define COLOR_BLACK        0xFF000000
+
+#define COLOR_DEFAULT      0xFF1B1B1B
 
 #define EPRINTF(text) gfx_printf("%k"text"%k\n", COLOR_RED, COLOR_LIGHTER_GREY)
 #define EPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_RED, args, COLOR_LIGHTER_GREY)
 
 #define WPRINTF(text) gfx_printf("%k"text"%k\n", COLOR_YELLOW, COLOR_LIGHTER_GREY)
 #define WPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_YELLOW, args, COLOR_LIGHTER_GREY)
+
+#define COLORTORGB(color) (color & 0x00FFFFFF)
+#define SETCOLOR(fg, bg) gfx_con_setcol(fg, 1, bg)
+#define RESETCOLOR SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
 
 typedef struct _gfx_ctxt_t
 {
@@ -87,7 +95,6 @@ void gfx_set_rect_land_block(u32 *fb, const u32 *buf, u32 pos_x, u32 pos_y, u32 
 
 // TODO: Are these needed?
 void gfx_clear_partial_grey(u8 color, u32 pos_x, u32 height);
-void gfx_vprintf(const char *fmt, va_list ap);
 void gfx_wputs(const char *s);
 void gfx_eputs(const char *s);
 void gfx_hexdiff(u32 base, const u8 *buf1, const u8 *buf2, u32 len);

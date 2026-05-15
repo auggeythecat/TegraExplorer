@@ -6,6 +6,7 @@
 #define _PIKA_CONFIG_H
 
 #include <bdk.h>
+#include "../../util/config.h"
 
 #define PIKA_OPTIMIZE                   PIKA_OPTIMIZE_SPEED
 #define PIKA_FLOAT_TYPE_DOUBLE          1
