@@ -1,9 +1,10 @@
 //
-// Created by yes on 5/15/26.
+// Created by auggiethecat
 //
 
-#include "error.h"
 #include "../gfx/gfx.h"
+
+#include "error.h"
 #include "hid.h"
 
 #define lx 256
@@ -12,38 +13,38 @@
 #define leny 240
 
 const char* _TEErrors[] = {
-    [TE_ERROR_IO]                     = "TMP",
-    [TE_ERROR_NO_DISK]                = "TMP",
-    [TE_ERROR_NOT_READY]              = "TMP",
-    [TE_ERROR_NO_FILE]                = "TMP",
-    [TE_ERROR_NO_PATH]                = "TMP",
-    [TE_ERROR_PATH_INVALID]           = "TMP",
-    [TE_ERROR_ACCESS_DENIED]          = "TMP",
-    [TE_ERROR_ACCESS_DENIED_2]        = "TMP",
-    [TE_ERROR_INVALID_PTR]            = "TMP",
-    [TE_ERROR_PROTECTED]              = "TMP",
-    [TE_ERROR_INVALID_DRIVE]          = "TMP",
-    [TE_ERROR_NO_MEM]                 = "TMP",
-    [TE_ERROR_NO_FAT]                 = "TMP",
-    [TE_ERROR_MKFS_ABORT]             = "TMP",
-    [TE_ERROR_UNIMPLEMENTED]          = "TMP",
-    [TE_ERROR_SAME_LOC]               = "TMP",
-    [TE_ERROR_KEYDUMP_FAIL]           = "TMP",
-    [TE_ERROR_PARTITION_NOT_FOUND]    = "TMP",
-    [TE_ERROR_PATH_IN_PATH]           = "TMP",
-    [TE_ERROR_EMMC_READ_FAIL]         = "TMP",
-    [TE_ERROR_EMMC_WRITE_FAIL]        = "TMP",
-    [TE_ERROR_NO_SD]                  = "TMP",
-    [TE_ERROR_FILE_TOO_BIG_FOR_DEST]  = "TMP",
-    [TE_ERROR_MEM_ALLOC_FAIL]         = "TMP",
+    [TE_ERROR_IO]                     = "I/O error!",
+    [TE_ERROR_NO_DISK]                = "No disk error!",
+    [TE_ERROR_NOT_READY]              = "Not ready!",
+    [TE_ERROR_NO_FILE]                = "No file present!",
+    [TE_ERROR_NO_PATH]                = "No path present!",
+    [TE_ERROR_PATH_INVALID]           = "Invalid path!",
+    [TE_ERROR_ACCESS_DENIED]          = "Access is denied!",
+    [TE_ERROR_ACCESS_DENIED_2]        = "Access is denied 2!",
+    [TE_ERROR_INVALID_PTR]            = "Invalid pointer!",
+    [TE_ERROR_PROTECTED]              = "Protected device!",
+    [TE_ERROR_INVALID_DRIVE]          = "Invalid drive!",
+    [TE_ERROR_NO_MEM]                 = "No memory left!",
+    [TE_ERROR_NO_FAT]                 = "No FAT file system found!",
+    [TE_ERROR_MKFS_ABORT]             = "MKFS aborted!",
+    [TE_ERROR_UNIMPLEMENTED]          = "This feature isn't implemented yet!",
+    [TE_ERROR_SAME_LOC]               = "Same file location!",
+    [TE_ERROR_KEYDUMP_FAIL]           = "Failed keydump!",
+    [TE_ERROR_PARTITION_NOT_FOUND]    = "This partition was not found!",
+    [TE_ERROR_PATH_IN_PATH]           = "Path is in path!",
+    [TE_ERROR_EMMC_READ_FAIL]         = "EMMC/EMUMMC read failed!",
+    [TE_ERROR_EMMC_WRITE_FAIL]        = "EMMC/EMUMMC write failed!",
+    [TE_ERROR_NO_SD]                  = "No SD found!",
+    [TE_ERROR_FILE_TOO_BIG_FOR_DEST]  = "File too big for destination filesystem!",
+    [TE_ERROR_MEM_ALLOC_FAIL]         = "Memory allocation failed!",
 
-    [TE_EXCEPTION_RESET]              = "TMP",
-    [TE_EXCEPTION_UNDEFINED]          = "TMP",
-    [TE_EXCEPTION_PREF_ABORT]         = "TMP",
-    [TE_EXCEPTION_DATA_ABORT]         = "TMP",
+    [TE_EXCEPTION_RESET]              = "Exception: Reset!",
+    [TE_EXCEPTION_UNDEFINED]          = "Exception: Undefined!",
+    [TE_EXCEPTION_PREF_ABORT]         = "Exception: Pref abort!",
+    [TE_EXCEPTION_DATA_ABORT]         = "Exception: Data abort!",
 
-    [TE_WARN_FILE_EXISTS]             = "TMP",
-    [TE_WARN_FILE_TOO_SMALL_FOR_DEST] = "TMP",
+    [TE_WARN_FILE_EXISTS]             = "Warning: File already exists",
+    [TE_WARN_FILE_TOO_SMALL_FOR_DEST] = "Warning: File is too small for destination!",
 };
 
 const char* _getErrorString(int error) {
@@ -67,19 +68,4 @@ void drawError(error_t error) {
     gfx_printf("Press A to continue");
 
     hidWaitMask((JoyA | JoyB));
-}
-
-void garbage() {
-    u32 num = 0;
-    num &= 0xFF000000;
-    u32* buf = (u32*)malloc(4*1280*720);
-    for (int x = 0; x < 720; x++) {
-        for (int y = 0; y < 1280; y++) {
-            num += 10;
-            // gfx_printf("%d", num);
-            buf[x+y] = num;
-        }
-    }
-
-    gfx_set_rect_argb(buf, 720, 1280, 0, 0);
 }

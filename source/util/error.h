@@ -1,5 +1,5 @@
 //
-// Created by yes on 5/15/26.
+// Created by auggiethecat
 //
 
 #ifndef _ERROR_H
