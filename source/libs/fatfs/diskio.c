@@ -9,14 +9,13 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 
-#include <string.h>
-
 #include <bdk.h>
 
 #include <libs/fatfs/diskio.h>
 
 static u32 sd_rsvd_sectors = 0;
-static u32 ramdisk_sectors = 0;
+static u32 emmc_sectors    = 0;
+// static u32 ramdisk_sectors = 0;
 static u32 bis_sectors     = 0;
 static u32 emummc_sectors  = 0;
 
@@ -53,8 +52,11 @@ DRESULT disk_read (
     switch (pdrv) {
     case DRIVE_SD:
         return sdmmc_storage_read(&sd_storage, sector, count, (void*)buff);
+    case DRIVE_EMMC:
+        return sdmmc_storage_read(&emmc_storage, sector, count, (void*)buff);
     // case DRIVE_RAM: TODO: Will we be needing ramdisk?
     case DRIVE_BIS:
+    case DRIVE_EMU:
         return nx_emmc_bis_read(sector, count, (void*)buff);
     }
 
@@ -74,8 +76,11 @@ DRESULT disk_write (
     switch (pdrv) {
     case DRIVE_SD:
         return sdmmc_storage_write(&sd_storage, sector, count, (void*)buff);
+    case DRIVE_EMMC:
+        return sdmmc_storage_write(&emmc_storage, sector, count, (void*)buff);
     // case DRIVE_RAM:
     case DRIVE_BIS:
+    case DRIVE_EMU:
         return nx_emmc_bis_write(sector, count, (void *)buff);
     }
 
@@ -95,25 +100,48 @@ DRESULT disk_ioctl (
 
     switch (pdrv) {
     case DRIVE_SD:
-            switch (cmd) {
-            case GET_SECTOR_COUNT:
-                *buf = sd_storage.sec_cnt - sd_rsvd_sectors;
-                break;
-            case GET_BLOCK_SIZE:
-                *buf = 37268;
-                break;
-            }
-            break;
+    switch (cmd) {
+    case GET_SECTOR_COUNT:
+        *buf = sd_storage.sec_cnt - sd_rsvd_sectors;
+        break;
+    case GET_BLOCK_SIZE:
+        *buf = 32768;
+        break;
+    }
+    break;
+
+    case DRIVE_EMMC:
+    switch (cmd) {
+    case GET_SECTOR_COUNT:
+        *buf = emmc_sectors;
+        break;
+    case GET_BLOCK_SIZE:
+        *buf = 16384;
+        break;
+    }
+    break;
 
     // case DRIVE_RAM:
     case DRIVE_BIS:
     switch (cmd)
     {
     case GET_SECTOR_COUNT:
-            *buf = bis_sectors;
-            break;
+        *buf = bis_sectors;
+        break;
     case GET_BLOCK_SIZE:
-            *buf = 32768; // Align to 16MB.
+        *buf = 32768; // Align to 16MB.
+        break;
+    }
+    break;
+
+    case DRIVE_EMU:
+    switch (cmd)
+    {
+    case GET_SECTOR_COUNT:
+        *buf = emummc_sectors;
+        break;
+    case GET_BLOCK_SIZE:
+            *buf = 16384; // Align to 8MB (With BOOT0/1 data will be at 16MB BU).
             break;
     }
     break;
@@ -122,13 +150,47 @@ DRESULT disk_ioctl (
     switch (cmd)
     {
     case CTRL_SYNC:
-            break;
+        break;
     case GET_SECTOR_COUNT:
     case GET_BLOCK_SIZE:
-            *buf = 0; // Zero value to force default or abort.
-            break;
+        *buf = 0; // Zero value to force default or abort.
+        break;
     }
     break;
+    }
+
+    return RES_OK;
+}
+
+DRESULT disk_set_info (
+    BYTE pdrv,		/* Physical drive nmuber (0..) */
+    BYTE cmd,		/* Control code */
+    void *buff		/* Buffer to send/receive control data */
+)
+{
+    DWORD *buf = (DWORD *)buff;
+
+    if (cmd == SET_SECTOR_COUNT)
+    {
+        switch (pdrv)
+        {
+            case DRIVE_SD:
+                sd_rsvd_sectors = *buf;
+                break;
+
+            case DRIVE_EMMC:
+                emmc_sectors = *buf;
+                break;
+
+            // case DRIVE_RAM:
+            case DRIVE_BIS:
+                bis_sectors = *buf;
+                break;
+
+            case DRIVE_EMU:
+                emummc_sectors = *buf;
+                break;
+        }
     }
 
     return RES_OK;

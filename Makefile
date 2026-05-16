@@ -61,7 +61,7 @@ OBJS += BaseObj dataArg dataArgs dataLink \
 #		standardLibrary unsolvedArrayClass
 #
 
-OBJS += emummc mountManager config vector error hid
+OBJS += emummc mountManager config vector error hid keys
 #OBJS += keyfile nca emmcfile emummc hid config menu tools err gfxutils utils vector \
 #		fsutils mountmanager fscopy folderReader \
 #		keys
