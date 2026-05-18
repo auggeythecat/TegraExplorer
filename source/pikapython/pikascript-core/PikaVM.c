@@ -33,6 +33,9 @@
 #include "PikaPlatform.h"
 #include "dataArg.h"
 #include "dataStrs.h"
+
+#include <bdk.h>
+
 #if PIKA_MATH_ENABLE
 #include <math.h>
 #endif
@@ -2005,7 +2008,7 @@ static char* __get_transferd_str(Args* buffs, char* str, size_t* iout_p) {
             char hex_str[] = "0x00";
             hex_str[2] = str[i + 2];
             hex_str[3] = str[i + 3];
-            char hex = (char)strtoll(hex_str, NULL, 0);
+            char hex = (char)strtol(hex_str, NULL, 0);
             transfered_str[i_out++] = hex;
             i += 3;
             continue;

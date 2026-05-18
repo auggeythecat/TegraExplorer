@@ -46,10 +46,7 @@ int pika_platform_snprintf(char* buff, u32 size, const char* fmt, ...) {
     return 0;
 }
 
-int pika_platform_vsnprintf(char* buff,
-                            u32 size,
-                            const char* fmt,
-                            va_list args) {
+int pika_platform_vsnprintf(char* buff, u32 size, const char* fmt, va_list args) {
     pika_platform_vsprintf(buff, fmt, args);
     return 0;
 }

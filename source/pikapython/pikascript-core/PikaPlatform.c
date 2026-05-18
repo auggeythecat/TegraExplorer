@@ -155,8 +155,7 @@ PIKA_WEAK int pika_platform_vsnprintf(char* buff,
                                       size_t size,
                                       const char* fmt,
                                       va_list args) {
-    // return vsnprintf(buff, size, fmt, args);
-    return 0; //TODO:
+    // return vsnprintf(buff, size, fmt, args); TODO: Why the hell can
 }
 
 PIKA_WEAK int pika_platform_sprintf(char* buff, char* fmt, ...) {
@@ -174,7 +173,7 @@ PIKA_WEAK int pika_platform_sprintf(char* buff, char* fmt, ...) {
         while (1)
             ;
     }
-    return res; // TODO:
+    return res;
 }
 
 PIKA_WEAK void pika_platform_wait(void) {
