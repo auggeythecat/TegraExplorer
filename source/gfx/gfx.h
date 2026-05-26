@@ -23,26 +23,42 @@
 
 #define COLOR_DEFAULT      0xFF1B1B1B
 
-#define EPRINTF(text) gfx_printf("%k"text"%k\n", COLOR_RED, COLOR_LIGHTER_GREY)
-#define EPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_RED, args, COLOR_LIGHTER_GREY)
+#define EPRINTF(text) gfx_printf("%k"text"%k\n", COLOR_RED, COLOR_DEFAULT)
+#define EPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_RED, args, COLOR_DEFAULT)
 
-#define WPRINTF(text) gfx_printf("%k"text"%k\n", COLOR_YELLOW, COLOR_LIGHTER_GREY)
-#define WPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_YELLOW, args, COLOR_LIGHTER_GREY)
+#define WPRINTF(text) gfx_printf("%k"text"%k\n", COLOR_YELLOW, COLOR_DEFAULT)
+#define WPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_YELLOW, args, COLOR_DEFAULT)
 
+#define RGBTOCOLOR(r, g, b) (b << 16 | g << 8 | r)
 #define COLORTORGB(color) (color & 0x00FFFFFF)
 #define SETCOLOR(fg, bg) gfx_con_setcol(fg, 1, bg)
 #define RESETCOLOR SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
 
-typedef struct _gfx_ctxt_t
-{
+#define NATIVE_FONT_SIZE 8
+#define SDF_SIZE         8
+
+//TODO: Bump allocation
+#define SDF_BUFFER        NYX_RES_ADDR
+#define SDF_ATLAS_8_BUFF  SDF_BUFFER        + SZ_32K
+#define SDF_ATLAS_16_BUFF SDF_ATLAS_8_BUFF  + SZ_32K
+#define SDF_ATLAS_24_BUFF SDF_ATLAS_16_BUFF + SZ_64K
+#define SDF_ATLAS_32_BUFF SDF_ATLAS_24_BUFF + SZ_128K
+#define SDF_ATLAS_48_BUFF SDF_ATLAS_32_BUFF + SZ_256K
+#define SDF_ATLAS_64_BUFF SDF_ATLAS_48_BUFF + SZ_512K
+
+//TODO: move to a util file or something, this doesn't belownng here.
+#define CLAMP(val, min, max) ((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
+#define CLAMPMIN(val, min) ((val) < (min) ? (min) : (val))
+#define CLAMPMAX(val, max) ((val) > (max) ? (max) : (val))
+
+typedef struct _gfx_ctxt_t {
     u32 *fb;
     u32 width;
     u32 height;
     u32 stride;
 } gfx_ctxt_t;
 
-typedef struct _gfx_con_t
-{
+typedef struct _gfx_con_t {
     gfx_ctxt_t *gfx_ctxt;
     u32 fntsz;
     u32 x;
@@ -58,12 +74,11 @@ typedef struct _gfx_con_t
 extern gfx_ctxt_t gfx_ctxt;
 extern gfx_con_t gfx_con;
 
-#define YLEFT 1279
-
 // TODO: How important is c/col/column?
 
 void gfx_init_ctxt(u32 *fb, u32 width, u32 height, u32 stride);
 void gfx_clear_grey(u8 color);
+void gfx_clear_partial_grey(u8 color, u32 pos_x, u32 height);
 void gfx_clear_color(u32 color);
 void gfx_con_init();
 void gfx_con_setcol(u32 fgcol, int fillbg, u32 bgcol);
@@ -92,19 +107,16 @@ void gfx_set_rect_land_pitch(u32 *fb, const u32 *buf, u32 stride, u32 pos_x, u32
 void gfx_set_rect_land_block(u32 *fb, const u32 *buf, u32 pos_x, u32 pos_y, u32 pos_x2, u32 pos_y2);
 
 
-
 // TODO: Are these needed?
-void gfx_clear_partial_grey(u8 color, u32 pos_x, u32 height);
-void gfx_wputs(const char *s);
-void gfx_eputs(const char *s);
 void gfx_hexdiff(u32 base, const u8 *buf1, const u8 *buf2, u32 len);
-void gfx_puts_limit(const char *s, u32 limit);
 void gfx_puts_small(const char *s);
 void gfx_putc_small(char c);
-void gfx_put_small_sep();
-void gfx_put_big_sep();
 // What are these for?
 void gfx_set_rect_grey(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y);
 void gfx_set_rect_rgb(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y);
+void gfx_render_sdf();
+void gfx_putc_sdf(char c);
+void gfx_test_putc(char c);
+void gfx_bake_atlas(u32 fontSize);
 
 #endif

@@ -14,6 +14,39 @@
 
 extern void pivot_stack(u32 stack_top);
 
+void _display_init() {
+	vic_surface_t      vic_sfc;
+	vic_sfc.src_buf  = NYX_FB2_ADDRESS;
+	vic_sfc.dst_buf  = NYX_FB_ADDRESS;
+	vic_sfc.width    = 1280;
+	vic_sfc.height   = 720;
+	vic_sfc.pix_fmt  = VIC_PIX_FORMAT_A8R8G8B8;
+	vic_sfc.rotation = VIC_ROTATION_270;
+
+	vic_init();
+	vic_set_surface(&vic_sfc);
+
+	vic_compose();
+	vic_wait_idle();
+
+	display_init_window_a_pitch_vic();
+	gfx_init_ctxt((u32 *)NYX_FB2_ADDRESS, 1280,720,1280);
+	gfx_con_init();
+
+	display_backlight_pwm_init();
+	display_backlight_brightness(80, 1000);
+
+	gfx_clear_grey(0xb1);
+
+	gfx_render_sdf();
+
+	gfx_con.fntsz = 16;
+	gfx_bake_atlas(gfx_con.fntsz);
+
+	vic_compose();
+	vic_wait_idle();
+}
+
 void ipl_main() {
     hw_init();
 
@@ -36,13 +69,7 @@ void ipl_main() {
     TEConfig.errors    |= minerva_init(NULL) ? ERR_LIBSYS_LP0 : false;
 	TEConfig.FSBuffSize = (TEConfig.minervaEnabled) ? 0x800000 : 0x10000;
 
-
-    u32 *fb = display_init_window_a_pitch();
-    gfx_init_ctxt(fb, 1280, 720, 720);
-    gfx_con_init();
-
-    display_backlight_pwm_init();
-    display_backlight_brightness(100, 1000);
+	_display_init();
 
 	emummc_load_cfg();
 
@@ -58,8 +85,19 @@ void ipl_main() {
 	// PikaObj* pikaObj = pikaScriptInit();
 	// pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_main_py_o);
 
+	gfx_printf("\n\n\n");
+	u32 before = get_tmr_us();
+	gfx_test_putc('k');
 
-	drawError(newError(TE_ERROR_MEM_ALLOC_FAIL));
+	u32 after = get_tmr_us();
+	gfx_printf("\nTook %dus", after - before);
+
+
+	vic_compose();
+	vic_wait_idle();
+	hidWait();
+
+	// drawError(newError(TE_ERROR_MEM_ALLOC_FAIL));
 
 	power_set_state(POWER_OFF_RESET);
 

@@ -68,5 +68,7 @@ void drawError(error_t error) {
     gfx_con_setpos(lx + ((lenx - 19 * 16) / 2), ly + leny - 48);
     gfx_printf("Press A to continue");
 
+    vic_compose();
+    vic_wait_idle();
     hidWaitMask((JoyA | JoyB));
 }

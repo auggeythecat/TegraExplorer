@@ -13,6 +13,8 @@ typedef struct _vecHeader_t {
     u32 elementSize;
 } vecHeader_t;
 
+typedef void* vector_t;
+
 #define          newVec(type, preallocate) _vecInit(sizeof(type), preallocate)
 #define newVecFromArray(type, data, count) _vecFromArray(data, count, sizeof(type))
 
@@ -33,7 +35,7 @@ typedef struct _vecHeader_t {
 #define     vecPop(vec) (vecHeader(vec)->count -= 1)
 #define vecPopBack(vec) (vecPop(vec))
 
-#define vecForEach(type, varname, vecPtr) for (type varname = vecPtr; ((u8*) (varname) - (u8*) (vecPtr)) < (vecHeader(vecPtr)->count); (varname++))
+#define vecForEach(type, varName, vecPtr) for (type varName = vecPtr; ((u8*) (varName) - (u8*) (vecPtr)) < (vecHeader(vecPtr)->count); (varName++))
 
 #define  vecFree(vec) free(vec); (vec) = NULL;
 #define vecClear(vec) (vecHeader(vec)->count = 0)

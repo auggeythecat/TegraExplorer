@@ -34,7 +34,7 @@ VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     
 
 OBJS  = start exception_handlers main heap gfx
 
-OBJS += bpmp ccplex clock di irq timer \
+OBJS += bpmp ccplex clock di vic irq timer \
 		mc sdram minerva smmu \
 		gpio pinmux pmc se tsec uart \
 		fuse kfuse \
