@@ -4,6 +4,8 @@ build
 output
 
 loader/payload.h
+source/keys/tsec_keygen.h
+
 source/pikapython/pikascript-api-old
 
 *.py.*

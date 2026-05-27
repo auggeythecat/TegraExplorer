@@ -26,6 +26,8 @@ BDKINC    := -I./$(BDKDIR)
 LOADERDIR := ./loader
 NRVDIR    := ./tools/nrv
 BIN2CDIR  := ./tools/bin2c
+KEYGENDIR := ./$(SOURCEDIR)/keys
+KEYGEN    := tsec_keygen
 
 VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  $(dir $(wildcard ./$(SOURCEDIR)/*/*/) $(dir $(wildcard ./$(SOURCEDIR)/*/*/*/)))
 VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
@@ -75,6 +77,7 @@ OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
 
 GFX_INC   := '"../$(SOURCEDIR)/gfx/gfx.h"'
 FFCFG_INC := '"../$(SOURCEDIR)/libs/fatfs/ffconf.h"'
+PREBUILD   = tsec_keygen
 
 ################################################################################
 
@@ -101,7 +104,7 @@ LDFLAGS += -Wl,-Map=./output.map,--cref
 
 ################################################################################
 
-.PHONY: all clean
+.PHONY: all clean pre_build $(PREBUILD)
 
 all: $(OUTPUTDIR)/$(TARGET)_small.bin
 	@echo "--------------------------------------"
@@ -119,6 +122,7 @@ clean:
 	@rm -rf $(BUILDDIR)
 	@rm -rf $(OUTPUTDIR)
 	@rm -rf $(LOADERDIR)/payload.h
+	@rm -rf $(KEYGENDIR)/$(KEYGEN).h
 
 $(OUTPUTDIR)/$(TARGET)_small.bin: $(OUTPUTDIR)/$(TARGET).bin
 	@$(MAKE) -C $(NRVDIR)
@@ -135,6 +139,13 @@ $(OUTPUTDIR)/$(TARGET).bin: $(BUILDDIR)/$(TARGET)/$(TARGET).elf
 
 $(BUILDDIR)/$(TARGET)/$(TARGET).elf: $(OBJS)
 	$(CC) $(LDFLAGS) -T $(SOURCEDIR)/link.ld $^ -o $@
+
+pre_build: $(PREBUILD)
+
+tsec_keygen: $(TOOLS)
+	@cd $(KEYGENDIR) && ../../$(BIN2CDIR)/bin2c $(KEYGEN) > $(KEYGEN).h
+
+$(OBJS): | pre_build
 
 $(BUILDDIR)/$(TARGET)/%.o: %.c
 	@mkdir -p "$(@D)"

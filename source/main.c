@@ -7,6 +7,7 @@
 #include "util/error.h"
 
 #include "test_script.h"
+#include "keys/keys.h"
 
 #include "pikapython/pikascript-api/pikaScript.h"
 #include "pikapython/pikascript-core/PikaVM.h"
@@ -85,6 +86,9 @@ void ipl_main() {
 	// PikaObj* pikaObj = pikaScriptInit();
 	// pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_main_py_o);
 
+	key_storage_t keys = {};
+	derive_relevant_keys(&keys);
+
 	gfx_printf("\n\n\n");
 	u32 before = get_tmr_us();
 	gfx_test_putc('k');
@@ -92,14 +96,14 @@ void ipl_main() {
 	u32 after = get_tmr_us();
 	gfx_printf("\nTook %dus", after - before);
 
-
 	vic_compose();
 	vic_wait_idle();
-	hidWait();
 
 	// drawError(newError(TE_ERROR_MEM_ALLOC_FAIL));
 
-	power_set_state(POWER_OFF_RESET);
+	hidWait();
+
+	power_set_state(POWER_OFF);
 
 	while (true)
         bpmp_halt();
