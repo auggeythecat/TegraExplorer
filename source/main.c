@@ -39,11 +39,6 @@ void _display_init() {
 
 	gfx_clear_grey(0xb1);
 
-	gfx_render_sdf();
-
-	gfx_con.fntsz = 16;
-	gfx_bake_atlas(gfx_con.fntsz);
-
 	vic_compose();
 	vic_wait_idle();
 }
@@ -80,7 +75,6 @@ void ipl_main() {
 
 	TEConfig.Pkg1ID = "Unknown";
 
-
 	minerva_change_freq(FREQ_800);
 
 	// PikaObj* pikaObj = pikaScriptInit();
@@ -90,22 +84,18 @@ void ipl_main() {
 	derive_relevant_keys(&keys);
 
 	gfx_printf("\n\n\n");
-	u32 before = get_tmr_us();
-	gfx_test_putc('k');
 
-	u32 after = get_tmr_us();
-	gfx_printf("\nTook %dus", after - before);
+	gfx_con_set_fontsz(16);
+	gfx_test_puts("abcdefghijklmonpqrstuvwxyz0123456789");
+	gfx_test_putc('\n'); gfx_test_putc('\n');
+	gfx_puts("abcdefghijklmonpqrstuvwxyz0123456789");
 
 	vic_compose();
 	vic_wait_idle();
 
-	// drawError(newError(TE_ERROR_MEM_ALLOC_FAIL));
-
 	hidWait();
-
 	power_set_state(POWER_OFF);
 
 	while (true)
         bpmp_halt();
-
 }

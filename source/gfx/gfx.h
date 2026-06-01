@@ -36,20 +36,20 @@
 
 #define NATIVE_FONT_SIZE 8
 #define SDF_SIZE         8
+#define MAX_ATLASES      16
+#define NUM_CHARS        98
 
-//TODO: Bump allocation
 #define SDF_BUFFER        NYX_RES_ADDR
-#define SDF_ATLAS_8_BUFF  SDF_BUFFER        + SZ_32K
-#define SDF_ATLAS_16_BUFF SDF_ATLAS_8_BUFF  + SZ_32K
-#define SDF_ATLAS_24_BUFF SDF_ATLAS_16_BUFF + SZ_64K
-#define SDF_ATLAS_32_BUFF SDF_ATLAS_24_BUFF + SZ_128K
-#define SDF_ATLAS_48_BUFF SDF_ATLAS_32_BUFF + SZ_256K
-#define SDF_ATLAS_64_BUFF SDF_ATLAS_48_BUFF + SZ_512K
 
 //TODO: move to a util file or something, this doesn't belownng here.
 #define CLAMP(val, min, max) ((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
 #define CLAMPMIN(val, min) ((val) < (min) ? (min) : (val))
 #define CLAMPMAX(val, max) ((val) > (max) ? (max) : (val))
+
+typedef struct _sdf_atlas_t {
+    u32 size;
+    u8* data;
+} sdf_atlas_t;
 
 typedef struct _gfx_ctxt_t {
     u32 *fb;
@@ -114,9 +114,11 @@ void gfx_putc_small(char c);
 // What are these for?
 void gfx_set_rect_grey(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y);
 void gfx_set_rect_rgb(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y);
+
 void gfx_render_sdf();
-void gfx_putc_sdf(char c);
 void gfx_test_putc(char c);
+void gfx_test_puts(const char *s);
 void gfx_bake_atlas(u32 fontSize);
+void gfx_con_set_fontsz(u32 fontSize);
 
 #endif
