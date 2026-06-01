@@ -39,7 +39,7 @@
 #define MAX_ATLASES      16
 #define NUM_CHARS        98
 
-#define SDF_BUFFER        NYX_RES_ADDR
+#define SDF_BUFFER       NYX_RES_ADDR
 
 //TODO: move to a util file or something, this doesn't belownng here.
 #define CLAMP(val, min, max) ((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
@@ -73,8 +73,6 @@ typedef struct _gfx_con_t {
 
 extern gfx_ctxt_t gfx_ctxt;
 extern gfx_con_t gfx_con;
-
-// TODO: How important is c/col/column?
 
 void gfx_init_ctxt(u32 *fb, u32 width, u32 height, u32 stride);
 void gfx_clear_grey(u8 color);
@@ -116,8 +114,6 @@ void gfx_set_rect_grey(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos
 void gfx_set_rect_rgb(const u8 *buf, u32 size_x, u32 size_y, u32 pos_x, u32 pos_y);
 
 void gfx_render_sdf();
-void gfx_test_putc(char c);
-void gfx_test_puts(const char *s);
 void gfx_bake_atlas(u32 fontSize);
 void gfx_con_set_fontsz(u32 fontSize);
 

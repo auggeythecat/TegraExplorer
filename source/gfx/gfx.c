@@ -153,7 +153,7 @@ void gfx_render_sdf() {
 }
 
 static sdf_atlas_t atlases[MAX_ATLASES];
-static u32 atlas_count = 0;
+static u32 atlas_count   = 0;
 static u8* atlas_pointer = (u8*) SDF_BUFFER + SZ_32K;
 
 u8* _gfx_get_atlas(u32 size) {
@@ -162,7 +162,7 @@ u8* _gfx_get_atlas(u32 size) {
 	}
 
 	if (atlas_count < MAX_ATLASES) {
-		u32 muh_bytes  = NUM_CHARS * (size * size);
+		u32 muh_bytes  = NUM_CHARS * (size*size);
 
 		u8* start_ptr  = (u8*)atlas_pointer;
 		atlas_pointer += (muh_bytes + 3) & ~3;
@@ -177,39 +177,38 @@ void gfx_bake_atlas(u32 fontSize) {
 	u8 *atlas_buf = _gfx_get_atlas(fontSize);
 	if (!atlas_buf) return;
 
-	u32 num_chars = ARRAY_SIZE(_gfx_font) / NATIVE_FONT_SIZE;
-	sfp8_t step = sfp8_div(SFP8FROMINT(SDF_SIZE-1), SFP8FROMINT(fontSize-1));
+	sfp16_t step = sfp16_div(SFP16FROMINT(SDF_SIZE-1), SFP16FROMINT(fontSize-1));
 
-	for (int i = 0; i < num_chars; i++) {
+	for (int i = 0; i < NUM_CHARS; i++) {
 		u8* char_sdf_base = &((u8*)SDF_BUFFER)[i * (SDF_SIZE * SDF_SIZE)];
 
 		for (int py = 0; py < fontSize; py++) {
-			sfp8_t y_pos = py * step;
+			sfp16_t y_pos = py * step;
 			for (int px = 0; px < fontSize; px++) {
-				sfp8_t x_pos = px * step;
-				int ix  = SFP8GETINT(x_pos);
-				int iy  = SFP8GETINT(y_pos);
-				int fx  = SFP8GETDEC(x_pos);
-				int fy  = SFP8GETDEC(y_pos);
+				sfp16_t x_pos = px * step;
+				int ix = SFP16GETINT(x_pos);
+				int iy = SFP16GETINT(y_pos);
+				int fx = SFP16GETDEC(x_pos);
+				int fy = SFP16GETDEC(y_pos);
 
 				if (iy >= SDF_SIZE - 1) iy = SDF_SIZE - 2;
 				if (ix >= SDF_SIZE - 1) ix = SDF_SIZE - 2;
 
-				int cix    = (ix + 1 >= SDF_SIZE) ? ix : ix + 1;
-				int ciy    = (iy + 1 >= SDF_SIZE) ? iy : iy + 1;
+				int cix = (ix + 1 >= SDF_SIZE) ? ix : ix + 1;
+				int ciy = (iy + 1 >= SDF_SIZE) ? iy : iy + 1;
 
-				int s00    = char_sdf_base[iy  * SDF_SIZE + ix ];
-				int s10    = char_sdf_base[iy  * SDF_SIZE + cix];
-				int s01    = char_sdf_base[ciy * SDF_SIZE + ix ];
-				int s11    = char_sdf_base[ciy * SDF_SIZE + cix];
+				int s00 = char_sdf_base[ iy * SDF_SIZE +  ix];
+				int s10 = char_sdf_base[ iy * SDF_SIZE + cix];
+				int s01 = char_sdf_base[ciy * SDF_SIZE +  ix];
+				int s11 = char_sdf_base[ciy * SDF_SIZE + cix];
 
-				int top    = s00 + (((s10    - s00) * fx) >> 8);
-				int bottom = s01 + (((s11    - s01) * fx) >> 8);
-				int sample = top + (((bottom - top) * fy) >> 8);
+				int top = s00 + (((s10 - s00) * fx) >> 8);
+				int bot = s01 + (((s11 - s01) * fx) >> 8);
+				int sam = top + (((bot - top) * fy) >> 8);
 
 				u32 index  = i * (fontSize * fontSize) + (py * fontSize) + px;
 
-				int alpha  = (sample - 128) * 32;
+				int alpha  = (sam - 128) * 32;
 					alpha  = CLAMP(alpha, 0, 255);
 
 				atlas_buf[index] = (u8)alpha;
@@ -218,7 +217,67 @@ void gfx_bake_atlas(u32 fontSize) {
 	}
 }
 
-void __attribute__((target("arm"))) __attribute__((optimize("O3"))) gfx_test_putc(char c) {
+void gfx_clear_grey(u8 color) {
+	memset(gfx_ctxt.fb, color, gfx_ctxt.width * gfx_ctxt.height * 4);
+}
+
+void gfx_clear_partial_grey(u8 color, u32 pos_y, u32 height) {
+	memset(gfx_ctxt.fb + pos_y * gfx_ctxt.stride, color, height * 4 * gfx_ctxt.stride);
+}
+
+void gfx_clear_color(u32 color) {
+	for (u32 i = 0; i < gfx_ctxt.width * gfx_ctxt.height; i++)
+		gfx_ctxt.fb[i] = color;
+}
+
+void gfx_init_ctxt(u32 *fb, u32 width, u32 height, u32 stride) {
+	gfx_ctxt.fb     = fb;
+	gfx_ctxt.width  = width;
+	gfx_ctxt.height = height;
+	gfx_ctxt.stride = stride;
+}
+
+void gfx_con_init() {
+	gfx_con.gfx_ctxt  = &gfx_ctxt;
+	gfx_con.fntsz     = 16;
+	gfx_con.x         = 0;
+	gfx_con.y         = 0;
+	gfx_con.savedx    = 0;
+	gfx_con.savedy    = 0;
+	gfx_con.fgcol     = COLOR_GREEN;
+	gfx_con.fillbg    = 1;
+	gfx_con.bgcol     = COLOR_DEFAULT;
+	gfx_con.mute      = 0;
+
+	gfx_con_init_done = true;
+
+	gfx_render_sdf();
+	gfx_bake_atlas(gfx_con.fntsz);
+}
+
+void gfx_con_setcol(u32 fgcol, int fillbg, u32 bgcol){
+	gfx_con.fgcol  = fgcol;
+	gfx_con.fillbg = fillbg;
+	gfx_con.bgcol  = bgcol;
+}
+
+void gfx_con_getpos(u32 *x, u32 *y) {
+	*y = gfx_con.y;
+	*x = gfx_con.x;
+}
+
+void gfx_con_setpos(u32 x, u32 y) {
+	gfx_con.y = y;
+	gfx_con.x = x;
+
+}
+
+void gfx_con_set_fontsz(u32 fontSize) {
+	gfx_con.fntsz = fontSize;
+	gfx_bake_atlas(fontSize);
+}
+
+void __attribute__((target("arm"))) __attribute__((optimize("Os"))) gfx_putc(char c) {
 	if unlikely(c <= 32 || c >= 129) {
 		if (c == '\n') {
 			gfx_con.x = 0;
@@ -230,7 +289,7 @@ void __attribute__((target("arm"))) __attribute__((optimize("O3"))) gfx_test_put
 	}
 
 	u32 sz    = gfx_con.fntsz;
-	u8 *data  = &_gfx_get_atlas(sz)[(c - 32) * (sz * sz)];
+	u8  *data = &_gfx_get_atlas(sz)[(c - 32) * (sz * sz)];
 	u32 *fb   = gfx_ctxt.fb + gfx_con.x + (gfx_con.y * gfx_ctxt.stride);
 	u32 mask  = 0x00FF00FF;
 
@@ -259,145 +318,6 @@ void __attribute__((target("arm"))) __attribute__((optimize("O3"))) gfx_test_put
 	gfx_con.x += sz;
 }
 
-
-void gfx_test_puts(const char *s) {
-	if (!s || !gfx_con_init_done || gfx_con.mute)
-		return;
-
-	for (; *s; s++) {
-		gfx_test_putc(*s);
-	}
-}
-
-void gfx_clear_grey(u8 color) {
-	memset(gfx_ctxt.fb, color, gfx_ctxt.width * gfx_ctxt.height * 4);
-}
-
-void gfx_clear_partial_grey(u8 color, u32 pos_y, u32 height) {
-	memset(gfx_ctxt.fb + pos_y * gfx_ctxt.stride, color, height * 4 * gfx_ctxt.stride);
-}
-
-void gfx_clear_color(u32 color) {
-	for (u32 i = 0; i < gfx_ctxt.width * gfx_ctxt.height; i++)
-		gfx_ctxt.fb[i] = color;
-}
-
-void gfx_init_ctxt(u32 *fb, u32 width, u32 height, u32 stride) {
-	gfx_ctxt.fb = fb;
-	gfx_ctxt.width = width;
-	gfx_ctxt.height = height;
-	gfx_ctxt.stride = stride;
-}
-
-void gfx_con_init() {
-	gfx_con.gfx_ctxt = &gfx_ctxt;
-	gfx_con.fntsz = 16;
-	gfx_con.x = 0;
-	gfx_con.y = 0;
-	gfx_con.savedx = 0;
-	gfx_con.savedy = 0;
-	gfx_con.fgcol = COLOR_GREEN;
-	gfx_con.fillbg = 1;
-	gfx_con.bgcol = COLOR_DEFAULT;
-	gfx_con.mute = 0;
-
-	gfx_con_init_done = true;
-
-	gfx_render_sdf();
-	gfx_bake_atlas(gfx_con.fntsz);
-}
-
-void gfx_con_setcol(u32 fgcol, int fillbg, u32 bgcol){
-	gfx_con.fgcol = fgcol;
-	gfx_con.fillbg = fillbg;
-	gfx_con.bgcol = bgcol;
-}
-
-void gfx_con_getpos(u32 *x, u32 *y) {
-	*y = gfx_con.y;
-	*x = gfx_con.x;
-}
-
-void gfx_con_setpos(u32 x, u32 y) {
-	gfx_con.y = y;
-	gfx_con.x = x;
-
-}
-
-void gfx_con_set_fontsz(u32 fontSize) {
-	gfx_con.fntsz = fontSize;
-	gfx_bake_atlas(fontSize);
-}
-
-// TODO: See if I can make this make more sense
-
-void gfx_putc(char c) {
-	// Duplicate code for performance reasons.
-	switch (gfx_con.fntsz) {
-	default:
-	case 16:
-		if (c >= 32 && c <= 129) {
-			u8 *cbuf = (u8 *)&_gfx_font[8 * (c - 32)];
-			u32 *fb = gfx_ctxt.fb + gfx_con.x + gfx_con.y * gfx_ctxt.stride;
-
-			for (u32 i = 0; i < 16; i+=2) {
-				u8 v = *cbuf;
-				for (u32 k = 0; k < 2; k++) {
-					for (u32 j = 0; j < 8; j++) {
-						if (v & 1) {
-							*fb = gfx_con.fgcol;
-							fb++;
-							*fb = gfx_con.fgcol;
-						} else if (gfx_con.fillbg) {
-							*fb = gfx_con.bgcol;
-							fb++;
-							*fb = gfx_con.bgcol;
-						} else
-							fb++;
-
-						v >>= 1;
-						fb++;
-					}
-					fb += gfx_ctxt.stride - 16;
-					v = *cbuf;
-				}
-				cbuf++;
-			}
-			gfx_con.x += 16;
-		} else if (c == '\n') {
-			gfx_con.x = 0;
-			gfx_con.y += 16;
-			if (gfx_con.y > gfx_ctxt.height - 16)
-				gfx_con.y = 0;
-		}
-		break;
-	case 8:
-		if (c >= 30 && c <= 129) {
-			u8 *cbuf = (u8 *)&_gfx_font[8 * (c - 32)];
-			u32 *fb = gfx_ctxt.fb + gfx_con.x + gfx_con.y * gfx_ctxt.stride;
-			for (u32 i = 0; i < 8; i++) {
-				u8 v = *cbuf++;
-				for (u32 j = 0; j < 8; j++) {
-					if (v & 1)
-						*fb = gfx_con.fgcol;
-					else if (gfx_con.fillbg)
-						*fb = gfx_con.bgcol;
-					v >>= 1;
-					fb++;
-				}
-				fb += gfx_ctxt.stride - 8;
-			}
-			gfx_con.x += 8;
-		} else if (c == '\n') {
-			gfx_con.x = 0;
-			gfx_con.y += 8;
-			if (gfx_con.y > gfx_ctxt.height - 8)
-				gfx_con.y = 0;
-		}
-		break;
-	}
-}
-
 void gfx_puts(const char *s) {
 	if (!s || !gfx_con_init_done || gfx_con.mute)
 		return;
@@ -424,7 +344,7 @@ static void _gfx_putn(u32 v, int base, char fill, int fcnt) {
 		c--;
 	}
 
-	p = buf + 64;
+	 p = buf + 64;
 	*p = 0;
 	do {
 		c--;
@@ -530,8 +450,6 @@ void gfx_hexdump(u32 base, const void *buf, u32 len) {
 
 	u8 *buff = (u8 *)buf;
 
-	u8 prevFontSize = gfx_con.fntsz;
-	// gfx_con.fntsz = 8;
 	for (u32 i = 0; i < len; i++) {
 		if (i % 0x10 == 0) {
 			if (i != 0) {
@@ -568,7 +486,6 @@ void gfx_hexdump(u32 base, const void *buf, u32 len) {
 		}
 	}
 	gfx_putc('\n');
-	gfx_con.fntsz = prevFontSize;
 }
 
 void gfx_set_pixel(u32 x, u32 y, u32 color) {
@@ -576,14 +493,13 @@ void gfx_set_pixel(u32 x, u32 y, u32 color) {
 }
 
 static int _abs(int x) {
-	if (x < 0)
-		return -x;
+	if (x < 0) return -x;
 	return x;
 }
 
 void gfx_line(int x0, int y0, int x1, int y1, u32 color) {
-	int dx = _abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-	int dy = _abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+	int dx  = _abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+	int dy  = _abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
 	int err = (dx > dy ? dx : -dy) / 2, e2;
 
 	while (1) {
@@ -593,11 +509,11 @@ void gfx_line(int x0, int y0, int x1, int y1, u32 color) {
 		e2 = err;
 		if (e2 >-dx) {
 			err -= dy;
-			x0 += sx;
+			x0  += sx;
 		}
 		if (e2 < dy) {
 			err += dx;
-			y0 += sy;
+			y0  += sy;
 		}
 	}
 }
