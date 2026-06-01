@@ -33,6 +33,7 @@
 #define COLORTORGB(color) (color & 0x00FFFFFF)
 #define SETCOLOR(fg, bg) gfx_con_setcol(fg, 1, bg)
 #define RESETCOLOR SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
+.#define RGBUNIONTOCOLOR(optionUnion) (optionUnion | 0xFF000000)
 
 #define NATIVE_FONT_SIZE 8
 #define SDF_SIZE         8
@@ -88,6 +89,7 @@ void gfx_puts(const char *s);
 void gfx_cputs(u32 color, const char *s);
 void gfx_vprintf(const char *fmt, va_list ap);
 void gfx_printf(const char *fmt, ...);
+void gfx_puts_limit(const char *s, u32 limit);
 void gfx_hexdump(u32 base, const void *buf, u32 len);
 
 void gfx_set_pixel(u32 x, u32 y, u32 color);

@@ -272,6 +272,22 @@ void gfx_con_setpos(u32 x, u32 y) {
 
 }
 
+void gfx_puts_limit(const char *s, u32 limit){
+	if (!s || gfx_con.mute)
+		return;
+
+	u32 len = strlen(s);
+
+	if (len > limit)
+		limit -= 3;
+
+	for (int i = 0; i < MIN(len, limit); i++)
+		gfx_putc(s[i]);
+
+	if (len > limit + 3)
+		gfx_puts("...");
+}
+
 void gfx_con_set_fontsz(u32 fontSize) {
 	gfx_con.fntsz = fontSize;
 	gfx_bake_atlas(fontSize);
@@ -398,6 +414,12 @@ void gfx_vprintf(const char *fmt, va_list ap) {
 				case 'd':
 					_gfx_putn(va_arg(ap, u32), 10, fill, fcnt);
 					break;
+				case 'n':
+					gfx_putc('\n');
+				case 'N':
+					u32 tmp = gfx_con.x;
+					gfx_putc('\n');
+					gfx_con.x = tmp;
 				case 'p':
 				case 'P':
 				case 'x':

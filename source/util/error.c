@@ -14,6 +14,7 @@
 
 const char* _TEErrors[] = {
     [TE_SUCCESS]                      = "Success! Error should not have been drawn!",
+    [TE_ERROR_NOT_IMPL_YET]           = "This feature isn't implemented yet!",
     [TE_ERROR_IO]                     = "I/O error!",
     [TE_ERROR_NO_DISK]                = "No disk error!",
     [TE_ERROR_NOT_READY]              = "Not ready!",
@@ -44,7 +45,7 @@ const char* _TEErrors[] = {
     [TE_EXCEPTION_PREF_ABORT]         = "Exception: Pref abort!",
     [TE_EXCEPTION_DATA_ABORT]         = "Exception: Data abort!",
 
-    [TE_WARN_FILE_EXISTS]             = "Warning: File already exists",
+    [TE_WARN_FILE_EXISTS]             = "Warning: File already exists!",
     [TE_WARN_FILE_TOO_SMALL_FOR_DEST] = "Warning: File is too small for destination!",
 };
 

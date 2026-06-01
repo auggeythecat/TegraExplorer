@@ -61,15 +61,14 @@ void ipl_main() {
 
     bpmp_clk_rate_set(BPMP_CLK_LOWER_BOOST);
 
-	TEConfig.errors    |= sd_mount() ? ERR_SD_BOOT_EN : false;
-    TEConfig.errors    |= minerva_init(NULL) ? ERR_LIBSYS_LP0 : false;
-	TEConfig.FSBuffSize = (TEConfig.minervaEnabled) ? 0x800000 : 0x10000;
+	TEConfig.errors    |= sd_mount()              ? ERR_SD_BOOT_EN : false;
+    TEConfig.errors    |= minerva_init(NULL)      ? ERR_LIBSYS_LP0 : false;
+	TEConfig.FSBuffSize = TEConfig.minervaEnabled ? 0x800000       : 0x10000;
 
 	_display_init();
 
 	emummc_load_cfg();
 
-	// Ignore whether emummc is enabled.
 	emu_cfg.enabled = !(emu_cfg.sector == true && !emu_cfg.path);
 	TEConfig.emummcForceDisable = false;
 
@@ -77,24 +76,12 @@ void ipl_main() {
 
 	minerva_change_freq(FREQ_800);
 
-	// PikaObj* pikaObj = pikaScriptInit();
-	// pikaVM_runByteCode(pikaObj, __source_pikapython_pikascript_api_main_py_o);
+	PikaObj* pikaObj = pikaScriptInit();
 
 	key_storage_t keys = {};
 	derive_relevant_keys(&keys);
 
-	gfx_printf("\n\n\n");
-
-	gfx_con_set_fontsz(16);
-	gfx_test_puts("abcdefghijklmonpqrstuvwxyz0123456789");
-	gfx_test_putc('\n'); gfx_test_putc('\n');
-	gfx_puts("abcdefghijklmonpqrstuvwxyz0123456789");
-
-	vic_compose();
-	vic_wait_idle();
-
 	hidWait();
-	power_set_state(POWER_OFF);
 
 	while (true)
         bpmp_halt();

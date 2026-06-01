@@ -9,6 +9,7 @@
 
 enum {
     TE_SUCCESS = 0,
+    TE_ERROR_NOT_IMPL_YET,
     TE_ERROR_IO,
     TE_ERROR_NO_DISK,
     TE_ERROR_NOT_READY,

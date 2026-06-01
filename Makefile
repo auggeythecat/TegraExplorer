@@ -63,12 +63,13 @@ OBJS += BaseObj dataArg dataArgs dataLink \
 #		standardLibrary unsolvedArrayClass
 #
 
-OBJS += emummc mountManager config vector error hid keys
+OBJS += emummc mountManager config vector error hid keys utils
 #OBJS += keyfile nca emmcfile emummc hid config menu tools err gfxutils utils vector \
 #		fsutils mountmanager fscopy folderReader \
 #		keys
 #
 #OBJS += mainmenu filemenu foldermenu gptmenu explorer
+OBJS += menu mainMenu
 
 OBJS += diskio ff ffunicode ffsystem elfload elfreloc_arm
 
