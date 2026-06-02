@@ -20,4 +20,6 @@ void powerOff();
 void rebootRCM();
 void reboot();
 
+u32 fuse_read_bootrom_rev();
+
 #endif //_UTILS_H

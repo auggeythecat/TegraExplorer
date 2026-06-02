@@ -95,7 +95,7 @@ u32 newMenu(vector_t vec, int startIndex, int screenLenX, int screenLenY, u8 opt
             gfx_con_setpos(startX, startY);
 
             if (redrawScreen)
-                gfx_boxGrey(startX,startY, startX + screenLenX * 16, startY + screenLenY * 16, COLOR_DEFAULT);
+                gfx_boxGrey(startX,startY, startX + screenLenX * 16, startY + screenLenY * 16, 0x1b);
 
             int start = selected / screenLenY * screenLenY;
             gfx_con_setpos(startX, startY);

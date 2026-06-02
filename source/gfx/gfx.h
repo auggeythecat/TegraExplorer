@@ -33,7 +33,7 @@
 #define COLORTORGB(color) (color & 0x00FFFFFF)
 #define SETCOLOR(fg, bg) gfx_con_setcol(fg, 1, bg)
 #define RESETCOLOR SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
-.#define RGBUNIONTOCOLOR(optionUnion) (optionUnion | 0xFF000000)
+#define RGBUNIONTOCOLOR(optionUnion) (optionUnion | 0xFF000000)
 
 #define NATIVE_FONT_SIZE 8
 #define SDF_SIZE         8

@@ -303,10 +303,11 @@ void __attribute__((target("arm"))) __attribute__((optimize("Os"))) gfx_putc(cha
 		}
 		return;
 	}
-
 	u32 sz    = gfx_con.fntsz;
-	u8  *data = &_gfx_get_atlas(sz)[(c - 32) * (sz * sz)];
-	u32 *fb   = gfx_ctxt.fb + gfx_con.x + (gfx_con.y * gfx_ctxt.stride);
+
+	u8 * restrict data = &_gfx_get_atlas(sz)[(c - 32) * (sz * sz)];
+	u32* restrict fb   = gfx_ctxt.fb + gfx_con.x + (gfx_con.y * gfx_ctxt.stride);
+
 	u32 mask  = 0x00FF00FF;
 
 	u32 fg    = gfx_con.fgcol;
@@ -324,6 +325,8 @@ void __attribute__((target("arm"))) __attribute__((optimize("Os"))) gfx_putc(cha
 			if likely(alpha == 0)   { *fb++ = bg; continue;};
 			if likely(alpha == 255) { *fb++ = fg; continue;};
 
+			// TODO: change to one mult and test.
+			// out = bg + ((fg-bg) * alpha) / 256
 			u32 rb = (bg_rb * (255 - alpha) + fg_rb * alpha) >> 8;
 			u32 ag = (bg_ag * (255 - alpha) + fg_ag * alpha);
 
@@ -472,6 +475,8 @@ void gfx_hexdump(u32 base, const void *buf, u32 len) {
 
 	u8 *buff = (u8 *)buf;
 
+	u8 prevFontSize = gfx_con.fntsz;
+	// gfx_con.fntsz = 8;
 	for (u32 i = 0; i < len; i++) {
 		if (i % 0x10 == 0) {
 			if (i != 0) {
@@ -508,6 +513,7 @@ void gfx_hexdump(u32 base, const void *buf, u32 len) {
 		}
 	}
 	gfx_putc('\n');
+	gfx_con.fntsz = prevFontSize;
 }
 
 void gfx_set_pixel(u32 x, u32 y, u32 color) {

@@ -8,6 +8,7 @@
 #include "keys.h"
 #include "tsec_keygen.h"
 #include "../../util/config.h"
+#include "../../util/utils.h"
 
 typedef enum {
     _NOT_DEVICE_UNIQUE = 0,
@@ -57,16 +58,6 @@ void _get_secure_data(key_storage_t *keys, void *out_data) {
     for (u32 i = 0; i < SE_KEY_128_SIZE; i++) {
         d[SE_KEY_128_SIZE + i] ^= _secure_data_tweaks[0][i];
     }
-}
-
-// TODO: Move out of this object
-u32 fuse_read_bootrom_rev()
-{
-    u32 rev = FUSE(FUSE_SOC_SPEEDO_1_CALIB);
-    if (hw_get_chip_id() == GP_HIDREV_MAJOR_T210)
-        return rev;
-    else
-        return rev | (1 << 12);
 }
 
 void _generate_specific_aes_key(u32 ks, key_storage_t *keys, void *out_key, const void *key_source, u32 generation) {
