@@ -3,8 +3,13 @@
 
 #include <bdk.h>
 
+#define SCREEN_WIDTH  1280
+#define SCREEN_HEIGHT 720
+
 #define GFX_COL_KEEP 0xFFFE
 #define GFX_COL_AUTO 0xFFFF
+
+#define COLOR_TRANSPARENT  0x00000000
 
 #define COLOR_RED          0xFFE70000
 #define COLOR_ORANGE       0xFFFF8C00
@@ -29,23 +34,33 @@
 #define WPRINTF(text) gfx_printf("%k"text"%k\n", COLOR_YELLOW, COLOR_DEFAULT)
 #define WPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_YELLOW, args, COLOR_DEFAULT)
 
-#define RGBTOCOLOR(r, g, b) (b << 16 | g << 8 | r)
-#define COLORTORGB(color) (color & 0x00FFFFFF)
+#define RGBTOCOLOR(r, g, b) (b << 16 | g << 8 | r << 0)
+#define GREYTOCOLOR(s)      (s << 16 | s << 8 | s << 0)
+#define COLORTORGB(color)   (color & 0x00FFFFFF)
+#define COLORTOGREY(color)  (color & 0x000000FF) // TODO: proper conversion. For now, just only input grey colors.
 #define SETCOLOR(fg, bg) gfx_con_setcol(fg, 1, bg)
 #define RESETCOLOR SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
-#define RGBUNIONTOCOLOR(optionUnion) (optionUnion | 0xFF000000)
+
 
 #define NATIVE_FONT_SIZE 8
-#define SDF_SIZE         8
+#define PADDING          1
+#define SDF_SIZE         (NATIVE_FONT_SIZE + (PADDING * 2))
+#define INNER_SIZE       (SDF_SIZE - (PADDING * 2))
+
 #define MAX_ATLASES      16
 #define NUM_CHARS        98
 
 #define SDF_BUFFER       NYX_RES_ADDR
 
+#define GFX_CHAR_SPACE    0
+#define GFX_CHAR_FOLDER   127
+#define GFX_CHAR_FILE     128
+#define GFX_CHAR_CHARGING 129
+
 //TODO: move to a util file or something, this doesn't belownng here.
-#define CLAMP(val, min, max) ((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
-#define CLAMPMIN(val, min) ((val) < (min) ? (min) : (val))
-#define CLAMPMAX(val, max) ((val) > (max) ? (max) : (val))
+#define    CLAMP(val, min, max) ((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
+#define CLAMPMIN(val, min)      ((val) < (min) ? (min) :  (val))
+#define CLAMPMAX(val, max)                               ((val) > (max) ? (max) : (val))
 
 typedef struct _sdf_atlas_t {
     u32 size;

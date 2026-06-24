@@ -18,7 +18,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "gfx.h"
-#include "../util/fixedpoint8x8.h"
+#include "../util/fixedpoint.h"
 
 gfx_ctxt_t gfx_ctxt;
 gfx_con_t gfx_con;
@@ -128,14 +128,31 @@ static const u8 _gfx_font[NUM_CHARS * NATIVE_FONT_SIZE] = {
 
 void gfx_render_sdf() {
 	for (int i = 0; i < ARRAY_SIZE(_gfx_font) / NATIVE_FONT_SIZE; i++) {
-		for (int y = 0; y < NATIVE_FONT_SIZE; y++) {
-			for (int x = 0; x < NATIVE_FONT_SIZE; x++) {
-				bool inside = (_gfx_font[NATIVE_FONT_SIZE*i + y] >> x) & 1;
+		for (int y = 0; y < SDF_SIZE; y++) {
+			int vy = ((y - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+
+			for (int x = 0; x < SDF_SIZE; x++) {
+				int vx = ((x - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+
+				bool inside = false;
+
+				if (vx >= 0 && vx < NATIVE_FONT_SIZE && vy >= 0 && vy < NATIVE_FONT_SIZE) {
+					inside = (_gfx_font[NATIVE_FONT_SIZE * i + vy] >> vx) & 1;
+				}
+
 				u32 minDistance = 1000000;
 
-				for (int sy = 0; sy < NATIVE_FONT_SIZE; sy++) {
-					for (int sx = 0; sx < NATIVE_FONT_SIZE; sx++) {
-						bool sinside = (_gfx_font[NATIVE_FONT_SIZE*i + sy] >> sx) & 1;
+				for (int sy = 0; sy < SDF_SIZE; sy++) {
+					int svy = ((sy - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+					for (int sx = 0; sx < SDF_SIZE; sx++) {
+						int svx = ((sx - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+
+						bool sinside = false;
+
+						if (svx >= 0 && svx < NATIVE_FONT_SIZE && svy >= 0 && svy < NATIVE_FONT_SIZE) {
+							sinside = (_gfx_font[NATIVE_FONT_SIZE*i + svy] >> svx) & 1;
+						}
+
 						if (sinside != inside) {
 							s32 dx = x - sx;
 							s32 dy = y - sy;
@@ -144,9 +161,10 @@ void gfx_render_sdf() {
 						}
 					}
 				}
-				u64 dist = 1 + sqrt64(minDistance);
-				u32 index = NATIVE_FONT_SIZE*NATIVE_FONT_SIZE*i + NATIVE_FONT_SIZE*y + x;
-				((u8*)SDF_BUFFER)[index] = inside ? CLAMPMAX(128 + dist * 16, 255) : CLAMPMIN(128 - dist * 16, 0);
+				u64 dist = 1 + sqrt64(minDistance * 256);
+				u32 index = SDF_SIZE*SDF_SIZE*i + SDF_SIZE*y + x;
+				int offset = dist - 8;
+				((u8*)SDF_BUFFER)[index] = inside ? CLAMPMAX(128 + offset, 255) : CLAMPMIN(128 - offset, 0);
 			}
 		}
 	}
@@ -177,39 +195,44 @@ void gfx_bake_atlas(u32 fontSize) {
 	u8 *atlas_buf = _gfx_get_atlas(fontSize);
 	if (!atlas_buf) return;
 
-	sfp16_t step = sfp16_div(SFP16FROMINT(SDF_SIZE-1), SFP16FROMINT(fontSize-1));
+	// Fine-tuned number
+	sfp16_t scale_factor = SFP16FROMINT(1) + (SFP16FROMINT(24) / 100);
 
 	for (int i = 0; i < NUM_CHARS; i++) {
 		u8* char_sdf_base = &((u8*)SDF_BUFFER)[i * (SDF_SIZE * SDF_SIZE)];
 
 		for (int py = 0; py < fontSize; py++) {
-			sfp16_t y_pos = py * step;
+			sfp16_t norm_y = sfp16_div(SFP16FROMINT(py), SFP16FROMINT(fontSize - 1));
+			sfp16_t scaled_norm_y = SFP16HALF + sfp16_mul(norm_y - SFP16HALF, sfp16_div(SFP16FROMINT(1), scale_factor));
+			sfp16_t y_pos = sfp16_mul(scaled_norm_y, SFP16FROMINT(SDF_SIZE - 1));
+
 			for (int px = 0; px < fontSize; px++) {
-				sfp16_t x_pos = px * step;
+				sfp16_t norm_x = sfp16_div(SFP16FROMINT(px), SFP16FROMINT(fontSize - 1));
+				sfp16_t scaled_norm_x = SFP16HALF + sfp16_mul(norm_x - SFP16HALF, sfp16_div(SFP16FROMINT(1), scale_factor));
+				sfp16_t x_pos = sfp16_mul(scaled_norm_x, SFP16FROMINT(SDF_SIZE - 1));
+
 				int ix = SFP16GETINT(x_pos);
 				int iy = SFP16GETINT(y_pos);
 				int fx = SFP16GETDEC(x_pos);
 				int fy = SFP16GETDEC(y_pos);
 
-				if (iy >= SDF_SIZE - 1) iy = SDF_SIZE - 2;
-				if (ix >= SDF_SIZE - 1) ix = SDF_SIZE - 2;
-
-				int cix = (ix + 1 >= SDF_SIZE) ? ix : ix + 1;
-				int ciy = (iy + 1 >= SDF_SIZE) ? iy : iy + 1;
+				int cix = ix + 1;
+				int ciy = iy + 1;
+				if (ciy >= SDF_SIZE) ciy = SDF_SIZE - 1;
+				if (cix >= SDF_SIZE) cix = SDF_SIZE - 1;
 
 				int s00 = char_sdf_base[ iy * SDF_SIZE +  ix];
 				int s10 = char_sdf_base[ iy * SDF_SIZE + cix];
 				int s01 = char_sdf_base[ciy * SDF_SIZE +  ix];
 				int s11 = char_sdf_base[ciy * SDF_SIZE + cix];
 
-				int top = s00 + (((s10 - s00) * fx) >> 8);
-				int bot = s01 + (((s11 - s01) * fx) >> 8);
-				int sam = top + (((bot - top) * fy) >> 8);
+				int top = s00 + (((s10 - s00) * fx) >> 16);
+				int bot = s01 + (((s11 - s01) * fx) >> 16);
+				int sam = top + (((bot - top) * fy) >> 16);
 
 				u32 index  = i * (fontSize * fontSize) + (py * fontSize) + px;
 
-				int alpha  = (sam - 128) * 32;
-					alpha  = CLAMP(alpha, 0, 255);
+				int alpha = CLAMP((sam - 128) * 255, 0, 255);
 
 				atlas_buf[index] = (u8)alpha;
 			}
@@ -278,6 +301,12 @@ void gfx_puts_limit(const char *s, u32 limit){
 
 	u32 len = strlen(s);
 
+	if (limit > len || limit == 0) {
+		// It checks for zero here so I can have infinetely long printing while still using this function (since it isn't a signed int, I can't use -1, and I don't feel like putting u32 max or something)
+		gfx_puts(s);
+		return;
+	}
+
 	if (len > limit)
 		limit -= 3;
 
@@ -294,7 +323,7 @@ void gfx_con_set_fontsz(u32 fontSize) {
 }
 
 void __attribute__((target("arm"))) __attribute__((optimize("Os"))) gfx_putc(char c) {
-	if unlikely(c <= 32 || c >= 129) {
+	if unlikely(c <= 31 || c >= 129) {
 		if (c == '\n') {
 			gfx_con.x = 0;
 			gfx_con.y += gfx_con.fntsz;
@@ -345,6 +374,58 @@ void gfx_puts(const char *s) {
 		gfx_putc(*s);
 }
 
+void __attribute__((target("arm"))) __attribute__((optimize("Os"))) gfx_putc_small(char c) {
+	if unlikely(c <= 33 || c >= 129) {
+		if (c == '\n') {
+			gfx_con.x = 0;
+			gfx_con.y += gfx_con.fntsz;
+			if (gfx_con.y > gfx_ctxt.height - gfx_con.fntsz)
+				gfx_con.y = 0;
+		}
+		return;
+	}
+	u32 sz    = 8;
+
+	u8 * restrict data = &_gfx_get_atlas(sz)[(c - 32) * (sz * sz)];
+	u32* restrict fb   = gfx_ctxt.fb + gfx_con.x + (gfx_con.y * gfx_ctxt.stride);
+
+	u32 mask  = 0x00FF00FF;
+
+	u32 fg    = gfx_con.fgcol;
+	u32 fg_rb =  fg       & mask;
+	u32 fg_ag = (fg >> 8) & mask;
+
+	u32 bg    = gfx_con.bgcol;
+	u32 bg_rb =  bg       & mask;
+	u32 bg_ag = (bg >> 8) & mask;
+
+	for (u32 y = 0; y < sz; y++) {
+		for (u32 x = 0; x < sz; x++) {
+			u8 alpha = *data++;
+
+			if likely(alpha == 0)   { *fb++ = bg; continue;};
+			if likely(alpha == 255) { *fb++ = fg; continue;};
+
+			// TODO: change to one mult and test.
+			// out = bg + ((fg-bg) * alpha) / 256
+			u32 rb = (bg_rb * (255 - alpha) + fg_rb * alpha) >> 8;
+			u32 ag = (bg_ag * (255 - alpha) + fg_ag * alpha);
+
+			*fb++ = (rb & mask) | (ag & ~mask);
+		}
+		fb += gfx_ctxt.stride - sz;
+	}
+	gfx_con.x += sz;
+}
+
+void gfx_puts_small(const char *s) {
+	if (!s || !gfx_con_init_done || gfx_con.mute)
+		return;
+
+	for (; *s; s++)
+		gfx_putc_small(*s);
+}
+
 static void _gfx_putn(u32 v, int base, char fill, int fcnt) {
 	static const char digits[] = "0123456789ABCDEF";
 
@@ -385,10 +466,10 @@ static void _gfx_putn(u32 v, int base, char fill, int fcnt) {
 }
 
 void gfx_vprintf(const char *fmt, va_list ap) {
-
 	if (!gfx_con_init_done || gfx_con.mute)
 		return;
 
+	u32 newLineConfig = 0;
 	int fill, fcnt;
 
 	while (*fmt) {
@@ -419,10 +500,12 @@ void gfx_vprintf(const char *fmt, va_list ap) {
 					break;
 				case 'n':
 					gfx_putc('\n');
+					gfx_con.x = newLineConfig;
+					break;
 				case 'N':
-					u32 tmp = gfx_con.x;
-					gfx_putc('\n');
-					gfx_con.x = tmp;
+					newLineConfig = va_arg(ap, u32);
+					gfx_con.x = newLineConfig;
+					break;
 				case 'p':
 				case 'P':
 				case 'x':

@@ -61,11 +61,11 @@ void drawError(error_t error) {
     if (error.code == TE_SUCCESS)
         return;
 
-    SETCOLOR(COLOR_ORANGE, COLOR_DARK_GREY);
+    SETCOLOR(COLOR_ORANGE, COLOR_VIOLET);
     gfx_box(lx, ly, lx + lenx, ly + leny, COLOR_VIOLET);
     gfx_boxGrey(lx + 16, ly + 16, lx + lenx - 16, ly + leny - 16, 0x60);
     gfx_con_setpos(lx + ((lenx - 17 * 16) / 2), ly + 32);
-    gfx_printf("An error occured!\n\n%bError: %d\nLine : %d\nFile : %s\nDesc : %s%b", lx + 48, error.code, error.line, error.file, _getErrorString(error.code), 0);
+    gfx_printf("An error occured!\n\n%NError: %d%nLine : %d%nFile : %s%nDesc : %s%N", lx + 48, error.code, error.line, error.file, _getErrorString(error.code), 0);
     gfx_con_setpos(lx + ((lenx - 19 * 16) / 2), ly + leny - 48);
     gfx_printf("Press A to continue");
 

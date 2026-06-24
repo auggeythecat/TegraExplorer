@@ -33,7 +33,7 @@ typedef s32 sfp16_t;
 #define SFP16GETINT(k)  ((k) >> SFP16BITS)
 #define SFP16FROMINT(k) ((sfp16_t)(k) << SFP16BITS)
 
-#define SFP16GETDEC(k)  ((sfp16_t)(k) & (0x00FF))
+#define SFP16GETDEC(k)  ((sfp16_t)(k) & (0xFFFF))
 
 sfp16_t sfp16_lrp(sfp16_t a, sfp16_t b, sfp16_t t) { return a + (sfp16_t)(((s64)t * (b - a) + SFP16HALF) >> SFP16BITS); }
 sfp16_t sfp16_mul(sfp16_t a, sfp16_t b) { return (sfp16_t)(((s64)a * (s64)b + SFP16HALF) >> SFP16BITS); }
