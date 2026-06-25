@@ -41,8 +41,8 @@ void _get_secure_data(key_storage_t *keys, void *out_data) {
     static const u8 _secure_data_source[0x10] __attribute__((aligned(4))) = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-    static const u8 _secure_data_counters[1][0x10] __attribute__((aligned(4))) = {
-        {0x3C, 0xD5, 0x92, 0xEC, 0x68, 0x31, 0x4A, 0x06, 0xD4, 0x1B, 0x0C, 0xD9, 0xF6, 0x2E, 0xD9, 0xE9}
+    static u8 _secure_data_counters[0x10] __attribute__((aligned(4))) = {
+        0x3C, 0xD5, 0x92, 0xEC, 0x68, 0x31, 0x4A, 0x06, 0xD4, 0x1B, 0x0C, 0xD9, 0xF6, 0x2E, 0xD9, 0xE9
     };
 
     static const u8 _secure_data_tweaks[1][0x10] __attribute__((aligned(4))) = {
@@ -51,8 +51,8 @@ void _get_secure_data(key_storage_t *keys, void *out_data) {
 
     se_aes_key_set(KS_AES_CTR, keys->device_key, SE_KEY_128_SIZE);
     u8 *d = (u8 *)out_data;
-    se_aes_crypt_ctr(KS_AES_CTR, d + SE_KEY_128_SIZE * 0, _secure_data_source, SE_KEY_128_SIZE, _secure_data_counters[0]);
-    se_aes_crypt_ctr(KS_AES_CTR, d + SE_KEY_128_SIZE * 1, _secure_data_source, SE_KEY_128_SIZE, _secure_data_counters[0]);
+    se_aes_crypt_ctr(KS_AES_CTR, d + SE_KEY_128_SIZE * 0, _secure_data_source, SE_KEY_128_SIZE, _secure_data_counters);
+    se_aes_crypt_ctr(KS_AES_CTR, d + SE_KEY_128_SIZE * 1, _secure_data_source, SE_KEY_128_SIZE, _secure_data_counters);
 
     // Apply tweak
     for (u32 i = 0; i < SE_KEY_128_SIZE; i++) {
@@ -173,7 +173,7 @@ void _derive_device_keys(key_storage_t *keys) {
 
 int _run_ams_keygen() {
     tsec_ctxt_t tsec_ctxt;
-    tsec_ctxt.fw = tsec_keygen;
+    tsec_ctxt.fw   = (u8*) tsec_keygen;
     tsec_ctxt.size = sizeof(tsec_keygen);
     tsec_ctxt.type = TSEC_FW_TYPE_NEW;
 
