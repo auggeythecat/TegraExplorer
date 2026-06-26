@@ -82,7 +82,6 @@ void ipl_main() {
 
 	// key_storage_t keys = {};
 	// derive_relevant_keys(&keys);
-	u32 fontsz = gfx_con.fntsz;
 
 	entry_t test_entries_2[] = {
 		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
@@ -99,14 +98,14 @@ void ipl_main() {
 
 	menu_t test_menu_2 = {
 		.title = "My Test 2",
-		.x = 0,    .y = fontsz,
-		.w = 1280, .h = 720,
-		.idx = 0,  .offset = 0,
+		.x     = 0,    .y = 0,
+		.w     = 1280, .h = 720,
+		.idx   = 0,    .offset = 0,
 
 		.is_overlay  = 0,
 		.is_dynamic  = 0,
 		.page_count  = 1,
-		.cursorIndex = 2,
+		.cursorIndex = 3,
 		.reserved    = 0,
 
 		.__static.entries = test_entries_2,
@@ -134,9 +133,9 @@ void ipl_main() {
 
 	menu_t test_menu = {
 		.title = "My Test",
-		.x = 0,    .y = fontsz,
-		.w = 1280, .h = 720,
-		.idx = 0,  .offset = 0,
+		.x     = 0,    .y = 0,
+		.w     = 1280, .h = 720,
+		.idx   = 0,  .offset = 0,
 
 
 		.is_overlay  = 0,

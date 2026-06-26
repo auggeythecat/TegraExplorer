@@ -5,7 +5,9 @@
 #include "hid.h"
 #include "config.h"
 
-input_t inputs = {0};
+input_t inputs      = {0};
+input_t lastInputs = {0};
+
 u16 LbaseX = 0, LbaseY = 0, RbaseX = 0, RbaseY = 0;
 
 void hidInit(){
@@ -14,6 +16,7 @@ void hidInit(){
 }
 
 input_t *hidRead(){
+    lastInputs = inputs;
     jc_gamepad_rpt_t *controller = joycon_poll();
 
     inputs.buttons = 0;
@@ -27,13 +30,10 @@ input_t *hidRead(){
                 LbaseY = controller->lstick_y;
             }
 
-            inputs.up    = (controller->up    || inputs.volp || (controller->lstick_y > LbaseY + 500)) ? 1 : 0;
-            inputs.down  = (controller->down  || inputs.volm || (controller->lstick_y < LbaseY - 500)) ? 1 : 0;
-            inputs.left  = (controller->left  || (controller->lstick_x < LbaseX - 500))                ? 1 : 0;
-            inputs.right = (controller->right || (controller->lstick_x > LbaseX + 500))                ? 1 : 0;
-        } else {
-            inputs.up    = inputs.volp;
-            inputs.down  = inputs.volm;
+            inputs.up    = (controller->up    || (controller->lstick_y > LbaseY + JOYSTICK_THRESHOLD)) ? 1 : 0;
+            inputs.down  = (controller->down  || (controller->lstick_y < LbaseY - JOYSTICK_THRESHOLD)) ? 1 : 0;
+            inputs.left  = (controller->left  || (controller->lstick_x < LbaseX - JOYSTICK_THRESHOLD)) ? 1 : 0;
+            inputs.right = (controller->right || (controller->lstick_x > LbaseX + JOYSTICK_THRESHOLD)) ? 1 : 0;
         }
 
         if (controller->conn_r) {
@@ -42,10 +42,10 @@ input_t *hidRead(){
                 RbaseY = controller->rstick_y;
             }
 
-            inputs.rUp    = (controller->rstick_y > RbaseY + 500) ? 1 : 0;
-            inputs.rDown  = (controller->rstick_y < RbaseY - 500) ? 1 : 0;
-            inputs.rLeft  = (controller->rstick_x < RbaseX - 500) ? 1 : 0;
-            inputs.rRight = (controller->rstick_x > RbaseX + 500) ? 1 : 0;
+            inputs.rUp    = (controller->rstick_y > RbaseY + JOYSTICK_THRESHOLD) ? 1 : 0;
+            inputs.rDown  = (controller->rstick_y < RbaseY - JOYSTICK_THRESHOLD) ? 1 : 0;
+            inputs.rLeft  = (controller->rstick_x < RbaseX - JOYSTICK_THRESHOLD) ? 1 : 0;
+            inputs.rRight = (controller->rstick_x > RbaseX + JOYSTICK_THRESHOLD) ? 1 : 0;
         }
     }
 
@@ -53,8 +53,9 @@ input_t *hidRead(){
     inputs.volp  = (btn & BTN_VOL_UP)   ? 1 : 0;
     inputs.volm  = (btn & BTN_VOL_DOWN) ? 1 : 0;
     inputs.power = (btn & BTN_POWER)    ? 1 : 0;
-
-    inputs.a = inputs.a || inputs.power;
+    inputs.up    = inputs.up   || inputs.volp;
+    inputs.down  = inputs.down || inputs.volm;
+    inputs.a     = inputs.a    || inputs.power;
 
     return &inputs;
 }

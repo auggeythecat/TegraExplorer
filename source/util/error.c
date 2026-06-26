@@ -71,5 +71,5 @@ void drawError(error_t error) {
 
     vic_compose();
     vic_wait_idle();
-    hidWaitMask((JoyA | JoyB));
+    hidWaitMask((JOYA | JOYB));
 }

@@ -7,44 +7,49 @@
 
 #include "bdk.h"
 
-#define JoyY      BIT(0)
-#define JoyX      BIT(1)
-#define JoyB      BIT(2)
-#define JoyA      BIT(3)
-#define JoySR_R   BIT(4)
-#define JoySL_R   BIT(5)
-#define JoyR      BIT(6)
-#define JoyZR     BIT(7)
+#define JOYSTICK_THRESHOLD 500
 
-#define JoyMINUS  BIT(8)
-#define JoyPLUS   BIT(9)
-#define JoyR3     BIT(10)
-#define JoyL3     BIT(11)
-#define JoyHOME   BIT(12)
-#define JoyCAP    BIT(13)
-#define JoyPAD    BIT(14)
-#define JoyWIRED  BIT(15)
+#define RE_DETECTION(button) ((inputs.buttons) & (button)) > ((lastInputs.buttons) & (button))
+#define FE_DETECTION(button) ((inputs.buttons) & (button)) < ((lastInputs.buttons) & (button))
 
-#define JoyLDown  BIT(16)
-#define JoyLUp    BIT(17)
-#define JoyLRight BIT(18)
-#define JoyLLeft  BIT(19)
-#define JoySR_L   BIT(20)
-#define JoySL_L   BIT(21)
-#define JoyL      BIT(22)
-#define JoyZL     BIT(23)
+#define JOYY      BIT(0)
+#define JOYX      BIT(1)
+#define JOYB      BIT(2)
+#define JOYA      BIT(3)
+#define JOYSR_R   BIT(4)
+#define JOYSL_R   BIT(5)
+#define JOYR      BIT(6)
+#define JOYZR     BIT(7)
 
-#define BtnPow    BIT(24)
-#define BtnVolP   BIT(25)
-#define BtnVolM   BIT(26)
+#define JOYMINUS  BIT(8)
+#define JOYPLUS   BIT(9)
+#define JOYR3     BIT(10)
+#define JOYL3     BIT(11)
+#define JOYHOME   BIT(12)
+#define JOYCAP    BIT(13)
+#define JOYPAD    BIT(14)
+#define JOYWIRED  BIT(15)
 
-#define JoyRDown  BIT(27)
-#define JoyRUp    BIT(28)
-#define JoyRRight BIT(29)
-#define JoyRLeft  BIT(30)
+#define JOYLDOWN  BIT(16)
+#define JOYLUP    BIT(17)
+#define JOYLRIGHT BIT(18)
+#define JOYLLEFT  BIT(19)
+#define JOYSR_L   BIT(20)
+#define JOYSL_L   BIT(21)
+#define JOYL      BIT(22)
+#define JOYZL     BIT(23)
+
+#define BTNPOW    BIT(24)
+#define BTNVOLP   BIT(25)
+#define BTNVOLM   BIT(26)
+
+#define JOYRDOWN  BIT(27)
+#define JOYRUP    BIT(28)
+#define JOYRRIGHT BIT(29)
+#define JOYRLEFT  BIT(30)
 #define JOYUNUSED BIT(31)
 
-#define WAITBUTTONS (JoyY | JoyX | JoyB | JoyA | JoyLDown | JoyLUp | JoyLRight | JoyLLeft)
+#define WAITBUTTONS (JOYY | JOYX | JOYB | JOYA | JOYLDOWN | JOYLUP | JOYLRIGHT | JOYLLEFT)
 
 typedef struct _input_t {
     union {
@@ -79,6 +84,7 @@ typedef struct _input_t {
             u32 l     :1;
             u32 zl    :1;
 
+            // Console
             u32 power :1;
             u32 volp  :1;
             u32 volm  :1;
@@ -93,6 +99,9 @@ typedef struct _input_t {
         u32 buttons;
     };
 } input_t;
+
+extern input_t inputs;
+extern input_t lastInputs;
 
 void     hidInit();
 input_t *hidRead();
