@@ -7,10 +7,12 @@
 #include "util/error.h"
 
 #include "test_script.h"
+#include "gfx/menu.h"
 #include "keys/keys.h"
 
 #include "pikapython/pikascript-api/pikaScript.h"
 #include "pikapython/pikascript-core/PikaVM.h"
+#include "util/utils.h"
 
 
 extern void pivot_stack(u32 stack_top);
@@ -19,10 +21,12 @@ void _display_init() {
 	vic_surface_t      vic_sfc;
 	vic_sfc.src_buf  = NYX_FB2_ADDRESS;
 	vic_sfc.dst_buf  = NYX_FB_ADDRESS;
-	vic_sfc.width    = 1280;
-	vic_sfc.height   = 720;
+	vic_sfc.width    = SCREEN_WIDTH;
+	vic_sfc.height   = SCREEN_HEIGHT;
 	vic_sfc.pix_fmt  = VIC_PIX_FORMAT_A8R8G8B8;
 	vic_sfc.rotation = VIC_ROTATION_270;
+
+	display_init();
 
 	vic_init();
 	vic_set_surface(&vic_sfc);
@@ -46,8 +50,6 @@ void _display_init() {
 void ipl_main() {
     hw_init();
 
-    jc_init_hw();
-
     pivot_stack(IPL_LOAD_ADDR);
 
     heap_init((void*)IPL_HEAP_START);
@@ -57,8 +59,6 @@ void ipl_main() {
 	uart_wait_idle(DEBUG_UART_PORT, UART_TX_IDLE);
 #endif
 
-    display_init();
-
     bpmp_clk_rate_set(BPMP_CLK_LOWER_BOOST);
 
 	TEConfig.errors    |= sd_mount()              ? ERR_SD_BOOT_EN : false;
@@ -66,6 +66,8 @@ void ipl_main() {
 	TEConfig.FSBuffSize = TEConfig.minervaEnabled ? 0x800000       : 0x10000;
 
 	_display_init();
+
+    hidInit();
 
 	emummc_load_cfg();
 
@@ -76,12 +78,83 @@ void ipl_main() {
 
 	minerva_change_freq(FREQ_800);
 
-	PikaObj* pikaObj = pikaScriptInit();
+	// PikaObj* pikaObj = pikaScriptInit();
 
-	key_storage_t keys = {};
-	derive_relevant_keys(&keys);
+	// key_storage_t keys = {};
+	// derive_relevant_keys(&keys);
+	u32 fontsz = gfx_con.fntsz;
 
-	hidWait();
+	entry_t test_entries_2[] = {
+		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
+		{ ENTRY_CAPTION,   COLOR_WHITE,      "Menu name 2!", NULL, NULL    },
+		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
+		{ ENTRY_BACK     , COLOR_GREEN,"Go back to where you came from!",              NULL, NULL    },
+		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_END,       COLOR_TRANSPARENT,0,              NULL, NULL    },
+
+	};
+
+	menu_t test_menu_2 = {
+		.title = "My Test 2",
+		.x = 0,    .y = fontsz,
+		.w = 1280, .h = 720,
+		.idx = 0,  .offset = 0,
+
+		.is_overlay  = 0,
+		.is_dynamic  = 0,
+		.page_count  = 1,
+		.cursorIndex = 2,
+		.reserved    = 0,
+
+		.__static.entries = test_entries_2,
+		.__static.count   = ARRAY_SIZE(test_entries_2)
+	};
+
+
+    entry_t test_entries[] = {
+	    { ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
+	    { ENTRY_CAPTION,   COLOR_WHITE,      "Menu name!!!", NULL, NULL    },
+	    { ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_MENU   ,   COLOR_YELLOW,     "Menu test",    &test_menu_2, NULL},
+	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_END,       COLOR_TRANSPARENT,0,              NULL, NULL    },
+    };
+
+
+	menu_t test_menu = {
+		.title = "My Test",
+		.x = 0,    .y = fontsz,
+		.w = 1280, .h = 720,
+		.idx = 0,  .offset = 0,
+
+
+		.is_overlay  = 0,
+		.is_dynamic  = 0,
+		.page_count  = 1,
+		.cursorIndex = 3,
+		.reserved    = 0,
+
+		.__static.entries = test_entries,
+		.__static.count   = ARRAY_SIZE(test_entries)
+	};
+
+	push_menu(test_menu);
+
+	while (true)
+		menu_render_top();
+
+	power_set_state(POWER_OFF_RESET);
 
 	while (true)
         bpmp_halt();

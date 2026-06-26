@@ -3,185 +3,186 @@
 //
 
 #include "menu.h"
-#include "../../util/vector.h"
-#include "../../util/hid.h"
 
 #include <bdk.h>
 #include <string.h>
 
+#include "../util/error.h"
+#include "../util/vector.h"
+#include "../util/hid.h"
+#include "gfx.h"
+#include "../util/utils.h"
+
 const char *sizeDefs[] = {
-    "B ",
-    "KB",
-    "MB",
-    "GB"
+    "B  ",
+    "KiB",
+    "MiB",
+    "GiB"
 };
 
-void _printEntry(menuEntry_t entry, u32 maxLen, u8 highlighted, u32 bg){
-    if (entry.hide)
+menu_manager_t menu_manager = {};
+
+void _printEntry(entry_t entry, u32 maxLen) {
+    if (entry.type == ENTRY_SEPERATOR || entry.hide) {
+        gfx_putc('\n');
         return;
+    }
 
-    (highlighted) ? SETCOLOR(bg, RGBUNIONTOCOLOR(entry.optionUnion)) : SETCOLOR(RGBUNIONTOCOLOR(entry.optionUnion), bg);
-
-    if (entry.icon){
-        gfx_putc(entry.icon);
-        gfx_putc(' ');
+    if (entry.icon) {
+        gfx_putc(entry.icon); gfx_putc(' ');
         maxLen -= 2;
     }
 
     u32 curX = 0, curY = 0;
     gfx_con_getpos(&curX, &curY);
-    gfx_puts_limit(entry.name, maxLen - ((entry.showSize) ? 8 : 0));
-    if (entry.showSize){
-        (highlighted) ? SETCOLOR(bg, COLOR_BLUE) : SETCOLOR(COLOR_BLUE, bg);
+
+    if (entry.type == ENTRY_DIR || entry.type == ENTRY_FILE || entry.type == ENTRY_HANDLER || entry.type == ENTRY_MENU || entry.type == ENTRY_BACK) {
+        if (entry.cursor) SETCOLOR(INVERTCOLOR(entry.color), INVERTCOLOR(COLOR_BLACK));
+        else              SETCOLOR(            entry.color , COLOR_BLACK);
+    }
+
+    if (!entry.showSize) {
+        gfx_puts_limit(entry.caption, maxLen - 0);
+        gfx_putc('\n');
+    }
+    else {
+        gfx_puts_limit(entry.caption, maxLen - 8);
         gfx_con_setpos(curX + (maxLen - 6) * 16, curY);
-        gfx_printf("%4d", entry.size);
-        gfx_puts_small(sizeDefs[entry.sizeDef]);
+        gfx_printf("%d", entry.showSize);
+        gfx_puts_small(sizeDefs[entry.sizeIdx]);
     }
-
-    gfx_putc('\n');
+    SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
 }
 
-void _printTopInfo() {
-    int battery = 0;
-    max17050_get_property(MAX17050_RepSOC, &battery);
+void inline _render_dynamic_menu(menu_t m) {
 
-    int current_charge_status = 0;
-    bq24193_get_property(BQ24193_ChargeStatus, &current_charge_status);
+}
+
+void _render_static_menu(menu_t* m) {
+    u32 lastDraw = get_tmr_us();
+
+    if (!m->is_overlay) // TODO: This will not work with small entry refreshing
+        gfx_clear_color(COLORTOGREY(COLOR_DEFAULT));
+
+    if (m->page_count) {
+        SETCOLOR(COLOR_DEFAULT, COLOR_WHITE);
+        char temp[40] = "";
+
+        u16 items_per_page = m->h / gfx_con.fntsz;
+        u16 total_pages = (m->__static.count / items_per_page) + 1;
+        u16 current_page = (m->offset / items_per_page) + 1;
+
+        s_printf(temp, " Page %d / %d | Total %d entries", current_page, total_pages, m->__static.count); // Figure out actual pages. This might be tricky with variable font sizes though.
+        gfx_con_setpos(SCREEN_WIDTH - (strlen(temp) * gfx_con.fntsz), 0);
+        gfx_printf(temp);
+    }
+
+    gfx_con_setpos(m->x, m->y);
+    gfx_boxGrey(m->x, m->y, m->x + m->w, m->y + m->h, COLORTOGREY(COLOR_DEFAULT));
+
+    for (u16 i = 0; m->__static.entries[i].type != ENTRY_END; i++) {
+        if (m->cursorIndex == i) m->__static.entries[i].cursor = true;
+        else                     m->__static.entries[i].cursor = false;
+
+        _printEntry(m->__static.entries[i], 0);
+    }
+
     SETCOLOR(COLOR_DEFAULT, COLOR_WHITE);
-    gfx_con_setpos(0, 0);
-    gfx_printf("Tegraexplorer %d.%d.%d | Battery: %d%% %c\n", TE_VER_MJ, TE_VER_MN, TE_VER_HF, battery >> 8, current_charge_status ? 129 : 32);
-    RESETCOLOR;
+    gfx_con_setpos(0, SCREEN_HEIGHT - gfx_con.fntsz);
+    input_t* input = hidRead();
+    // gfx_printf("Buttons active: %d", input->buttons);
+    gfx_printf("Time taken for screen draw: %dus ", get_tmr_us() - lastDraw);
 }
 
+bool _is_selectable(entry_type_t type) {
+    return (type == ENTRY_HANDLER || type == ENTRY_MENU || type == ENTRY_BACK || type == ENTRY_FILE || type == ENTRY_DIR);
+}
 
-u32 newMenu(vector_t vec, int startIndex, int screenLenX, int screenLenY, u8 options,int entryCount) {
-    menuEntry_t *entries = vec;
-    u32 selected = startIndex;
-    u32 menuItems = vecGetCount(vec);
-    u32 fontSize = gfx_con.fntsz;
-
-    while (entries[selected].skip || entries[selected].hide) {
-        selected++;
-        if (selected > menuItems)
-            selected = 0;
-    }
-
-    u32 lastIndex = selected;
-    u32 startX = 0, startY = 0;
-    gfx_con_getpos(&startX, &startY);
-
-    u32 bgColor = COLOR_DEFAULT; // TODO: User control, settings or nyx.ini?
-
-    bool redrawScreen = true;
+void _handle_input(menu_t* m) {
     input_t *input = hidRead();
 
-    // Maybe add a check here so you don't read OOB by providing a too high startindex?
-    // TODO: Not magic numbers ;(
-    u32 lastPress = 0x666 + get_tmr_ms();
-    u32 holdTimer = 300;
-
-    while (true) {
-        u32 lastDraw = get_tmr_us();
-        if (redrawScreen || options & ALWAYSREDRAW) {
-            if (options & ENABLEPAGECOUNT) {
-                SETCOLOR(COLOR_DEFAULT, COLOR_WHITE);
-                char temp[40] = "";
-                s_printf(temp, " Page %d / %d | Total %d entries", (selected / screenLenY) + 1, (menuItems - 1  / screenLenY) + 1, entryCount);
-                gfx_con_setpos(1280 - strlen(temp) * 18, 0);
-                gfx_printf(temp);
-            }
-
-
-            gfx_con_setpos(startX, startY);
-
-            if (redrawScreen)
-                gfx_boxGrey(startX,startY, startX + screenLenX * 16, startY + screenLenY * 16, 0x1b);
-
-            int start = selected / screenLenY * screenLenY;
-            gfx_con_setpos(startX, startY);
-            gfx_printf("%N", startX);
-            for (int i = start; i < MIN(vecGetCount(vec), start + screenLenY); i++){
-                _printEntry(entries[i], screenLenX, (i == selected), bgColor);
-            }
-            gfx_printf("%N", 0);
-        } else if (lastIndex != selected) {
-            u32 minLastCur = MIN(lastIndex, selected);
-            u32 maxLastCur = MAX(lastIndex, selected);
-            gfx_con_setpos(startX, startY + ((minLastCur % screenLenY) * 16));
-            _printEntry(entries[minLastCur], screenLenX, (minLastCur == selected), bgColor);
-            gfx_con_setpos(startX, startY + ((maxLastCur % screenLenY) * 16));
-            _printEntry(entries[maxLastCur], screenLenX, (minLastCur != selected), bgColor);
-        }
-        lastIndex = selected;
-
-        SETCOLOR(COLOR_DEFAULT, COLOR_WHITE);
-        gfx_con_setpos(0, 704);
-        gfx_printf("Time taken for screen draw: %dms  ", get_tmr_ms() - lastDraw);
-
-        while(hidRead()){
-            if (!(input->buttons)){
-                holdTimer = 300;
-                break;
-            }
-
-            if (input->buttons & (JoyRUp | JoyRDown))
-                holdTimer = 35;
-
-            if ((lastPress + holdTimer) < get_tmr_ms()){
-                if (holdTimer > 50)
-                    holdTimer -= 50;
-                break;
-            }
+    while (hidRead()) {
+        if (input->buttons & JoyPLUS) {
+            if (gfx_con.fntsz < 24) gfx_con_set_fontsz(gfx_con.fntsz += 1);
+            break;
         }
 
-        while (1){
-            if (hidRead()->a)
-                return selected;
-            else if (input->b && options & ENABLEB)
-                return 0;
-            else if (input->down || input->rDown || input->right){ //Rdown should probs not trigger a page change. Same for RUp
-                u32 temp = (input->right && !(input->down || input->rDown)) ? screenLenY : 1;
-
-                if (vecGetCount(vec) > selected + temp){
-                    selected += temp;
-                    break;
-                }
-                else if (input->right && (selected / screenLenY != (vecGetCount(vec) - 1) / screenLenY)){
-                    selected = vecGetCount(vec) - 1;
-                    break;
-                }
-            }
-            else if (input->up || input->rUp || input->left){
-                u32 temp = (input->left && !(input->up || input->rUp)) ? screenLenY : 1;
-                if (selected >= temp){
-                    selected -= temp;
-                    break;
-                }
-            }
-            else if (input->plus) {
-                gfx_con_set_fontsz(fontSize += 2);
-                redrawScreen = true;
-            }
-            else if (input->minus) {
-                gfx_con_set_fontsz(fontSize -= 2);
-                redrawScreen = true;
-            }
-
-            else {
-                holdTimer = 300;
-                _printTopInfo();
-            }
+        if (input->buttons & JoyMINUS) {
+            if (gfx_con.fntsz > 8 ) gfx_con_set_fontsz(gfx_con.fntsz -= 1);
+            break;
         }
 
-        lastPress = get_tmr_ms();
+        if (input->buttons & JoyHOME) {
+            powerOff();
+        }
 
-        int m = (selected > lastIndex) ? 1 : -1;
-        while (selected > 0 && selected < vecGetCount(vec) - 1 && entries[selected].optionUnion & SKIPHIDEBITS)
-            selected += m;
+        if (input->buttons & JoyRUp) {
+            int prev = m->cursorIndex - 1;
+            while (prev >= 0 && !_is_selectable(m->__static.entries[prev].type)) {
+                prev--;
+            }
+            if (prev >= 0) m->cursorIndex = prev;
+            break;
+        }
 
-        if (entries[selected].optionUnion & SKIPHIDEBITS)
-            selected = lastIndex;
+        if (input->buttons & JoyRDown) {
+            int next = m->cursorIndex + 1;
+            while (next < m->__static.count && !_is_selectable(m->__static.entries[next].type)) {
+                next++;
+            }
+            if (next < m->__static.count) m->cursorIndex = next;
+            break;
+        }
 
-        redrawScreen = (selected / screenLenY != lastIndex / screenLenY);
+        if (input->buttons & JoyA) {
+            if (m->is_dynamic) {
+                // TODO:
+            } else {
+                switch (m->__static.entries[m->cursorIndex].type) {
+                    case ENTRY_HANDLER:
+                        m->__static.entries[m->cursorIndex].handler(NULL);
+                        break;
+                    case ENTRY_MENU:
+                        push_menu(*(menu_t *)(m->__static.entries[m->cursorIndex].data));
+                        break;
+                    case ENTRY_BACK:
+                        pop_menu();
+                        break;
+                    default:
+                }
+            }
+            break;
+        }
     }
+}
+
+void menu_render_top() {
+    menu_t* m = &menu_manager.stack[menu_manager.top];
+    if (m->is_dynamic) { // TODO: Do way better.
+        drawError(newError(TE_ERROR_NOT_IMPL_YET)); // TODO: do better.
+        powerOff();
+    }
+
+    _render_static_menu(m);
+
+    vic_compose();
+    vic_wait_idle();
+
+    _handle_input(m);
+}
+
+
+void pop_menu() {
+    menu_t *m = &menu_manager.stack[menu_manager.top];
+    if (m->is_dynamic) {
+        vecFree(m->__dynamic.data);
+    }
+
+    memset(&menu_manager.stack[menu_manager.top], 0, sizeof(menu_t));
+    menu_manager.top--;
+}
+
+void push_menu(menu_t m) {
+    if (menu_manager.top++ >= MAX_STACK) drawError(newError(TE_ERROR_UNIMPLEMENTED)); // TODO: do better.
+    menu_manager.stack[menu_manager.top] = m;
 }

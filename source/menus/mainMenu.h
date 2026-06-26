@@ -7,6 +7,4 @@
 
 #include <bdk.h>
 
-void enterMainMenu();
-
 #endif //_MAINMENU_H

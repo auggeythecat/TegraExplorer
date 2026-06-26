@@ -38,6 +38,7 @@
 #define GREYTOCOLOR(s)      (s << 16 | s << 8 | s << 0)
 #define COLORTORGB(color)   (color & 0x00FFFFFF)
 #define COLORTOGREY(color)  (color & 0x000000FF) // TODO: proper conversion. For now, just only input grey colors.
+#define INVERTCOLOR(color)  (~(color & 0x00FFFFFF))
 #define SETCOLOR(fg, bg) gfx_con_setcol(fg, 1, bg)
 #define RESETCOLOR SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
 
