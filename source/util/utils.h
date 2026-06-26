@@ -14,12 +14,12 @@
 #define EXT_PAYLOAD_ADDR    0xC0000000
 #define RCM_PAYLOAD_ADDR    (EXT_PAYLOAD_ADDR + ALIGN(PATCHED_RELOC_SZ, 0x10))
 
-void launch_payload(char *path, bool clear_screen);
+void launchPayload(char *path, bool clearScreen);
 
 void powerOff();
 void rebootRCM();
 void reboot();
 
-u32 fuse_read_bootrom_rev();
+u32 fuseReadBootromRevision();
 
 #endif //_UTILS_H

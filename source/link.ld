@@ -1,8 +1,8 @@
 ENTRY(_start)
 
 SECTIONS {
-	PROVIDE(__ipl_start = IPL_LOAD_ADDR);
-	. = __ipl_start;
+	PROVIDE(__iplStart = IPL_LOAD_ADDR);
+	. = __iplStart;
 	.text : {
 		*(.text._start);
 		KEEP(*(._ipl_version));
@@ -14,7 +14,7 @@ SECTIONS {
 		*(.rodata*);
 	}
 	. = ALIGN(0x10);
-	__ipl_end = .;
+	__iplEnd = .;
 	.bss : {
 		__bss_start = .;
 		*(COMMON)

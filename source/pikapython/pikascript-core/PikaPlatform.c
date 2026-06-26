@@ -126,7 +126,7 @@ PIKA_WEAK int pika_platform_putchar(char ch) {
 }
 
 PIKA_WEAK int pika_platform_vprintf(char* fmt, va_list args) {
-    gfx_vprintf(fmt, args);
+    gfxVPrintF(fmt, args);
     return 0;
 }
 

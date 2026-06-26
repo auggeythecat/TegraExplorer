@@ -35,7 +35,7 @@ error_t mountMMCPartition(const char* partition) {
     if (!systemPart)
         return newError(TE_ERROR_PARTITION_NOT_FOUND);
 
-    nx_emmc_bis_init(systemPart, false, TEConfig.currentMMC == MMC_CONN_EMUMMC ? emu_cfg.active_part : 0); // TOOD: This can't be right. Look into it better.
+    nx_emmc_bis_init(systemPart, false, TEConfig.currentMMC == MMC_CONN_EMUMMC ? emuCFG.activePart : 0); // TOOD: This can't be right. Look into it better.
 
     int res = f_mount(&emmc_fs, "bis:", 1);
     return newError(res);
@@ -65,13 +65,13 @@ error_t connectMMC(u8 MMCType) {
 
     disconnectMMC();
     TEConfig.emummcForceDisable = (MMCType == MMC_CONN_EMMC);
-    int res = emummc_storage_init_mmc(&emmc_storage, &emmc_sdmmc);
+    int res = emummcStorageInitMMC(&emmc_storage, &emmc_sdmmc);
 
     if (res)
         return newError(res);
 
     TEConfig.currentMMC = MMCType;
-    emummc_storage_set_mmc_partition(0); // TODO: Why does it do this?
+    emummcStorageSetMMCPartition(0); // TODO: Why does it do this?
     emmc_gpt_parse(&currentGPT);
     return newError(0);
 }

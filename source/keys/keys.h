@@ -39,26 +39,26 @@
 #define GET_SEAL_KEY_INDEX(x)   (((x) >> 5) & 7)
 #define GET_IS_DEVICE_UNIQUE(x) ((x) & 1)
 
-typedef struct _key_storage_t {
-    u8  temp_key[SE_KEY_128_SIZE];
-    u8  bis_keys[4][SE_KEY_128_SIZE * 2];
+typedef struct _keyStorage_t {
+    u8  tempKey[SE_KEY_128_SIZE];
+    u8  bisKeys[4][SE_KEY_128_SIZE * 2];
 
-    u8  master_key[SE_KEY_128_SIZE];
+    u8  masterKey0[SE_KEY_128_SIZE];
 
-    u8  header_key[SE_KEY_128_SIZE * 2];
-    u8  save_mac_key[SE_KEY_128_SIZE];
+    u8  headerKey[SE_KEY_128_SIZE * 2];
+    u8  saveMacKey[SE_KEY_128_SIZE];
 
-    u8  tsec_key[SE_KEY_128_SIZE];
-    u8  tsec_root_key[SE_KEY_128_SIZE];
-    u8  secure_boot_key[SE_KEY_128_SIZE];
+    u8  tsecKey[SE_KEY_128_SIZE];
+    u8  tsecRootKey[SE_KEY_128_SIZE];
+    u8  secureBootKey[SE_KEY_128_SIZE];
 
-    u8  keyblob_key[SE_KEY_128_SIZE];
-    u8  keyblob_mac_key[SE_KEY_128_SIZE];
+    u8  keyblobKey[SE_KEY_128_SIZE];
+    u8  keyblobMacKey[SE_KEY_128_SIZE];
 
-    u8  device_key[SE_KEY_128_SIZE];
-    u8  device_key_4x[SE_KEY_128_SIZE];
-} key_storage_t;
+    u8  deviceKey[SE_KEY_128_SIZE];
+    u8  deviceKey4x[SE_KEY_128_SIZE];
+} keyStorage_t;
 
-void derive_relevant_keys(key_storage_t *keys);
+void deriveRelevantKeys(keyStorage_t *keys);
 
 #endif //_KEYS_H

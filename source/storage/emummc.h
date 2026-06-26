@@ -19,41 +19,39 @@
 
 #include <bdk.h>
 
-typedef enum
-{
+typedef enum _emummcType_t {
     EMUMMC_TYPE_NONE      = 0,
     EMUMMC_TYPE_PARTITION = 1,
     EMUMMC_TYPE_FILES     = 2,
-} emummc_type_t;
+} emummcType_t;
 
-typedef enum {
+typedef enum _emummcMMC_t {
     EMUMMC_MMC_NAND = 0,
     EMUMMC_MMC_SD   = 1,
     EMUMMC_MMC_GC   = 2,
-} emummc_mmc_t;
+} emummcMMC_t;
 
-typedef struct _emummc_cfg_t
-{
+typedef struct _emummcCFG_t {
     int   enabled;
     u64   sector;
     u32   id;
     char *path;
-    char *nintendo_path;
+    char *nintendoPath;
     // Internal.
-    char *emummc_file_based_path;
-    u32 file_based_part_size;
-    u32 active_part;
-    int fs_ver;
-} emummc_cfg_t;
+    char *emummcFileBasedPath;
+    u32 fileBasedPartSize;
+    u32 activePart;
+    int fsVer;
+} emummcCFG_t;
 
-extern emummc_cfg_t emu_cfg;
+extern emummcCFG_t emuCFG;
 
-void emummc_load_cfg();
-bool emummc_set_path(char *path);
-int  emummc_storage_init_mmc();
-int  emummc_storage_end();
-int  emummc_storage_read(u32 sector, u32 num_sectors, void *buf);
-int  emummc_storage_write(u32 sector, u32 num_sectors, void *buf);
-int  emummc_storage_set_mmc_partition(u32 partition);
+void emummcLoadCFG();
+bool emummcSetPath(char *path);
+int  emummcStorageInitMMC();
+int  emummcStorageEnd();
+int  emummcStorageRead(u32 sector, u32 numSectors, void *buf);
+int  emummcStorageWrite(u32 sector, u32 numSectors, void *buf);
+int  emummcStorageSetMMCPartition(u32 partition);
 
 #endif

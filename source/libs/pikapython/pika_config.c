@@ -20,7 +20,7 @@ void pika_platform_disable_irq_handle(void) {
 void pika_platform_printf(char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    gfx_vprintf(fmt, args);
+    gfxVPrintF(fmt, args);
     va_end(args);
 }
 

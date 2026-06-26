@@ -27,7 +27,7 @@ LOADERDIR := ./loader
 NRVDIR    := ./tools/nrv
 BIN2CDIR  := ./tools/bin2c
 KEYGENDIR := ./$(SOURCEDIR)/keys
-KEYGEN    := tsec_keygen
+KEYGEN    := tsecKeygen
 
 VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  $(dir $(wildcard ./$(SOURCEDIR)/*/*/) $(dir $(wildcard ./$(SOURCEDIR)/*/*/*/)))
 VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
@@ -78,7 +78,7 @@ OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
 
 GFX_INC   := '"../$(SOURCEDIR)/gfx/gfx.h"'
 FFCFG_INC := '"../$(SOURCEDIR)/libs/fatfs/ffconf.h"'
-PREBUILD   = tsec_keygen
+PREBUILD   = tsecKeygen
 
 ################################################################################
 
@@ -105,13 +105,13 @@ LDFLAGS += -Wl,-Map=./output.map,--cref
 
 ################################################################################
 
-.PHONY: all clean pre_build $(PREBUILD)
+.PHONY: all clean preBuild $(PREBUILD)
 
-all: $(OUTPUTDIR)/$(TARGET)_small.bin
+all: $(OUTPUTDIR)/$(TARGET)Small.bin
 	@echo "--------------------------------------"
 	$(eval BIN_SIZE = $(shell wc -c < $(OUTPUTDIR)/$(TARGET).bin))
 	@echo "Payload size is $(BIN_SIZE)"
-	$(eval COMPR_BIN_SIZE = $(shell wc -c < $(OUTPUTDIR)/$(TARGET)_small.bin))
+	$(eval COMPR_BIN_SIZE = $(shell wc -c < $(OUTPUTDIR)/$(TARGET)Small.bin))
 	@echo "Compressed Payload size is $(COMPR_BIN_SIZE)"
 
 	@echo "Max size is 126296 Bytes."
@@ -125,14 +125,14 @@ clean:
 	@rm -rf $(LOADERDIR)/payload.h
 	@rm -rf $(KEYGENDIR)/$(KEYGEN).h
 
-$(OUTPUTDIR)/$(TARGET)_small.bin: $(OUTPUTDIR)/$(TARGET).bin
+$(OUTPUTDIR)/$(TARGET)Small.bin: $(OUTPUTDIR)/$(TARGET).bin
 	@$(MAKE) -C $(NRVDIR)
 	@$(NRVDIR)/nrv2e $(OUTPUTDIR)/$(TARGET).bin
 	@$(MAKE) -C $(BIN2CDIR)
 	@$(BIN2CDIR)/bin2c $(OUTPUTDIR)/$(TARGET).bin.nrv payload > $(LOADERDIR)/payload.h
 	@rm -rf $(OUTPUTDIR)/$(TARGET).bin.nrv
 
-	$(MAKE) -C $(LOADERDIR) PAYLOAD_NAME=$(TARGET)_small
+	$(MAKE) -C $(LOADERDIR) PAYLOAD_NAME=$(TARGET)Small
 
 $(OUTPUTDIR)/$(TARGET).bin: $(BUILDDIR)/$(TARGET)/$(TARGET).elf
 	@mkdir -p "$(@D)"
@@ -141,12 +141,12 @@ $(OUTPUTDIR)/$(TARGET).bin: $(BUILDDIR)/$(TARGET)/$(TARGET).elf
 $(BUILDDIR)/$(TARGET)/$(TARGET).elf: $(OBJS)
 	$(CC) $(LDFLAGS) -T $(SOURCEDIR)/link.ld $^ -o $@
 
-pre_build: $(PREBUILD)
+preBuild: $(PREBUILD)
 
-tsec_keygen: $(TOOLS)
+tsecKeygen: $(TOOLS)
 	@cd $(KEYGENDIR) && ../../$(BIN2CDIR)/bin2c $(KEYGEN) > $(KEYGEN).h
 
-$(OBJS): | pre_build
+$(OBJS): | preBuild
 
 $(BUILDDIR)/$(TARGET)/%.o: %.c
 	@mkdir -p "$(@D)"

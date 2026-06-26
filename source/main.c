@@ -15,9 +15,9 @@
 #include "util/utils.h"
 
 
-extern void pivot_stack(u32 stack_top);
+extern void pivotStack(u32 stack_top);
 
-void _display_init() {
+void _displayInit() {
 	vic_surface_t      vic_sfc;
 	vic_sfc.src_buf  = NYX_FB2_ADDRESS;
 	vic_sfc.dst_buf  = NYX_FB_ADDRESS;
@@ -35,22 +35,22 @@ void _display_init() {
 	vic_wait_idle();
 
 	display_init_window_a_pitch_vic();
-	gfx_init_ctxt((u32 *)NYX_FB2_ADDRESS, 1280,720,1280);
-	gfx_con_init();
+	gfxInitCtxt((u32 *)NYX_FB2_ADDRESS, 1280,720,1280);
+	gfxConInit();
 
 	display_backlight_pwm_init();
 	display_backlight_brightness(80, 1000);
 
-	gfx_clear_grey(0xb1);
+	gfxClearGrey(0xb1);
 
 	vic_compose();
 	vic_wait_idle();
 }
 
-void ipl_main() {
+void ipl_main() { // Mus
     hw_init();
 
-    pivot_stack(IPL_LOAD_ADDR);
+    pivotStack(IPL_LOAD_ADDR);
 
     heap_init((void*)IPL_HEAP_START);
 
@@ -65,13 +65,13 @@ void ipl_main() {
     TEConfig.errors    |= minerva_init(NULL)      ? ERR_LIBSYS_LP0 : false;
 	TEConfig.FSBuffSize = TEConfig.minervaEnabled ? 0x800000       : 0x10000;
 
-	_display_init();
+	_displayInit();
 
     hidInit();
 
-	emummc_load_cfg();
+	emummcLoadCFG();
 
-	emu_cfg.enabled = !(emu_cfg.sector == true && !emu_cfg.path);
+	emuCFG.enabled = !(emuCFG.sector == true && !emuCFG.path);
 	TEConfig.emummcForceDisable = false;
 
 	TEConfig.Pkg1ID = "Unknown";
@@ -83,7 +83,7 @@ void ipl_main() {
 	// key_storage_t keys = {};
 	// derive_relevant_keys(&keys);
 
-	entry_t test_entries_2[] = {
+	entry_t testEntries2[] = {
 		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
 		{ ENTRY_CAPTION,   COLOR_WHITE,      "Menu name 2!", NULL, NULL    },
 		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
@@ -96,24 +96,24 @@ void ipl_main() {
 
 	};
 
-	menu_t test_menu_2 = {
+	menu_t testMenu2 = {
 		.title = "My Test 2",
 		.x     = 0,    .y = 0,
 		.w     = 1280, .h = 720,
 		.idx   = 0,    .offset = 0,
 
-		.is_overlay  = 0,
-		.is_dynamic  = 0,
-		.page_count  = 1,
+		.isOverlay   = 0,
+		.isDynamic   = 0,
+		.isPageCount = 1,
 		.cursorIndex = 3,
 		.reserved    = 0,
 
-		.__static.entries = test_entries_2,
-		.__static.count   = ARRAY_SIZE(test_entries_2)
+		.__static.entries = testEntries2,
+		.__static.count   = ARRAY_SIZE(testEntries2)
 	};
 
 
-    entry_t test_entries[] = {
+    entry_t testEntries[] = {
 	    { ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
 	    { ENTRY_CAPTION,   COLOR_WHITE,      "Menu name!!!", NULL, NULL    },
 	    { ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
@@ -125,33 +125,33 @@ void ipl_main() {
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_MENU   ,   COLOR_YELLOW,     "Menu test",    &test_menu_2, NULL},
+	    { ENTRY_MENU   ,   COLOR_YELLOW,     "Menu test",    &testMenu2, NULL},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_END,       COLOR_TRANSPARENT,0,              NULL, NULL    },
     };
 
 
-	menu_t test_menu = {
+	menu_t testMenu = {
 		.title = "My Test",
 		.x     = 0,    .y = 0,
 		.w     = 1280, .h = 720,
-		.idx   = 0,  .offset = 0,
+		.idx   = 0,    .offset = 0,
 
 
-		.is_overlay  = 0,
-		.is_dynamic  = 0,
-		.page_count  = 1,
+		.isOverlay   = 0,
+		.isDynamic   = 0,
+		.isPageCount = 1,
 		.cursorIndex = 3,
 		.reserved    = 0,
 
-		.__static.entries = test_entries,
-		.__static.count   = ARRAY_SIZE(test_entries)
+		.__static.entries = testEntries,
+		.__static.count   = ARRAY_SIZE(testEntries)
 	};
 
-	push_menu(test_menu);
+	pushMenu(testMenu);
 
 	while (true)
-		menu_render_top();
+		menuRenderTop();
 
 	power_set_state(POWER_OFF_RESET);
 

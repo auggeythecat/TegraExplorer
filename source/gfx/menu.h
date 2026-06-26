@@ -9,7 +9,7 @@
 
 #include "../util/vector.h"
 
-typedef enum _entry_type_t {
+typedef enum _entryType_t {
     ENTRY_END = 0,
     ENTRY_SEPERATOR,
     ENTRY_CAPTION,
@@ -18,10 +18,10 @@ typedef enum _entry_type_t {
     ENTRY_DIR,
     ENTRY_FILE,
     ENTRY_BACK,
-} entry_type_t;
+} entryType_t;
 
 typedef struct _entry_t {
-    entry_type_t type;
+    entryType_t type;
     u32 color;
     const char *caption;
     void *data;
@@ -51,9 +51,9 @@ typedef struct _menu_t {
 
     u16 cursorIndex;
     struct {
-        u16 is_overlay:1;
-        u16 is_dynamic:1;
-        u16 page_count:1;
+        u16 isOverlay:1;
+        u16 isDynamic:1;
+        u16 isPageCount:1;
         u16 reserved:13;
         // what the hell am I going to do with 13 bits?
     };
@@ -73,14 +73,14 @@ typedef struct _menu_t {
 } menu_t;
 
 #define MAX_STACK 10
-typedef struct _menu_manager_t {
+typedef struct _menuManager_t {
     menu_t stack[MAX_STACK];
     s8 top;
-    bool full_redraw;
-} menu_manager_t;
+    bool fullRedraw;
+} menuManager_t;
 
-void  pop_menu();
-void push_menu(menu_t m);
-void menu_render_top();
+void  popMenu();
+void pushMenu(menu_t m);
+void menuRenderTop();
 
 #endif //_MENU_H

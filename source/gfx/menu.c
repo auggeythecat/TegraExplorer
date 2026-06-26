@@ -20,7 +20,7 @@ const char *sizeDefs[] = {
     "GiB"
 };
 
-menu_manager_t menu_manager = {};
+menuManager_t menuManager = {};
 
 void _printEntry(entry_t entry, u32 maxLen) {
 
@@ -29,32 +29,32 @@ void _printEntry(entry_t entry, u32 maxLen) {
         drawError(newError(TE_ERROR_ACCESS_DENIED)); // TODO: Do better. Or stop wasting binary space.
         return;
     case ENTRY_SEPERATOR:
-        gfx_putc('\n');
+        gfxPutc('\n');
         return;
     case ENTRY_CAPTION:
     case ENTRY_HANDLER:
     case ENTRY_MENU:
     case ENTRY_BACK:
         if (entry.icon) {
-            gfx_putc(entry.icon); gfx_putc(' ');
+            gfxPutc(entry.icon); gfxPutc(' ');
             maxLen -= 2;
         }
 
         u32 curX = 0, curY = 0;
-        gfx_con_getpos(&curX, &curY);
+        gfxConGetPos(&curX, &curY);
 
         if (entry.cursor)        SETCOLOR(INVERTCOLOR(entry.color), INVERTCOLOR(COLOR_BLACK));
         else if (entry.selected) SETCOLOR(entry.color, INVERTCOLOR(COLOR_BLACK));
         else                     SETCOLOR(            entry.color , COLOR_BLACK);
 
         if (!entry.showSize) {
-            gfx_puts_limit(entry.caption, maxLen - 0);
-            gfx_putc('\n');
+            gfxPutsLimit(entry.caption, maxLen - 0);
+            gfxPutc('\n');
         } else {
-            gfx_puts_limit(entry.caption, maxLen - 8);
-            gfx_con_setpos(curX + (maxLen - 6) * gfx_con.fntsz, curY);
+            gfxPutsLimit(entry.caption, maxLen - 8);
+            gfxConSetPos(curX + (maxLen - 6) * gfx_con.fntsz, curY);
             gfx_printf("%d", entry.showSize);
-            gfx_puts_small(sizeDefs[entry.sizeIdx]);
+            gfxPutsSmall(sizeDefs[entry.sizeIdx]);
         }
         SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
     // case ENTRY_DIR: // TODO:
@@ -62,34 +62,34 @@ void _printEntry(entry_t entry, u32 maxLen) {
     }
 }
 
-void _render_dynamic_menu(menu_t m) {
+void _renderDynamicMenu(menu_t m) {
 
 }
 
-void _render_static_menu(menu_t* m) {
-    gfx_con_setpos(0, 0);
+void _renderStaticMenu(menu_t* m) {
+    gfxConSetPos(0, 0);
     u32 lastDraw = get_tmr_us();
 
-    if (!m->is_overlay) // TODO: This will not work with small entry refreshing
-        gfx_clear_color(COLORTOGREY(COLOR_DEFAULT));
+    if (!m->isOverlay) // TODO: This will not work with small entry refreshing
+        gfxClearColor(COLORTOGREY(COLOR_DEFAULT));
 
-    if (m->page_count) {
+    if (m->isPageCount) {
         SETCOLOR(COLOR_DEFAULT, COLOR_WHITE);
         gfx_printf("TegraExplorer 5.0.0");
         gfx_printf("                                                    ");
         char temp[40] = "";
 
-        u16 items_per_page = (m->h              / gfx_con.fntsz);
-        u16 total_pages    = (m->__static.count / items_per_page) + 1;
-        u16 current_page   = (m->offset         / items_per_page) + 1;
+        u16 itemsPerPage = (m->h              / gfx_con.fntsz);
+        u16 totalPages   = (m->__static.count / itemsPerPage) + 1;
+        u16 currentPage  = (m->offset         / itemsPerPage) + 1;
 
-        s_printf(temp, " Page %d / %d | %d entries", current_page, total_pages, m->__static.count); // Figure out actual pages. This might be tricky with variable font sizes though.
-        gfx_con_setpos(SCREEN_WIDTH - (strlen(temp) * gfx_con.fntsz), 0);
+        s_printf(temp, " Page %d / %d | %d entries", currentPage, totalPages, m->__static.count); // Figure out actual pages. This might be tricky with variable font sizes though.
+        gfxConSetPos(SCREEN_WIDTH - (strlen(temp) * gfx_con.fntsz), 0);
         gfx_printf(temp);
     }
 
-    gfx_con_setpos(m->x, m->y);
-    gfx_boxGrey(m->x, m->y, m->x + m->w, m->y + m->h, COLORTOGREY(COLOR_DEFAULT));
+    gfxConSetPos(m->x, m->y);
+    gfxBoxGrey(m->x, m->y, m->x + m->w, m->y + m->h, COLORTOGREY(COLOR_DEFAULT));
 
     for (u16 i = 0; m->__static.entries[i].type != ENTRY_END; i++) {
         if (m->cursorIndex == i) m->__static.entries[i].cursor = true;
@@ -99,25 +99,24 @@ void _render_static_menu(menu_t* m) {
     }
 
     SETCOLOR(COLOR_DEFAULT, COLOR_WHITE);
-    gfx_con_setpos(0, SCREEN_HEIGHT - gfx_con.fntsz);
-    // input_t* input = hidRead();
-    // gfx_printf("Buttons active: %d", input->buttons);
+    gfxConSetPos(0, SCREEN_HEIGHT - gfx_con.fntsz);
+    // gfx_printf("Buttons active: %d", inputs->buttons);
     gfx_printf("Time taken for screen draw: %dus ", get_tmr_us() - lastDraw);
 }
 
-bool _can_cursor(entry_type_t type) {
+bool _canCursor(entryType_t type) {
     return (type == ENTRY_HANDLER || type == ENTRY_MENU || type == ENTRY_BACK || type == ENTRY_FILE || type == ENTRY_DIR);
 }
 
-void _handle_input(menu_t* m) {
+void _handleInput(menu_t* m) {
     while (hidRead()) {
         if (RE_DETECTION(JOYPLUS)) {
-            if (gfx_con.fntsz < 24) gfx_con_set_fontsz(gfx_con.fntsz += 1);
+            if (gfx_con.fntsz < 24) gfxConSetFontSize(gfx_con.fntsz += 1);
             break;
         }
 
         if (RE_DETECTION(JOYMINUS)) {
-            if (gfx_con.fntsz > 8 ) gfx_con_set_fontsz(gfx_con.fntsz -= 1);
+            if (gfx_con.fntsz > 8 ) gfxConSetFontSize(gfx_con.fntsz -= 1);
             break;
         }
 
@@ -127,7 +126,7 @@ void _handle_input(menu_t* m) {
 
         if (RE_DETECTION(JOYLUP)) {
             int prev = m->cursorIndex - 1;
-            while (prev >= 0 && !_can_cursor(m->__static.entries[prev].type))
+            while (prev >= 0 && !_canCursor(m->__static.entries[prev].type))
                 prev--;
 
             if (prev >= 0) m->cursorIndex = prev;
@@ -136,7 +135,7 @@ void _handle_input(menu_t* m) {
 
         if (RE_DETECTION(JOYLDOWN)) {
             int next = m->cursorIndex + 1;
-            while (next < m->__static.count && !_can_cursor(m->__static.entries[next].type))
+            while (next < m->__static.count && !_canCursor(m->__static.entries[next].type))
                 next++;
 
             if (next < m->__static.count) m->cursorIndex = next;
@@ -150,10 +149,10 @@ void _handle_input(menu_t* m) {
                 entry.handler(NULL);
                 break;
             case ENTRY_MENU:
-                push_menu(*(menu_t *)(entry.data));
+                pushMenu(*(menu_t *)(entry.data));
                 break;
             case ENTRY_BACK:
-                pop_menu();
+                popMenu();
                 break;
             case ENTRY_FILE: // TODO: File menu
             case ENTRY_DIR:  // TODO: Folder menu
@@ -180,33 +179,33 @@ void _handle_input(menu_t* m) {
     }
 }
 
-void menu_render_top() {
-    menu_t* m = &menu_manager.stack[menu_manager.top];
-    if (m->is_dynamic) { // TODO: Do way better.
+void menuRenderTop() {
+    menu_t* m = &menuManager.stack[menuManager.top];
+    if (m->isDynamic) { // TODO: Do way better.
         drawError(newError(TE_ERROR_NOT_IMPL_YET)); // TODO: do better.
         powerOff();
     }
 
-    _render_static_menu(m);
+    _renderStaticMenu(m);
 
     vic_compose();
     vic_wait_idle();
 
-    _handle_input(m);
+    _handleInput(m);
 }
 
 
-void pop_menu() {
-    menu_t *m = &menu_manager.stack[menu_manager.top];
-    if (m->is_dynamic) {
+void popMenu() {
+    menu_t *m = &menuManager.stack[menuManager.top];
+    if (m->isDynamic) {
         vecFree(m->__dynamic.data);
     }
 
-    memset(&menu_manager.stack[menu_manager.top], 0, sizeof(menu_t));
-    menu_manager.top--;
+    memset(&menuManager.stack[menuManager.top], 0, sizeof(menu_t));
+    menuManager.top--;
 }
 
-void push_menu(menu_t m) {
-    if (menu_manager.top++ >= MAX_STACK) drawError(newError(TE_ERROR_UNIMPLEMENTED)); // TODO: do better.
-    menu_manager.stack[menu_manager.top] = m;
+void pushMenu(menu_t m) {
+    if (menuManager.top++ >= MAX_STACK) drawError(newError(TE_ERROR_UNIMPLEMENTED)); // TODO: do better.
+    menuManager.stack[menuManager.top] = m;
 }
