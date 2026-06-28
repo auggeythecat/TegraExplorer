@@ -106,7 +106,6 @@ void ipl_main() { // Mus
 		.isDynamic   = 0,
 		.isPageCount = 1,
 		.cursorIndex = 3,
-		.reserved    = 0,
 
 		.__static.entries = testEntries2,
 		.__static.count   = ARRAY_SIZE(testEntries2)
@@ -142,7 +141,6 @@ void ipl_main() { // Mus
 		.isDynamic   = 0,
 		.isPageCount = 1,
 		.cursorIndex = 3,
-		.reserved    = 0,
 
 		.__static.entries = testEntries,
 		.__static.count   = ARRAY_SIZE(testEntries)
@@ -152,8 +150,6 @@ void ipl_main() { // Mus
 
 	while (true)
 		menuRenderTop();
-
-	power_set_state(POWER_OFF_RESET);
 
 	while (true)
         bpmp_halt();

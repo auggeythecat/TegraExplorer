@@ -49,13 +49,12 @@ typedef struct _menu_t {
     u16 x, y, w, h;
     u16 idx, offset;
 
-    u16 cursorIndex;
     struct {
-        u16 isOverlay:1;
-        u16 isDynamic:1;
-        u16 isPageCount:1;
-        u16 reserved:13;
-        // what the hell am I going to do with 13 bits?
+        u32 isOverlay:1;
+        u32 isDynamic:1;
+        u32 isPageCount:1;
+        u32 cursorIndex:29; // TODO: Maybe find a better place for this that isn't here?
+        // u32 reserved:0;
     };
 
     union {
