@@ -5,6 +5,7 @@
 #include "util/config.h"
 #include "util/hid.h"
 #include "util/error.h"
+#include "storage/safeStorage.h"
 
 #include "test_script.h"
 #include "gfx/menu.h"
@@ -45,6 +46,10 @@ void _displayInit() {
 
 	vic_compose();
 	vic_wait_idle();
+}
+
+void _testsdmmc() {
+    safeSdmmcStorageRead(&sd_storage, )
 }
 
 void ipl_main() { // Mus
@@ -123,7 +128,7 @@ void ipl_main() { // Mus
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
+	    { ENTRY_HANDLER,   COLOR_ORANGE,     "test thingy",  NULL, interuptTest},
 	    { ENTRY_MENU   ,   COLOR_YELLOW,     "Menu test",    &testMenu2, NULL},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_END,       COLOR_TRANSPARENT,0,              NULL, NULL    },
