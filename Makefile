@@ -34,7 +34,7 @@ VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     
 
 # !TODO: add objs when needed
 
-OBJS  = start exception_handlers main heap gfx
+OBJS  = start saveState exception_handlers main heap gfx
 
 OBJS += bpmp ccplex clock di vic irq timer \
 		mc sdram minerva smmu \
@@ -63,7 +63,7 @@ OBJS += BaseObj dataArg dataArgs dataLink \
 #		standardLibrary unsolvedArrayClass
 #
 
-OBJS += emummc mountManager timeout saveState safeStorage config vector error hid keys utils
+OBJS += emummc mountManager timeout safeStorage config vector error hid keys utils
 #OBJS += keyfile nca emmcfile emummc hid config menu tools err gfxutils utils vector \
 #		fsutils mountmanager fscopy folderReader \
 #		keys

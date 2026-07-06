@@ -49,10 +49,13 @@ void _displayInit() {
 }
 
 void _testsdmmc() {
-    safeSdmmcStorageRead(&sd_storage, )
+    u8* buf[256];
+    safeSdmmcStorageRead(&sd_storage, 0, 1, buf);
+    // 0, success, 1, read failure, -1, irq fired.
+    gfxHexDump(16, buf, 256);
 }
 
-void ipl_main() { // Mus
+void ipl_main() {
     hw_init();
 
     pivotStack(IPL_LOAD_ADDR);
@@ -85,8 +88,8 @@ void ipl_main() { // Mus
 
 	// PikaObj* pikaObj = pikaScriptInit();
 
-	// key_storage_t keys = {};
-	// derive_relevant_keys(&keys);
+	// keyStorage_t keys = {};
+	// deriveRelevantKeys(&keys);
 
 	entry_t testEntries2[] = {
 		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
@@ -129,6 +132,7 @@ void ipl_main() { // Mus
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_HANDLER,   COLOR_ORANGE,     "test thingy",  NULL, interuptTest},
+	    { ENTRY_HANDLER,   COLOR_ORANGE,     "test thing 2", NULL, _testsdmmc},
 	    { ENTRY_MENU   ,   COLOR_YELLOW,     "Menu test",    &testMenu2, NULL},
 	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
 	    { ENTRY_END,       COLOR_TRANSPARENT,0,              NULL, NULL    },

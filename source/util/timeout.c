@@ -11,7 +11,7 @@ saveState_t savedState = {0};
 extern u32 saveState(saveState_t *saveState);
 extern u32 restoreState(saveState_t *saveState);
 extern void irq_enable_cpu_irq_exceptions();
-extern void overrideIRQ();
+extern void setup_vectors();
 
 int _irqCHandler(u32 irq, void* data) {
     restoreState(&savedState);
@@ -22,7 +22,7 @@ int executeWithTimeout(u32 timeoutUS, workPointer worker, void* args) {
     int res;
 
     if (!saveState(&savedState)) {
-        overrideIRQ();
+        // setup_vectors();
         TMR(TIMER_TMR8_TMR_PTV) = TIMER_EN | timeoutUS;
         irq_request(IRQ_TMR8, &_irqCHandler, &savedState, IRQ_FLAG_ONE_OFF);
         res = worker(args);

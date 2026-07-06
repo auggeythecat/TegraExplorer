@@ -18,10 +18,11 @@ typedef struct _safeSdmmcStorageWrite_t {
 
 int _safeSdmmcStorageWrite(void* arg) {
     safeSdmmcStorageWrite_t *args = (safeSdmmcStorageWrite_t*) arg;
-    sdmmc_storage_write(args->storage, args->sector, args->numSectors, args->buf);
+    return sdmmc_storage_write(args->storage, args->sector, args->numSectors, args->buf);
 }
 
-void safeSdmmcStorageWrite(sdmmc_storage_t *storage, u32 sector, u32 numSectors, void *buf) {
+// TODO: This is not currently function
+int safeSdmmcStorageWrite(sdmmc_storage_t *storage, u32 sector, u32 numSectors, void *buf) {
     safeSdmmcStorageWrite_t args = {
         .storage    = storage,
         .sector     = sector,
@@ -29,7 +30,7 @@ void safeSdmmcStorageWrite(sdmmc_storage_t *storage, u32 sector, u32 numSectors,
         .buf        = buf,
     };
 
-    executeWithTimeout(500000, &_safeSdmmcStorageWrite, &args);
+    return executeWithTimeout(500000, &_safeSdmmcStorageWrite, &args);
 }
 
 typedef struct _safeSdmmcStorageRead_t {
@@ -41,10 +42,10 @@ typedef struct _safeSdmmcStorageRead_t {
 
 int _safeSdmmcStorageRead(void* arg) {
     safeSdmmcStorageRead_t *args = (safeSdmmcStorageRead_t*) arg;
-    sdmmc_storage_read(args->storage, args->sector, args->numSectors, args->buf);
+    return sdmmc_storage_read(args->storage, args->sector, args->numSectors, args->buf);
 }
 
-void safeSdmmcStorageRead(sdmmc_storage_t *storage, u32 sector, u32 numSectors, void *buf) {
+int safeSdmmcStorageRead(sdmmc_storage_t *storage, u32 sector, u32 numSectors, void *buf) {
     safeSdmmcStorageRead_t args = {
         .storage    = storage,
         .sector     = sector,
@@ -52,7 +53,7 @@ void safeSdmmcStorageRead(sdmmc_storage_t *storage, u32 sector, u32 numSectors, 
         .buf        = buf,
     };
 
-    executeWithTimeout(500000, &_safeSdmmcStorageRead, &args);
+    return executeWithTimeout(500000, &_safeSdmmcStorageRead, &args);
 }
 
 int iloop(void* null) {

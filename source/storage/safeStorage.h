@@ -7,6 +7,8 @@
 
 #include <bdk.h>
 
+int  safeSdmmcStorageWrite(sdmmc_storage_t *storage, u32 sector, u32 numSectors, void *buf);
+int  safeSdmmcStorageRead (sdmmc_storage_t *storage, u32 sector, u32 numSectors, void *buf);
 void interuptTest();
 
 #endif //_SAFESTORAGE_H
