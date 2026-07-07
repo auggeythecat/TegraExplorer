@@ -27,7 +27,7 @@ typedef void* vector_t;
 #define   vecAppend(vec, element) ( \
     (vec) = _vecValidateCapacity(vec, 1, sizeof(element)), \
     (vec)[vecHeader(vec)->count] = (element), \
-    &(vec)[vecHeader(vec)->count++])
+    (vec)[vecHeader(vec)->count++])
 #define      vecAdd(vec, element) (vecAppend(vec, element))
 #define     vecPush(vec, element) (vecAppend(vec, element))
 #define vecPushBack(vec, element) (vecAppend(vec, element))

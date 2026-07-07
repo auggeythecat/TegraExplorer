@@ -20,6 +20,9 @@ void powerOff();
 void rebootRCM();
 void reboot();
 
+void rebootAMS();
+void rebootHekate();
+
 u32 fuseReadBootromRevision();
 
 #endif //_UTILS_H

@@ -5,6 +5,6 @@
 #ifndef _MAINMENU_H
 #define _MAINMENU_H
 
-#include <bdk.h>
+void pushMainMenu();
 
 #endif //_MAINMENU_H

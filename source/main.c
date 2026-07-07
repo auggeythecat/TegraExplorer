@@ -6,6 +6,7 @@
 #include "util/hid.h"
 #include "util/error.h"
 #include "storage/safeStorage.h"
+#include "menus/mainMenu.h"
 
 #include "test_script.h"
 #include "gfx/menu.h"
@@ -91,71 +92,7 @@ void ipl_main() {
 	// keyStorage_t keys = {};
 	// deriveRelevantKeys(&keys);
 
-	entry_t testEntries2[] = {
-		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
-		{ ENTRY_CAPTION,   COLOR_WHITE,      "Menu name 2!", NULL, NULL    },
-		{ ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
-		{ ENTRY_BACK     , COLOR_GREEN,"Go back to where you came from!",              NULL, NULL    },
-		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-		{ ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_END,       COLOR_TRANSPARENT,0,              NULL, NULL    },
-
-	};
-
-	menu_t testMenu2 = {
-		.title = "My Test 2",
-		.x     = 0,    .y = 0,
-		.w     = 1280, .h = 720,
-		.idx   = 0,    .offset = 0,
-
-		.isOverlay   = 0,
-		.isDynamic   = 0,
-		.isPageCount = 1,
-		.cursorIndex = 3,
-
-		.__static.entries = testEntries2,
-		.__static.count   = ARRAY_SIZE(testEntries2)
-	};
-
-
-    entry_t testEntries[] = {
-	    { ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
-	    { ENTRY_CAPTION,   COLOR_WHITE,      "Menu name!!!", NULL, NULL    },
-	    { ENTRY_SEPERATOR, COLOR_TRANSPARENT,0,              NULL, NULL    },
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_HANDLER,   COLOR_ORANGE,     "test thingy",  NULL, interuptTest},
-	    { ENTRY_HANDLER,   COLOR_ORANGE,     "test thing 2", NULL, _testsdmmc},
-	    { ENTRY_MENU   ,   COLOR_YELLOW,     "Menu test",    &testMenu2, NULL},
-	    { ENTRY_HANDLER,   COLOR_BLUE,       "Power off",    NULL, powerOff},
-	    { ENTRY_END,       COLOR_TRANSPARENT,0,              NULL, NULL    },
-    };
-
-
-	menu_t testMenu = {
-		.title = "My Test",
-		.x     = 0,    .y = 0,
-		.w     = 1280, .h = 720,
-		.idx   = 0,    .offset = 0,
-
-
-		.isOverlay   = 0,
-		.isDynamic   = 0,
-		.isPageCount = 1,
-		.cursorIndex = 3,
-
-		.__static.entries = testEntries,
-		.__static.count   = ARRAY_SIZE(testEntries)
-	};
-
-	pushMenu(testMenu);
+    pushMainMenu();
 
 	while (true)
 		menuRenderTop();

@@ -66,17 +66,12 @@ void launchPayload(char *path, bool clearScreen)
 
 }
 
-void powerOff() {
-    power_set_state(POWER_OFF_RESET);
-}
+void powerOff()     { power_set_state(POWER_OFF_RESET    ); }
+void rebootRCM()    { power_set_state(REBOOT_RCM         ); }
+void reboot()       { power_set_state(REBOOT_BYPASS_FUSES); }
 
-void rebootRCM() {
-    power_set_state(REBOOT_RCM);
-}
-
-void reboot() {
-    power_set_state(REBOOT_BYPASS_FUSES);
-}
+void rebootAMS()    { launchPayload("sd:/atmosphere/reboot_payload.bin", true); }
+void rebootHekate() { launchPayload("sd:/bootloader/update.bin",         true); }
 
 u32 fuseReadBootromRevision() {
     if (hw_get_chip_id() == GP_HIDREV_MAJOR_T210)
