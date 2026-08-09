@@ -69,7 +69,7 @@ OBJS += emummc mountManager timeout safeStorage config vector error hid keys uti
 #		keys
 #
 #OBJS += mainmenu filemenu foldermenu gptmenu explorer
-OBJS += menu mainMenu
+OBJS += menu mainMenu explorers
 
 OBJS += diskio ff ffunicode ffsystem elfload elfreloc_arm
 
