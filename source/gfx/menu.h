@@ -14,6 +14,7 @@ typedef enum _entryType_t {
     ENTRY_SEPERATOR,
     ENTRY_CAPTION,
     ENTRY_HANDLER,
+    ENTRY_HANDLER_EX,
     ENTRY_MENU,
     ENTRY_DIRECTORY,
     ENTRY_FILE,
@@ -23,7 +24,7 @@ typedef enum _entryType_t {
 typedef struct _entry_t {
     entryType_t type;
     u32 color;
-    const char *caption;
+    char *caption;
     void *data;
     void (*handler)(void *arg);
 
@@ -51,14 +52,15 @@ typedef struct _entry_t {
 #define SHOWSIZE BIT(31)
 // #define RESERVED BIT(32)
 
-#define       ENT_END(                             ) { ENTRY_END      , COLOR_NONE, 0      , NULL, NULL   , { .skip = 1, .hide = 1 } }
-#define ENT_SEPERATOR(                             ) { ENTRY_SEPERATOR, COLOR_NONE, 0      , NULL, NULL   , { .skip = 1, .hide = 1 } }
-#define   ENT_CAPTION(color, caption               ) { ENTRY_CAPTION  , color     , caption, NULL, NULL   , { .skip = 1}             }
-#define   ENT_HANDLER(color, caption,       handler) { ENTRY_HANDLER  , color     , caption, NULL, handler, { 0 }                    }
-#define      ENT_MENU(color, caption, data         ) { ENTRY_MENU     , color     , caption, data, NULL   , { 0 }                    }
-#define ENT_DIRECTORY(color, caption, data, handler) { ENTRY_FILE     , color     , caption, data, NULL   , { .showSize = 1 }        }
-#define      ENT_FILE(color, caption, data, handler) { ENTRY_DIRECTORY, color     , caption, data, NULL   , { .showSize = 1 }        }
-#define      ENT_BACK(color, caption               ) { ENTRY_BACK     , color     , 0      , NULL, NULL   , { 0 }                    }
+#define        ENT_END(                             ) { ENTRY_END       , COLOR_NONE, 0      , NULL, NULL   , { .skip = 1, .hide = 1 } }
+#define  ENT_SEPERATOR(                             ) { ENTRY_SEPERATOR , COLOR_NONE, 0      , NULL, NULL   , { .skip = 1, .hide = 1 } }
+#define    ENT_CAPTION(color, caption               ) { ENTRY_CAPTION   , color     , caption, NULL, NULL   , { .skip = 1 }            }
+#define    ENT_HANDLER(color, caption,       handler) { ENTRY_HANDLER   , color     , caption, NULL, handler, { 0 }                    }
+#define ENT_HANDLER_EX(color, caption, data, handler) { ENTRY_HANDLER_EX, color     , caption, data, handler, { 0 }                    }
+#define       ENT_MENU(color, caption, data         ) { ENTRY_MENU      , color     , caption, data, NULL   , { 0 }                    }
+#define  ENT_DIRECTORY(color, caption, data, handler) { ENTRY_DIRECTORY , color     , caption, data, NULL   , { .showSize = 1 }        }
+#define       ENT_FILE(color, caption, data, handler) { ENTRY_FILE      , color     , caption, data, NULL   , { .showSize = 1 }        }
+#define       ENT_BACK(color, caption               ) { ENTRY_BACK      , color     , caption, NULL, NULL   , { 0 }                    }
 
 typedef struct _menu_t {
     const char *title;
@@ -80,9 +82,8 @@ typedef struct _menu_t {
         } __static;
 
         struct {
-            u32 (*get_count)(void* ctx);
-            void (*get_entries)(void* ctx, u32 idx, entry_t *out_entries);
-            vector_t data;
+            vector_t entries;
+            char* path;
         } __dynamic;
     };
 } menu_t;
