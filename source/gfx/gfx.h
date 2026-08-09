@@ -50,7 +50,7 @@
 #define SDF_SIZE         (NATIVE_FONT_SIZE + (PADDING * 2))
 #define INNER_SIZE       (SDF_SIZE - (PADDING * 2))
 
-#define MAX_ATLASES      16
+#define MAX_ATLASES      16 + 1
 #define NUM_CHARS        98
 
 #define SDF_BUFFER       NYX_RES_ADDR

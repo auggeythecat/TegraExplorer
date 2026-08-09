@@ -300,21 +300,21 @@ void gfxPutsLimit(const char *s, u32 limit){
 		return;
 
 	u32 len = strlen(s);
+	u32 char_limit = limit / gfx_con.fntsz;
 
-	if (limit > len || limit == 0) {
-		// It checks for zero here so I can have infinetely long printing while still using this function (since it isn't a signed int, I can't use -1, and I don't feel like putting u32 max or something)
+	if (char_limit > len) {
 		gfxPuts(s);
 		return;
 	}
 
-	if (len > limit)
-		limit -= 3;
+	if (len > char_limit)
+		char_limit -= 4;
 
-	for (int i = 0; i < MIN(len, limit); i++)
+	for (int i = 0; i < MIN(len, char_limit); i++)
 		gfxPutc(s[i]);
 
-	if (len > limit + 3)
-		gfxPuts("...");
+	if (len > char_limit + 4)
+		gfxPuts("... ");
 }
 
 void gfxConSetFontSize(u32 fontSize) {
@@ -375,16 +375,16 @@ void gfxPuts(const char *s) {
 }
 
 void __attribute__((target("arm"))) __attribute__((optimize("Os"))) gfxPutcSmall(char c) {
+	u32 sz = 8;
 	if unlikely(c <= 33 || c >= 129) {
 		if (c == '\n') {
 			gfx_con.x = 0;
-			gfx_con.y += gfx_con.fntsz;
-			if (gfx_con.y > gfx_ctxt.height - gfx_con.fntsz)
+			gfx_con.y += sz;
+			if (gfx_con.y > gfx_ctxt.height - sz)
 				gfx_con.y = 0;
 		}
 		return;
 	}
-	u32 sz    = 8;
 
 	u8 * restrict data = &_gfx_get_atlas(sz)[(c - 32) * (sz * sz)];
 	u32* restrict fb   = gfx_ctxt.fb + gfx_con.x + (gfx_con.y * gfx_ctxt.stride);
