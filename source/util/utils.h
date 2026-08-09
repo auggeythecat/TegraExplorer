@@ -25,4 +25,7 @@ void rebootHekate();
 
 u32 fuseReadBootromRevision();
 
+u32 log_2(u32 x);
+u32 log_10(u32 x);
+
 #endif //_UTILS_H

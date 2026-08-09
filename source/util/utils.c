@@ -79,3 +79,23 @@ u32 fuseReadBootromRevision() {
 
     return FUSE(FUSE_SOC_SPEEDO_1_CALIB) | (1 << 12);
 }
+
+u32 log_2(u32 x) {
+    u32 r, shift;
+
+    r =     (x > 0xFFFF) << 4; x >>= r;
+    shift = (x > 0xFF  ) << 3; x >>= shift; r |= shift;
+    shift = (x > 0xF   ) << 2; x >>= shift; r |= shift;
+    shift = (x > 0x3   ) << 1; x >>= shift; r |= shift;
+                                            r |= (x >> 1);
+    return r;
+}
+
+u32 log_10(u32 x) {
+    static const u32 _powers10[] =
+    {1, 10, 100, 1000, 10000, 100000,
+     1000000, 10000000, 100000000, 1000000000};
+
+    u32 t = (log_2(x) + 1) * 1233 >> 12;
+    return t - (x < _powers10[t]);
+}
