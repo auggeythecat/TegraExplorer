@@ -43,10 +43,7 @@ void _displayInit() {
 	display_backlight_pwm_init();
 	display_backlight_brightness(80, 1000);
 
-	gfxClearGrey(0xb1);
-
-	vic_compose();
-	vic_wait_idle();
+	gfxBakeAtlas(8);
 }
 
 void _testsdmmc() {
