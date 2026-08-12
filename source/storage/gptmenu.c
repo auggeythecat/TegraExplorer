@@ -14,6 +14,7 @@
 #include "emmcfile.h"
 #include <storage/nx_sd.h>
 #include "../fs/fsutils.h"
+#include "../hid/hid.h"
 #include "../utils/utils.h"
 
 MenuEntry_t GptMenuHeader[] = {
@@ -107,18 +108,14 @@ void GptMenu(u8 MMCType){
             free(fileName);
         }
         else if (entries[res].icon == 127){
-            unmountMMCPart();
-            ErrCode_t err = (TConf.keysDumped) ? mountMMCPart(entries[res].name) : newErrCode(TE_ERR_KEYDUMP_FAIL);
-            if (err.err){
-                DrawError(err);
-            }
-            else {
-                if (TConf.curExplorerLoc > LOC_SD)
-                    ResetCopyParams();
-                    
-                TConf.curExplorerLoc = LOC_EMMC;
-                FileExplorer("bis:/");
-            }
+            u32 arbitary_header_size = NX_EMMC_BLOCKSIZE * 5;
+            u8* USER_header = malloc(arbitary_header_size);
+            sdmmc_storage_read(&emmc_storage, 0xA7800000 / NX_EMMC_BLOCKSIZE, 8, USER_header);
+
+            gfx_con_setpos(0, 0);
+            gfx_hexdump(16, USER_header, arbitary_header_size);
+            hidWait();
+            free(USER_header);
         }
         else {
             if (!sd_mount())
