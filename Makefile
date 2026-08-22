@@ -25,7 +25,10 @@ BDKINC    := -I./$(BDKDIR)
 VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  $(dir $(wildcard ./$(SOURCEDIR)/*/*/))
 VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
 
-OBJS  =
+OBJS  = start exception_handlers main heap
+
+OBJS += hw_init di vic joycon touch se bpmp clock fuse gpio i2c pinmux pmc uart timer mc minerva sdram \
+        bq24193 max7762x regulator_5v sd sdmmc fan tmp451 util irq
 
 OBJS := $(addsuffix .o, $(OBJS))
 OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
@@ -51,7 +54,7 @@ all: $(OUTPUTDIR)/$(TARGET).bin
 	@echo "Payload size is $(BIN_SIZE)"
 
 	@echo "Max size is 126296 Bytes."
-	@if [ ${COMPR_BIN_SIZE} -gt 126296 ]; then echo -e "\e[1;33m Payload size exceeds limit!\e[0m"; fi
+	@if [ ${BIN_SIZE} -gt 126296 ]; then echo -e "\e[1;33m Payload size exceeds limit!\e[0m"; fi
 	@echo "--------------------------------------"
 
 clean:
