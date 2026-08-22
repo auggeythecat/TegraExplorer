@@ -1,7 +1,9 @@
 <component name="CopyrightManager">
   <settings default="TegraExplorer">
+    <module2copyright>
+      <element module="All" copyright="TegraExplorer" />
+    </module2copyright>
     <LanguageOptions name="C/C++">
-      <option name="fileTypeOverride" value="3" />
       <option name="separateBefore" value="true" />
       <option name="separateAfter" value="true" />
       <option name="lenBefore" value="79" />
@@ -12,8 +14,6 @@
     <LanguageOptions name="__TEMPLATE__">
       <option name="separateBefore" value="true" />
       <option name="separateAfter" value="true" />
-      <option name="lenBefore" value="79" />
-      <option name="lenAfter" value="79" />
       <option name="box" value="true" />
       <option name="filler" value="—" />
     </LanguageOptions>
