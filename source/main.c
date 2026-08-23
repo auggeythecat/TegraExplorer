@@ -25,7 +25,9 @@
 
 extern void pivot_stack(u32 stack_top);
 
-void ipl_main() {
+void ipl_main() __attribute__((alias("iplMain")));
+
+void iplMain() {
     hw_init();
 
     pivot_stack(IPL_LOAD_ADDR);
