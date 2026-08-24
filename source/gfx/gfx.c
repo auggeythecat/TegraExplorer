@@ -118,3 +118,144 @@ static const u8 _font[][] = {
     [0x70, 0x00, 0x18, 0x0E, 0x18, 0x18, 0x70, 0x00] // char 125 (})
     [0x76, 0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00] // char 126 (~)
 };
+
+void gfxRenderSDF() {
+	for (int i = 0; i < ARRAY_SIZE(_font) / NATIVE_FONT_SIZE; i++) {
+		for (int y = 0; y < SDF_SIZE; y++) {
+			int vy = ((y - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+
+			for (int x = 0; x < SDF_SIZE; x++) {
+				int vx = ((x - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+
+				bool inside = false;
+
+				if (vx >= 0 && vx < NATIVE_FONT_SIZE && vy >= 0 && vy < NATIVE_FONT_SIZE) {
+					inside = (_font[NATIVE_FONT_SIZE * i + vy] >> vx) & 1;
+				}
+
+				u32 minDistance = 1000000;
+
+				for (int sy = 0; sy < SDF_SIZE; sy++) {
+					int svy = ((sy - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+
+					for (int sx = 0; sx < SDF_SIZE; sx++) {
+						int svx = ((sx - PADDING) * NATIVE_FONT_SIZE / INNER_SIZE);
+
+						bool sinside = false;
+
+						if (svx >= 0 && svx < NATIVE_FONT_SIZE && svy >= 0 && svy < NATIVE_FONT_SIZE)
+							sinside = (_font[NATIVE_FONT_SIZE*i + svy] >> svx) & 1;
+
+						if (sinside != inside) {
+							s32 dx     = x - sx;
+							s32 dy     = y - sy;
+							u64 distSq = dx*dx + dy*dy;
+							if (distSq < minDistance) minDistance = distSq;
+						}
+					}
+				}
+				u64 dist   = 1 + sqrt64(minDistance * 256);
+				u32 index  = SDF_SIZE*SDF_SIZE*i + SDF_SIZE*y + x;
+				int offset = dist - 8;
+				((u8*)SDF_BUFFER)[index] = inside ? CLAMPMAX(128 + offset, 255) : CLAMPMIN(128 - offset, 0);
+			}
+		}
+	}
+}
+
+static sdfAtlas_t atlases[MAX_ATLASES];
+static u32 atlasCount   = 0;
+static u8* atlasPointer = (u8*) SDF_BUFFER + SZ_32K;
+
+u8* _gfxGetAtlas(u32 size) {
+	for (u32 i = 0; i < atlasCount; i++) {
+		if (atlases[i].size == size) return atlases[i].data;
+	}
+
+	if (atlasCount < MAX_ATLASES) {
+	    // Will I ever find a good name for this variable?
+		u32 muhBytes  = NUM_CHARS * (size*size);
+
+		u8* startPtr  = (u8*)atlasPointer;
+		atlasPointer += (muhBytes + 3) & ~3;
+
+		atlases[atlasCount++] = (sdfAtlas_t) {size, startPtr};
+		return startPtr;
+	}
+	return NULL;
+}
+
+void gfxBakeAtlas(u32 fontSize) {
+	u8 *atlasBuf = _gfxGetAtlas(fontSize);
+	if (!atlasBuf) return;
+
+	// Fine-tuned number
+	sfp16_t scaleFactor = SFP16FROMINT(1) + (SFP16FROMINT(24) / 100);
+
+	for (int i = 0; i < NUM_CHARS; i++) {
+		u8* charSDFBase = &((u8*)SDF_BUFFER)[i * (SDF_SIZE * SDF_SIZE)];
+
+		for (int py = 0; py < fontSize; py++) {
+			sfp16_t normY       = sfp16Div(SFP16FROMINT(py), SFP16FROMINT(fontSize - 1));
+			sfp16_t scaledNormY = SFP16HALF + sfp16Mul(normY - SFP16HALF, sfp16Div(SFP16FROMINT(1), scaleFactor));
+			sfp16_t yPos        = sfp16Mul(scaledNormY, SFP16FROMINT(SDF_SIZE - 1));
+
+			for (int px = 0; px < fontSize; px++) {
+				sfp16_t normX       = sfp16Div(SFP16FROMINT(px), SFP16FROMINT(fontSize - 1));
+				sfp16_t scaledNormX = SFP16HALF + sfp16Mul(normX - SFP16HALF, sfp16Div(SFP16FROMINT(1), scaleFactor));
+				sfp16_t xPos        = sfp16Mul(scaledNormX, SFP16FROMINT(SDF_SIZE - 1));
+
+				int ix = SFP16GETINT(xPos);
+				int iy = SFP16GETINT(yPos);
+				int fx = SFP16GETDEC(xPos);
+				int fy = SFP16GETDEC(yPos);
+
+				int cix = ix + 1;
+				int ciy = iy + 1;
+				if (ciy >= SDF_SIZE) ciy = SDF_SIZE - 1;
+				if (cix >= SDF_SIZE) cix = SDF_SIZE - 1;
+
+				int s00 = charSDFBase[ iy * SDF_SIZE +  ix];
+				int s10 = charSDFBase[ iy * SDF_SIZE + cix];
+				int s01 = charSDFBase[ciy * SDF_SIZE +  ix];
+				int s11 = charSDFBase[ciy * SDF_SIZE + cix];
+
+				int top = s00 + (((s10 - s00) * fx) >> 16);
+				int bot = s01 + (((s11 - s01) * fx) >> 16);
+				int sam = top + (((bot - top) * fy) >> 16);
+
+				u32 index = i * (fontSize * fontSize) + (py * fontSize) + px;
+
+				int alpha = CLAMP((sam - 128) * 255, 0, 255);
+
+				atlasBuf[index] = (u8)alpha;
+			}
+		}
+	}
+}
+
+void gfxInitCtxt(u32 *fb, u32 width, u32 height, u32 stride) {
+	gfx_ctxt.fb     = fb;
+	gfx_ctxt.width  = width;
+	gfx_ctxt.height = height;
+	gfx_ctxt.stride = stride;
+}
+
+// gfx_con is required by bdk, so I'm just going to copy-paste it.
+void gfxConInit() {
+	gfx_con.gfxCtxt  = &gfx_ctxt;
+	gfx_con.fntsz     = 16;
+	gfx_con.x         = 0;
+	gfx_con.y         = 0;
+	gfx_con.savedx    = 0;
+	gfx_con.savedy    = 0;
+	gfx_con.fgcol     = COLOR_GREEN;
+	gfx_con.fillbg    = 1;
+	gfx_con.bgcol     = COLOR_DEFAULT;
+	gfx_con.mute      = 0;
+
+	gfx_con_init_done = true;
+
+	gfxRenderSDF();
+	gfxBakeAtlas(gfx_con.fntsz);
+}

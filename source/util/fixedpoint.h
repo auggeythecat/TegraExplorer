@@ -1,0 +1,56 @@
+/*—————————————————————————————————————————————————————————————————————————————
+ — Copyright (c) 2026 auggiethecat!                                           —
+ —                                                                            —
+ — All code was handwritten without the assistance of a Large Language Model. —
+ —                                                                            —
+ — This program is free software; you can redistribute it and/or modify it    —
+ — under the terms and conditions of the GNU General Public License,          —
+ — version 2, as published by the Free Software Foundation.                   —
+ —                                                                            —
+ — This program is distributed in the hope it will be useful, but WITHOUT     —
+ — ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      —
+ — FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for  —
+ — more details.                                                              —
+ —                                                                            —
+ — You should have received a copy of the GNU General Public License          —
+ — along with this program.  If not, see <http://www.gnu.org/licenses/>.      —
+ —————————————————————————————————————————————————————————————————————————————*/
+
+#ifndef _FIXEDPOINT_H
+#define _FIXEDPOINT_H
+
+#include <util/types.h>
+
+typedef s16 sfp8_t;
+
+#define SFP8BITS       (8                  )
+#define SFP8ONE        (1 << (SFP8BITS    ))
+#define SFP8HALF       (1 << (SFP8BITS - 1))
+
+#define  SFP8GETINT(k) (        (k) >> SFP8BITS)
+#define SFP8FROMINT(k) ((sfp8_t)(k) << SFP8BITS)
+#define  SFP8GETDEC(k) ((sfp8_t)(k) & (0x00FF) )
+
+sfp8_t sfp8Lrp(sfp8_t a, sfp8_t b, sfp8_t t) { return a + (sfp8_t)(((s32)t * (b - a) + SFP8HALF) >> SFP8BITS); }
+sfp8_t sfp8Mul(sfp8_t a, sfp8_t b)           { return (sfp8_t)(((s32)a * (s32)b + SFP8HALF) >> SFP8BITS);      }
+sfp8_t sfp8Div(sfp8_t a, sfp8_t b)           { return (sfp8_t)(((s32)a << SFP8BITS) / b);                      }
+sfp8_t sfp8Add(sfp8_t a, sfp8_t b)           { return a + b;                                                   }
+sfp8_t sfp8Sub(sfp8_t a, sfp8_t b)           { return a - b;                                                   }
+
+typedef s32 sfp16_t;
+
+#define SFP16BITS       (16                  )
+#define SFP16ONE        (1 << (SFP16BITS    ))
+#define SFP16HALF       (1 << (SFP16BITS - 1))
+
+#define  SFP16GETINT(k) (         (k) >> SFP16BITS)
+#define SFP16FROMINT(k) ((sfp16_t)(k) << SFP16BITS)
+#define  SFP16GETDEC(k) ((sfp16_t)(k) & (0xFFFF)  )
+
+sfp16_t sfp16Lrp(sfp16_t a, sfp16_t b, sfp16_t t) { return a + (sfp16_t)(((s64)t * (b - a) + SFP16HALF) >> SFP16BITS); }
+sfp16_t sfp16Mul(sfp16_t a, sfp16_t b)            { return (sfp16_t)(((s64)a * (s64)b + SFP16HALF) >> SFP16BITS);      }
+sfp16_t sfp16Div(sfp16_t a, sfp16_t b)            { return (sfp16_t)(((s64)a << SFP16BITS) / b);                       }
+sfp16_t sfp16Add(sfp16_t a, sfp16_t b)            { return a + b;                                                      }
+sfp16_t sfp16Sub(sfp16_t a, sfp16_t b)            { return a - b;                                                      }
+
+#endif //_FIXEDPOINT_H

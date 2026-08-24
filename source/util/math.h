@@ -16,18 +16,11 @@
  — along with this program.  If not, see <http://www.gnu.org/licenses/>.      —
  —————————————————————————————————————————————————————————————————————————————*/
 
-#ifndef _GFX_H
-#define _GFX_H
+#ifndef _MATH_H
+#define _MATH_H
 
-#include <utils/types.h>
+#define    CLAMP(val, min, max) ((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
+#define CLAMPMIN(val, min)      ((val) < (min) ? (min) :  (val))
+#define CLAMPMAX(val, max)                               ((val) > (max) ? (max) : (val))
 
-#define SCREEN_WIDTH  1280
-#define SCREEN_HEIGHT 720
-
-#define NATIVE_FONT_SIZE 8
-#define PADDING          1
-#define SDF_SIZE         (NATIVE_FONT_SIZE + (PADDING * 2))
-#define INNER_SIZE       (SDF_SIZE - (PADDING * 2))
-
-
-#endif //_GFX_H
+#endif //_MATH_H
