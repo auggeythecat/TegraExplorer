@@ -126,7 +126,7 @@ static const u8 _font[NUM_CHARS][FONT_SIZE] = {
     {0x76, 0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // char 126 (~)
     {0x00, 0x0C, 0x12, 0x7E, 0x42, 0x42, 0x7E, 0x00}, // 127 (folder)
     {0x00, 0x0E, 0x12, 0x22, 0x22, 0x22, 0x3E, 0x00}, // 128   (file)
-    {0x00, 0x08, 0x0C, 0x0E, 0x7E, 0x70, 0x30, 0x10}, // 129 (Charge)
+    {0x00, 0x08, 0x0C, 0x0E, 0x7E, 0x70, 0x30, 0x10}, // 129 (charge)
 };
 
 void gfxRenderSDF() {
@@ -230,9 +230,9 @@ void gfxBakeAtlas(const u32 fontSize) {
 				const int s01 = charSDFBase[ciy * SDF_SIZE +  ix];
 				const int s11 = charSDFBase[ciy * SDF_SIZE + cix];
 
-				const int top  = s00 + (((s10 - s00) * fx) >> 16);
-				const int bot  = s01 + (((s11 - s01) * fx) >> 16);
-				const int sam  = top + (((bot - top) * fy) >> 16);
+				const int top = s00 + (((s10 - s00) * fx) >> 16);
+				const int bot = s01 + (((s11 - s01) * fx) >> 16);
+				const int sam = top + (((bot - top) * fy) >> 16);
 
 				const u32 index = i * (fontSize * fontSize) + (py * fontSize) + px;
 
