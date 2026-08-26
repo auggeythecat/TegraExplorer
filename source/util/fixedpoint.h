@@ -19,7 +19,7 @@
 #ifndef _FIXEDPOINT_H
 #define _FIXEDPOINT_H
 
-#include <util/types.h>
+#include <utils/types.h>
 
 typedef s16 sfp8_t;
 
