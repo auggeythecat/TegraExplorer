@@ -205,12 +205,12 @@ void gfxBakeAtlas(const u32 fontSize) {
 	for (int i = 0; i < NUM_CHARS; i++) {
 		const u8* charSDFBase = &((u8*)SDF_BUFFER)[i * (SDF_SIZE * SDF_SIZE)];
 
-		for (int py = 0; py < fontSize; py++) {
+		for (u32 py = 0; py < fontSize; py++) {
 			const sfp16_t normY       = sfp16Div(SFP16FROMINT(py), SFP16FROMINT(fontSize - 1));
 			const sfp16_t scaledNormY = SFP16HALF + sfp16Mul(normY - SFP16HALF, sfp16Div(SFP16FROMINT(1), scaleFactor));
 			const sfp16_t yPos        = sfp16Mul(scaledNormY, SFP16FROMINT(SDF_SIZE - 1));
 
-			for (int px = 0; px < fontSize; px++) {
+			for (u32 px = 0; px < fontSize; px++) {
 				const sfp16_t normX       = sfp16Div(SFP16FROMINT(px), SFP16FROMINT(fontSize - 1));
 				const sfp16_t scaledNormX = SFP16HALF + sfp16Mul(normX - SFP16HALF, sfp16Div(SFP16FROMINT(1), scaleFactor));
 				const sfp16_t xPos        = sfp16Mul(scaledNormX, SFP16FROMINT(SDF_SIZE - 1));
@@ -331,8 +331,8 @@ void __attribute__((target("arm"))) gfxPutc(const char c) {
                  if (alpha == 0)   { *fb++ = bg; }
             else if (alpha == 255) { *fb++ = fg; }
             else {
-                const u32 rb = (bg_rb + (((fg_rb - bg_rb) * alpha) >> 8) & mask)     ;
-                const u32 ag = (bg_ag + (((fg_ag - bg_ag) * alpha) >> 8) & mask) << 8;
+                const u32 rb = ((bg_rb + (((fg_rb - bg_rb) * alpha) >> 8)) & mask)     ;
+                const u32 ag = ((bg_ag + (((fg_ag - bg_ag) * alpha) >> 8)) & mask) << 8;
 
                 *fb++ = rb | ag;
             }
@@ -382,7 +382,7 @@ void gfxPutsLimit(const char *s, const u32 limit){
     if (len > charLimit)
         charLimit -= 4;
 
-    for (int i = 0; i < MIN(len, charLimit); i++)
+    for (u32 i = 0; i < MIN(len, charLimit); i++)
         gfxPutc(s[i]);
 
     if (len > charLimit + 4)

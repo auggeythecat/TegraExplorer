@@ -41,7 +41,7 @@ CUSTOMDEFINES := -DIPL_LOAD_ADDR=$(IPL_LOAD_ADDR) -DTE_MAGIC=$(IPL_MAGIC)
 CUSTOMDEFINES += -DTE_VER_MJ=$(TEVERSION_MAJOR) -DTE_VER_MN=$(TEVERSION_MINOR) -DTE_VER_HF=$(TEVERSION_BUGFX) -DTE_VER=$(TEVERSION)
 CUSTOMDEFINES += -DGFX_INC=$(GFX_INC)
 
-WARNINGS := -Wall -Wextra
+WARNINGS := -Wall -Wextra -Wno-implicit-fallthrough
 
 ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork $(WARNINGS)
 CFLAGS  = $(ARCH) -Os -g -gdwarf-4 -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -std=gnu11 $(CUSTOMDEFINES)
