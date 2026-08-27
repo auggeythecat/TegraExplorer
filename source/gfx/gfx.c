@@ -18,16 +18,16 @@
 
 #include "gfx.h"
 
-#include <stdarg.h>
-
 #include "../util/fixedpoint.h"
 #include "../util/math.h"
 
 #include <utils/util.h>
 #include <string.h>
+#include <stdarg.h>
 
 // Lifted from https://github.com/epto/epto-fonts/ directly
 // I just love the capital letters especially from figo1
+// Do note: The font had to be horizontally mirrored.
 static const u8 _font[NUM_CHARS][FONT_SIZE] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // char 032 ( )
     {0x18, 0x3c, 0x3c, 0x18, 0x18, 0x00, 0x18, 0x00}, // char 033 (!)
