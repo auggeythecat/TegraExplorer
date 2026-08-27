@@ -35,6 +35,7 @@ typedef enum _entryType_t {
 } entryType_t;
 
 typedef struct _menuEntry_t {
+    u32 type;
     const char* caption;
     u32 color;
     void* (*handler)(void*);
@@ -42,6 +43,8 @@ typedef struct _menuEntry_t {
 
     union {
         struct {
+            u32 renderDirty:1;
+
             u32 skip:1;
             u32 hide:1;
             u32 selected:1;
@@ -52,7 +55,7 @@ typedef struct _menuEntry_t {
 
             u32 filesizeIndex:2;
 
-            u32 reserved:24;
+            u32 reserved:23;
         };
         u32 options;
     };
@@ -71,12 +74,18 @@ typedef struct _menuEntry_t {
 typedef struct _menu_t {
     const char* title;
     menuEntry_t* entries;
-    u32 cursorIndex;
+    u32 cursorIndex, count;
     u16 x, y, w, h;
 
     union {
         struct {
             u32 isOverlay:1;
+            u32 printHeader:1;
+            u32 printFooter:1;
+
+            u32 headerDirty:1;
+            u32 footerDirty:1;
+            u32 renderDirty:1;
         };
         u32 options;
     };
