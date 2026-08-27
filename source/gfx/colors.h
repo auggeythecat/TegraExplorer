@@ -47,4 +47,7 @@
 #define SETCOLOR(fg, bg)    gfxConSetCol(fg, 1, bg)
 #define RESETCOLOR          SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
 
+#define FILLBG   1
+#define NOFILLBG 0
+
 #endif //_COLORS_H
