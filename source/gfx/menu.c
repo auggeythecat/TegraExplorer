@@ -17,13 +17,18 @@
  —————————————————————————————————————————————————————————————————————————————*/
 
 #include "menu.h"
+#include "../configuration.h"
 
 #include <string.h>
 #include <mem/heap.h>
 
+#ifdef USE_VIC
+#include <display/vic.h>
+#endif
+
 menuManager_t menuManager = {};
 
-void popmenu() {
+void popMenu() {
     if (menuManager.top <= 1) return; // Please don't pop the main menu/
 
     menu_t *m = &menuManager.stack[menuManager.top];
@@ -31,4 +36,18 @@ void popmenu() {
 
     memset(&menuManager.stack[menuManager.top], 0, sizeof(menu_t));
     menuManager.top--;
+}
+
+void pushMenu(const menu_t m) {
+    if (menuManager.top++ >= MAX_MENU_STACK) return;
+    menuManager.stack[menuManager.top] = m;
+}
+
+void renderMenuTop() {
+    menu_t* m = &menuManager.stack[menuManager.top];
+
+#ifdef USE_VIC
+    vic_compose();
+    vic_wait_idle();
+#endif
 }
