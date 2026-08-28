@@ -23,8 +23,8 @@
 
 #define JOYSTICK_THRESHOLD 500
 
-#define RE_DETECTION(button) ((inputs.buttons) & (button)) > ((lastInputs.buttons) & (button))
-#define FE_DETECTION(button) ((inputs.buttons) & (button)) < ((lastInputs.buttons) & (button))
+#define RE_INPUT_DETECTION(button) ((inputs.buttons) & (button)) > ((lastInputs.buttons) & (button))
+#define FE_INPUT_DETECTION(button) ((inputs.buttons) & (button)) < ((lastInputs.buttons) & (button))
 
 #define JOYY      BIT(0)
 #define JOYX      BIT(1)
