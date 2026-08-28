@@ -95,6 +95,12 @@ void gfxCPuts(u32 color, const char *s);
 void gfxPutsLimit(const char *s, u32 limit);
 void gfxVPrintF(const char *fmt, va_list ap);
 void gfxPrintF(const char *fmt, ...); void gfx_printf(const char *fmt, ...);
-
+void gfxSetPixel(u32 x, u32 y, u32 color);
+void gfxLine(int x0, int y0, int x1, int y1, u32 color);
+void gfxBoxGrey(u32 x0, u32 y0, u32 x1, u32 y1, u8 shade);
+void gfxBoxARGB(u32 x0, u32 y0, u32 x1, u32 y1, u32 color);
+void gfxClearGrey(u8 color);
+void gfxClearPartialGrey(u8 color, u32 pos_y, u32 height);
+void gfxClearColor(u32 color);
 
 #endif //_GFX_H

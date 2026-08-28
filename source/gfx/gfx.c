@@ -503,3 +503,55 @@ void gfxPrintF(const char *fmt, ...) {
 }
 
 __attribute__((alias("gfxPrintF"))) void gfx_printf(const char *fmt, ...);
+
+void gfxSetPixel(const u32 x, const u32 y, const u32 color) {
+    gfxCtxt.fb[x + y * gfxCtxt.stride] = color;
+}
+
+void gfxLine(int x0, int y0, const int x1, const int y1, const u32 color) {
+    const int dx = ABS(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    const int dy = ABS(y1 - y0), sy = y0 < y1 ? 1 : -1;
+          int er = (dx > dy ? dx : -dy) / 2;
+
+    while (1) {
+        gfxSetPixel(x0, y0, color);
+        if (x0 == x1 && y0 == y1)
+            break;
+
+        const int e2 = er;
+
+        if (e2 >-dx) {
+            er -= dy;
+            x0 += sx;
+        }
+
+        if (e2 < dy) {
+            er += dx;
+            y0 += sy;
+        }
+    }
+}
+
+void gfxBoxGrey(const u32 x0, const u32 y0, const u32 x1, const u32 y1, const u8 shade) {
+    for (u32 y = y0; y < y1 + 1; y++)
+        memset(gfxCtxt.fb + (y0 * gfxCtxt.stride) + y0, shade, x1 - x0);
+}
+
+void gfxBoxARGB(const u32 x0, const u32 y0, const u32 x1, const u32 y1, const u32 color) {
+    for (u32 x = x0; x < x1 + 1; x++)
+        for (u32 y = y0; y < y1 + 1; y++)
+            gfxSetPixel(x, y, color);
+}
+
+void gfxClearGrey(const u8 color) {
+    memset(gfxCtxt.fb, color, gfxCtxt.width * gfxCtxt.height * 4);
+}
+
+void gfxClearPartialGrey(const u8 color, const u32 pos_y, const u32 height) {
+    memset(gfxCtxt.fb + pos_y * gfxCtxt.stride, color, height * 4 * gfxCtxt.stride);
+}
+
+void gfxClearColor(const u32 color) {
+    for (u32 i = 0; i < gfxCtxt.width * gfxCtxt.height; i++)
+        gfxCtxt.fb[i] = color;
+}
