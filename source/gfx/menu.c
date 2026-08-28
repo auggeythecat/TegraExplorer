@@ -24,6 +24,8 @@
 #include <mem/heap.h>
 
 #include "gfx.h"
+#include "soc/timer.h"
+#include "utils/sprintf.h"
 
 #ifdef USE_VIC
 #include <display/vic.h>
@@ -46,6 +48,22 @@ void pushMenu(const menu_t m) {
     menuManager.stack[menuManager.top] = m;
 }
 
+static void _printEntry(const menuEntry_t entry) {
+    if (entry.type == ENTRY_END)
+        __builtin_unreachable();
+
+    if (entry.renderDirty) {
+             if (entry.highlighted) SETCOLOR(INVERTCOLOR(entry.color), INVERTCOLOR(COLOR_BG));
+        else if (entry.selected)    SETCOLOR(            entry.color , INVERTCOLOR(COLOR_BG));
+        else                        SETCOLOR(            entry.color ,             COLOR_BG );
+
+        // TODO: Putting filesize and icons.
+
+        gfxPuts(entry.caption);
+        gfxPutc('\n');
+    }
+}
+
 static void _printHeader(const menu_t* m) {
     if (!m->headerDirty)
         return;
@@ -53,17 +71,29 @@ static void _printHeader(const menu_t* m) {
     gfxConSetPos(0,0);
     gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
 
-    if (m->renderDirty) {
-        // TODO: fill the bg of the header
-    }
+    // TODO: Check if this makes a major performance difference.
+    // If it does, the best path forward might be to make this render with a white background color,
+    // (makes character printing faster because no alpha mult first of all)
+    // but also, it *might* remove the need to redraw the whole box.
+    // I guess you would also want to add some padding on the back
+    // (ie, add multiple spaces before the text, since that would just throw the bg color into the fb)
+    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0xFF);
 
     gfxPrintF("TegraExplorer %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
 
-    // TODO: The right side.
+    const u16 itemsPerPage = (m->h           / gfxCon.fntsz)    ;
+    const u16 totalPages   = (m->count       / itemsPerPage) + 1;
+    const u16 currentPage  = (m->cursorIndex / itemsPerPage) + 1;
+
+    char temp[40];
+    s_printf(temp, " Page %d / %d | %d entries", currentPage, totalPages, m->count);
+    gfxConSetPos(SCREEN_WIDTH - (strlen(temp) * gfxCon.fntsz), 0);
+    gfx_printf(temp);
 }
 
-static void _printFooter(const menu_t* m) {
-
+static void _printFooter(const u32 lastDraw) {
+    gfxConSetPos(0, SCREEN_HEIGHT - gfx_con.fntsz);
+    gfx_printf("Time taken for screen draw: %dus ", get_tmr_us() - lastDraw);
 }
 
 static void _handleInput(const menu_t* m) {
@@ -85,39 +115,21 @@ static void _handleInput(const menu_t* m) {
 }
 
 void renderMenuTop() {
+    const u32 before = get_tmr_us();
     const menu_t* m = &menuManager.stack[menuManager.top];
+
+    if (m->renderDirty)
+        gfxClearGrey(0xF8);
 
     if (m->printHeader)
         _printHeader(m);
 
-    for (u32 i = 0; i < m->count; i++) {
-        const menuEntry_t entry = m->entries[i];
-        switch (entry.type) {
-        case ENTRY_END:
-        case ENTRY_SEPERATOR:
-            if (entry.renderDirty)
-                gfxPutc('\n');
-            break;
+    gfxConSetPos(m->x, m->y);
+    for (u32 i = 0; i < m->count || m->entries[i].type != ENTRY_END; i++)
+        _printEntry(m->entries[i]);
 
-        case ENTRY_CAPTION:
-        case ENTRY_HANDLER:
-        case ENTRY_HANDLER_EX:
-        case ENTRY_MENU:
-        case ENTRY_DIRECTORY:
-        case ENTRY_FILE:
-        case ENTRY_BACK:
-            if (entry.renderDirty) {
-                gfxCPuts(entry.color, entry.caption);
-                gfxPutc('\n');
-            }
-            break;
-
-        default:
-            break;
-        }
-    }
-
-    _printFooter(m);
+    if (m->printFooter)
+        _printFooter(before);
 
 #ifdef USE_VIC
     vic_compose();

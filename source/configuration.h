@@ -20,5 +20,8 @@
 #define _CONFIGURATION_H
 
 #define USE_VIC
+#define COLOR_FG COLOR_WHITE
+#define COLOR_BG COLOR_DARKER_GREY
+
 
 #endif //_CONFIGURATION_H
