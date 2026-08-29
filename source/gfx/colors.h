@@ -1,5 +1,5 @@
 /*—————————————————————————————————————————————————————————————————————————————
-— Copyright (c) 2026 auggiethecat!                                           —
+ — Copyright (c) 2026 auggiethecat!                                           —
  —                                                                            —
  — All code was handwritten without the assistance of a Large Language Model. —
  —                                                                            —
