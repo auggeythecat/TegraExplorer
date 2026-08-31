@@ -38,8 +38,8 @@ typedef struct _menuEntry_t {
     u32 type;
     const char* caption;
     u32 color;
-    void* (*handler)(void*);
-    u32 fileSize;
+    void (*handler)(void);
+    void* data;
 
     union {
         struct {
@@ -63,15 +63,15 @@ typedef struct _menuEntry_t {
     };
 } menuEntry_t;
 
-#define        ENT_END(                             ) { ENTRY_END       , COLOR_NONE, 0      , NULL, NULL   , { .renderDirty = 1, .skip = 1, .hide = 1           } }
-#define  ENT_SEPERATOR(                             ) { ENTRY_SEPERATOR , COLOR_NONE, 0      , NULL, NULL   , { .renderDirty = 1, .skip = 1, .hide = 1           } }
-#define    ENT_CAPTION(color, caption               ) { ENTRY_CAPTION   , color     , caption, NULL, NULL   , { .renderDirty = 1, .skip = 1                      } }
-#define    ENT_HANDLER(color, caption,       handler) { ENTRY_HANDLER   , color     , caption, NULL, handler, { .renderDirty = 1,                                } }
-#define ENT_HANDLER_EX(color, caption, data, handler) { ENTRY_HANDLER_EX, color     , caption, data, handler, { .renderDirty = 1, .selectable = 1                } }
-#define       ENT_MENU(color, caption, data         ) { ENTRY_MENU      , color     , caption, data, NULL   , { .renderDirty = 1, .selectable = 1                } }
-#define  ENT_DIRECTORY(color, caption, data, handler) { ENTRY_DIRECTORY , color     , caption, data, NULL   , { .renderDirty = 1, .selectable = 1, .showSize = 1 } }
-#define       ENT_FILE(color, caption, data, handler) { ENTRY_FILE      , color     , caption, data, NULL   , { .renderDirty = 1, .selectable = 1  .showSize = 1 } }
-#define       ENT_BACK(color, caption               ) { ENTRY_BACK      , color     , caption, NULL, NULL   , { .renderDirty = 1, .selectable = 1                } }
+#define        ENT_END(                             ) { ENTRY_END       , 0      , COLOR_NONE, NULL   , NULL, { .renderDirty = 1, .skip = 1, .hide = 1           } }
+#define  ENT_SEPERATOR(                             ) { ENTRY_SEPERATOR , 0      , COLOR_NONE, NULL   , NULL, { .renderDirty = 1, .skip = 1, .hide = 1           } }
+#define    ENT_CAPTION(color, caption               ) { ENTRY_CAPTION   , caption, color     , NULL   , NULL, { .renderDirty = 1, .skip = 1                      } }
+#define    ENT_HANDLER(color, caption,       handler) { ENTRY_HANDLER   , caption, color     , handler, NULL, { .renderDirty = 1,                                } }
+#define ENT_HANDLER_EX(color, caption, data, handler) { ENTRY_HANDLER_EX, caption, color     , handler, data, { .renderDirty = 1, .selectable = 1                } }
+#define       ENT_MENU(color, caption, data, handler) { ENTRY_MENU      , caption, color     , handler, data, { .renderDirty = 1, .selectable = 1                } }
+#define  ENT_DIRECTORY(color, caption, data, handler) { ENTRY_DIRECTORY , caption, color     , NULL   , data, { .renderDirty = 1, .selectable = 1, .showSize = 1 } }
+#define       ENT_FILE(color, caption, data, handler) { ENTRY_FILE      , caption, color     , NULL   , data, { .renderDirty = 1, .selectable = 1  .showSize = 1 } }
+#define       ENT_BACK(color, caption               ) { ENTRY_BACK      , caption, color     , NULL   , NULL, { .renderDirty = 1, .selectable = 1                } }
 
 typedef struct _menu_t {
     const char* title;

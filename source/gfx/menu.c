@@ -22,10 +22,12 @@
 
 #include <string.h>
 #include <mem/heap.h>
+#include <soc/timer.h>
+#include <utils/sprintf.h>
 
 #include "gfx.h"
-#include "soc/timer.h"
-#include "utils/sprintf.h"
+#include "../util/hid.h"
+#include "../util/utils.h"
 
 #ifdef USE_VIC
 #include <display/vic.h>
@@ -49,9 +51,6 @@ void pushMenu(const menu_t m) {
 }
 
 static void _printEntry(const menuEntry_t entry) {
-    if (entry.type == ENTRY_END)
-        __builtin_unreachable();
-
     if (entry.renderDirty) {
              if (entry.highlighted) SETCOLOR(INVERTCOLOR(entry.color), INVERTCOLOR(COLOR_BG));
         else if (entry.selected)    SETCOLOR(            entry.color , INVERTCOLOR(COLOR_BG));
@@ -60,7 +59,6 @@ static void _printEntry(const menuEntry_t entry) {
         // TODO: Putting filesize and icons.
 
         gfxPuts(entry.caption);
-        gfxPutc('\n');
     }
 }
 
@@ -77,56 +75,73 @@ static void _printHeader(const menu_t* m) {
     // but also, it *might* remove the need to redraw the whole box.
     // I guess you would also want to add some padding on the back
     // (ie, add multiple spaces before the text, since that would just throw the bg color into the fb)
-    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0xFF);
+    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0x00);
 
-    gfxPrintF("TegraExplorer %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
+    gfxPrintF("TEGRAEXPLORER %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
 
     const u16 itemsPerPage = (m->h           / gfxCon.fntsz)    ;
     const u16 totalPages   = (m->count       / itemsPerPage) + 1;
     const u16 currentPage  = (m->cursorIndex / itemsPerPage) + 1;
 
     char temp[40];
-    s_printf(temp, " Page %d / %d | %d entries", currentPage, totalPages, m->count);
+    s_printf(temp, " PAGE %d / %d | %d ENTRIES", currentPage, totalPages, m->count);
     gfxConSetPos(SCREEN_WIDTH - (strlen(temp) * gfxCon.fntsz), 0);
     gfx_printf(temp);
 }
 
 static void _printFooter(const u32 lastDraw) {
-    gfxConSetPos(0, SCREEN_HEIGHT - gfx_con.fntsz);
-    gfx_printf("Time taken for screen draw: %dus ", get_tmr_us() - lastDraw);
+    gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT - gfxCon.fntsz, 0x00);
+    gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
+    gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
+    gfx_printf("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - lastDraw);
 }
 
 static void _handleInput(const menu_t* m) {
-    const menuEntry_t entry = m->entries[m->cursorIndex];
+    menuEntry_t entry = m->entries[m->cursorIndex];
 
-    switch (entry.type) {
-    case ENTRY_END:
-    case ENTRY_SEPERATOR:
-    case ENTRY_CAPTION:
-    case ENTRY_HANDLER:
-    case ENTRY_HANDLER_EX:
-    case ENTRY_MENU:
-    case ENTRY_DIRECTORY:
-    case ENTRY_FILE:
-    case ENTRY_BACK:
-    default:
-        break;
+    while (hidRead()) {
+        if (RE_INPUT_DETECTION(JOYPLUS)) {
+            if (gfx_con.fntsz < 48) gfxConSetFontSize(gfx_con.fntsz += 1);
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYMINUS)) {
+            if (gfx_con.fntsz > 8 ) gfxConSetFontSize(gfx_con.fntsz -= 1);
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYHOME)) {
+            powerOff();
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYA)) {
+            entry.handler();
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYX)) {
+            if (entry.selectable) entry.selected = ~entry.selected;
+            break;
+        }
     }
 }
 
 void renderMenuTop() {
-    const u32 before = get_tmr_us();
     const menu_t* m = &menuManager.stack[menuManager.top];
+    const u32 before = get_tmr_us();
 
     if (m->renderDirty)
-        gfxClearGrey(0xF8);
+        gfxClearGrey(0x4F);
 
     if (m->printHeader)
         _printHeader(m);
 
     gfxConSetPos(m->x, m->y);
-    for (u32 i = 0; i < m->count || m->entries[i].type != ENTRY_END; i++)
+    for (u32 i = 0; i < m->count || m->entries[i].type != ENTRY_END; i++) {
         _printEntry(m->entries[i]);
+        gfxPutc('\n');
+    }
 
     if (m->printFooter)
         _printFooter(before);
