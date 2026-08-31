@@ -194,12 +194,13 @@ static u8* _gfxGetAtlas(const u32 size) {
 	return NULL;
 }
 
+// TODO: Fix corner rounding.
 void gfxBakeAtlas(const u32 fontSize) {
 	u8 *atlasBuf = _gfxGetAtlas(fontSize);
 	if (!atlasBuf) return;
 
 	// Fine-tuned number
-	const sfp16_t scaleFactor = SFP16FROMINT(1) + (SFP16FROMINT(24) / 100);
+	const sfp16_t scaleFactor = SFP16FROMINT(1) + (SFP16FROMINT(1) / 100);
 
 	for (int i = 0; i < NUM_CHARS; i++) {
 		const u8* charSDFBase = &((u8*)SDF_BUFFER)[i * (SDF_SIZE * SDF_SIZE)];
