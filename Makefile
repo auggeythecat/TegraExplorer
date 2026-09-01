@@ -25,10 +25,12 @@ BDKINC    := -I./$(BDKDIR)
 VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  $(dir $(wildcard ./$(SOURCEDIR)/*/*/))
 VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
 
-OBJS  = start exception_handlers main heap gfx menu testMenu hid
+OBJS  = start exception_handlers main heap gfx menu testMenu
 
 OBJS += hw_init di vic joycon touch se bpmp clock fuse gpio i2c pinmux pmc uart timer mc minerva sdram \
-        bq24193 max7762x regulator_5v sd sdmmc fan tmp451 util irq
+        bq24193 max7762x regulator_5v fan tmp451 util irq hid btn utils sprintf
+
+OBJS += ff ffsystem diskio nx_emmc_bis ramdisk emmc sdmmc sdmmc_driver sd
 
 OBJS := $(addsuffix .o, $(OBJS))
 OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
