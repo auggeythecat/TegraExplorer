@@ -60,7 +60,8 @@ static void _printEntry(const menuEntry_t entry) {
 
         // TODO: Putting filesize and icons.
 
-        gfxPuts(entry.caption);
+        gfxPutS(entry.caption);
+        entry.renderDirty = false;
     }
 }
 
@@ -178,7 +179,7 @@ void renderMenuTop() {
     gfxConSetPos(m->x, m->y);
     for (u32 i = 0; i < m->count || m->entries[i].type != ENTRY_END; i++) {
         _printEntry(m->entries[i]);
-        gfxPutc('\n');
+        gfxPutC('\n');
     }
 
     if (m->printFooter)
@@ -193,5 +194,7 @@ void renderMenuTop() {
 
     m->renderDirty = false;
 
+    m->footerDirty = true;
+    m->headerDirty = true;
     gfxClearGrey(0x4F);
 }

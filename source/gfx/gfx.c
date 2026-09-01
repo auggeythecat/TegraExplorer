@@ -299,7 +299,7 @@ void gfxConSetPos(const u32 x, const u32 y) {
     gfxCon.x = x;
 }
 
-void __attribute__((target("arm"))) gfxPutc(const char c) {
+void __attribute__((target("arm"))) gfxPutC(const char c) {
     if unlikely(c <= 31 || c >= 130) {
         if (c == '\n') {
             gfxCon.x = 0;
@@ -342,32 +342,32 @@ void __attribute__((target("arm"))) gfxPutc(const char c) {
     gfxCon.x += sz;
 }
 
-void gfxPuts(const char *s) {
+void gfxPutS(const char *s) {
     if (!s || !gfxConInitDone || gfxCon.mute)
         return;
 
     for (; *s; s++)
-        gfxPutc(*s);
+        gfxPutC(*s);
 }
 
-void gfxPutsSmall(const char *s) {
+void gfxPutSSmall(const char *s) {
     if (!s || !gfxConInitDone || gfxCon.mute)
         return;
 
     gfxConSetFontSize(8);
 
     for (; *s; s++)
-        gfxPutc(*s);
+        gfxPutC(*s);
 }
 
-void gfxCPuts(const u32 color, const char *s) {
+void gfxCPutS(const u32 color, const char *s) {
     gfxCon.fgcol = color;
-    gfxPuts(s);
-    gfxPutc('\n');
+    gfxPutS(s);
+    gfxPutC('\n');
     gfxCon.fgcol = COLOR_DEFAULT;
 }
 
-void gfxPutsLimit(const char *s, const u32 limit){
+void gfxPutSLimit(const char *s, const u32 limit){
     if (!s || gfxCon.mute)
         return;
 
@@ -375,7 +375,7 @@ void gfxPutsLimit(const char *s, const u32 limit){
     u32 charLimit = limit / gfxCon.fntsz;
 
     if (charLimit > len) {
-        gfxPuts(s);
+        gfxPutS(s);
         return;
     }
 
@@ -383,13 +383,13 @@ void gfxPutsLimit(const char *s, const u32 limit){
         charLimit -= 4;
 
     for (u32 i = 0; i < MIN(len, charLimit); i++)
-        gfxPutc(s[i]);
+        gfxPutC(s[i]);
 
     if (len > charLimit + 4)
-        gfxPuts("... ");
+        gfxPutS("... ");
 }
 
-static void _gfx_putn(u32 v, const int base, const char fill, const int fcnt) {
+static void _gfxPutN(u32 v, const int base, const char fill, const int fcnt) {
     static const char digits[] = "0123456789ABCDEF";
 
     char buf[65];
@@ -424,7 +424,7 @@ static void _gfx_putn(u32 v, const int base, const char fill, const int fcnt) {
         }
     }
 
-    gfxPuts(p);
+    gfxPutS(p);
 }
 
 void gfxVPrintF(const char *fmt, va_list ap) {
@@ -451,16 +451,16 @@ void gfxVPrintF(const char *fmt, va_list ap) {
                 }
             } switch(*fmt) {
             case 'c':
-                gfxPutc(va_arg(ap, u32));
+                gfxPutC(va_arg(ap, u32));
                 break;
             case 's':
-                gfxPuts(va_arg(ap, char *));
+                gfxPutS(va_arg(ap, char *));
                 break;
             case 'd':
-                _gfx_putn(va_arg(ap, u32), 10, fill, fcnt);
+                _gfxPutN(va_arg(ap, u32), 10, fill, fcnt);
                 break;
             case 'n':
-                gfxPutc('\n');
+                gfxPutC('\n');
                 gfxCon.x = newLineConfig;
                 break;
             case 'N':
@@ -471,7 +471,7 @@ void gfxVPrintF(const char *fmt, va_list ap) {
             case 'P':
             case 'x':
             case 'X':
-                _gfx_putn(va_arg(ap, u32), 16, fill, fcnt);
+                _gfxPutN(va_arg(ap, u32), 16, fill, fcnt);
                 break;
             case 'k':
                 gfxCon.fgcol = va_arg(ap, u32);
@@ -481,17 +481,17 @@ void gfxVPrintF(const char *fmt, va_list ap) {
                 gfxCon.fillbg = 1;
                 break;
             case '%':
-                gfxPutc('%');
+                gfxPutC('%');
                 break;
             case '\0':
                 return;
             default:
-                gfxPutc('%');
-                gfxPutc(*fmt);
+                gfxPutC('%');
+                gfxPutC(*fmt);
                 break;
             }
         } else
-            gfxPutc(*fmt);
+            gfxPutC(*fmt);
         fmt++;
     }
 }
