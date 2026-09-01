@@ -78,6 +78,7 @@ typedef struct _menu_t {
     menuEntry_t* entries;
     u32 cursorIndex, count;
     u16 x, y, w, h;
+    u32 lastDraw;
 
     union {
         struct {
@@ -96,7 +97,7 @@ typedef struct _menu_t {
 #define MAX_MENU_STACK 32
 typedef struct _menuManager_t {
     menu_t stack[MAX_MENU_STACK];
-    s8 top;
+    u32 top;
     bool fullRedraw;
 } menuManager_t;
 

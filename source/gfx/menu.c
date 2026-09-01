@@ -36,13 +36,15 @@
 static menuManager_t menuManager = {};
 
 void popMenu() {
-    if (menuManager.top <= 1) return; // Please don't pop the main menu/
+    if (menuManager.top <= 1) return; // Please don't pop the main menu.
 
     const menu_t *m = &menuManager.stack[menuManager.top];
     if (m->entries) free(m->entries);
 
     memset(&menuManager.stack[menuManager.top], 0, sizeof(menu_t));
     menuManager.top--;
+
+    menuManager.stack[menuManager.top].renderDirty = true;
 }
 
 void pushMenu(const menu_t m) {
@@ -62,7 +64,7 @@ static void _printEntry(const menuEntry_t entry) {
     }
 }
 
-static void _printHeader(const menu_t* m) {
+static void _printHeader(menu_t* m) {
     if (!m->headerDirty)
         return;
 
@@ -86,27 +88,33 @@ static void _printHeader(const menu_t* m) {
     char temp[40];
     s_printf(temp, " PAGE %d / %d | %d ENTRIES", currentPage, totalPages, m->count);
     gfxConSetPos(SCREEN_WIDTH - (strlen(temp) * gfxCon.fntsz), 0);
-    gfx_printf(temp);
+    gfxPrintF(temp);
+
+    m->headerDirty = false;
 }
 
-static void _printFooter(const u32 lastDraw) {
+static void _printFooter(menu_t* m) {
     gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT - gfxCon.fntsz, 0x00);
     gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
-    gfx_printf("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - lastDraw);
+    gfxPrintF("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - m->lastDraw);
+
+    m->footerDirty = false;
 }
 
-static void _handleInput(const menu_t* m) {
+static void _handleInput(menu_t* m) {
     menuEntry_t entry = m->entries[m->cursorIndex];
 
     while (hidRead()) {
         if (RE_INPUT_DETECTION(JOYPLUS)) {
-            if (gfx_con.fntsz < 48) gfxConSetFontSize(gfx_con.fntsz += 1);
+            if (gfx_con.fntsz < 24) gfxConSetFontSize(gfx_con.fntsz += 1);
+            m->renderDirty = true;
             break;
         }
 
         if (RE_INPUT_DETECTION(JOYMINUS)) {
             if (gfx_con.fntsz > 8 ) gfxConSetFontSize(gfx_con.fntsz -= 1);
+            m->renderDirty = true;
             break;
         }
 
@@ -122,14 +130,44 @@ static void _handleInput(const menu_t* m) {
 
         if (RE_INPUT_DETECTION(JOYX)) {
             if (entry.selectable) entry.selected = ~entry.selected;
+            entry.renderDirty = true;
             break;
         }
+
+        if (RE_INPUT_DETECTION(JOYLDOWN)) {
+            menuEntry_t entry2 = m->entries[m->cursorIndex++];
+            if (entry2.type == ENTRY_END) {
+                m->cursorIndex--;
+                break;
+            }
+
+            if (!entry2.skip) {
+                entry.renderDirty = true;
+                entry2.highlighted = true;
+                entry2.renderDirty = true;
+            }
+        }
+
+        if (RE_INPUT_DETECTION(JOYLUP)) {
+            if (m->cursorIndex == 0) break;
+
+            entry.renderDirty = true;
+            menuEntry_t entry2 = m->entries[m->cursorIndex--];
+
+            if (!entry2.skip) {
+                entry2.highlighted = true;
+                entry2.renderDirty = true;
+            }
+        }
     }
+
+    m->footerDirty = true;
+    m->headerDirty = true;
 }
 
 void renderMenuTop() {
-    const menu_t* m = &menuManager.stack[menuManager.top];
-    const u32 before = get_tmr_us();
+    menu_t* m = &menuManager.stack[menuManager.top];
+    m->lastDraw = get_tmr_us();
 
     if (m->renderDirty)
         gfxClearGrey(0x4F);
@@ -144,7 +182,7 @@ void renderMenuTop() {
     }
 
     if (m->printFooter)
-        _printFooter(before);
+        _printFooter(m);
 
 #ifdef USE_VIC
     vic_compose();
@@ -152,4 +190,8 @@ void renderMenuTop() {
 #endif
 
     _handleInput(m);
+
+    m->renderDirty = false;
+
+    gfxClearGrey(0x4F);
 }
