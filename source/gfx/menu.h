@@ -52,12 +52,15 @@ typedef struct _menuEntry_t {
             u32 highlighted:1;
 
             u32 showIcon:1;
-            u32 fileIcon:1;
+            u32 icon:1;
 
             u32 showSize:1;
-            u32 filesizeIndex:2;
+            u32 fileSizeIndex:2;
+            u32 fileSize:10;
+            // It only needs to be 10, since the max value is 4GiB,
+            // and the longest value would be 1023M/K/iB
 
-            u32 reserved:22;
+            u32 reserved:12;
         };
         u32 options;
     };
@@ -76,7 +79,7 @@ typedef struct _menuEntry_t {
 typedef struct _menu_t {
     const char* title;
     menuEntry_t* entries;
-    u32 cursorIndex, count;
+    u16 cursorIndex, count;
     u16 x, y, w, h;
     u32 lastDraw;
 

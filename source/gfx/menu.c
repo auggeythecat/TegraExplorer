@@ -52,15 +52,27 @@ void pushMenu(const menu_t m) {
     menuManager.stack[menuManager.top] = m;
 }
 
-static void _printEntry(const menuEntry_t entry) {
+static void _printEntry(menuEntry_t entry, u32 maxLen) {
     if (entry.renderDirty) {
              if (entry.highlighted) SETCOLOR(INVERTCOLOR(entry.color), INVERTCOLOR(COLOR_BG));
         else if (entry.selected)    SETCOLOR(            entry.color , INVERTCOLOR(COLOR_BG));
         else                        SETCOLOR(            entry.color ,             COLOR_BG );
 
-        // TODO: Putting filesize and icons.
+        const u32 fontSize = gfxCon.fntsz;
 
-        gfxPutS(entry.caption);
+        if (entry.showIcon) {
+            // TODO: Is there an actual way to concat characters better then this?
+            gfxPutC(entry.icon);
+            gfxPutC('|');
+
+            maxLen -= 2*fontSize;
+        }
+
+        if (entry.showSize) {
+            // TODO: log stuff to find length of numbers?
+        } else
+            gfxPutSLimit(entry.caption, maxLen);
+
         entry.renderDirty = false;
     }
 }
@@ -161,9 +173,6 @@ static void _handleInput(menu_t* m) {
             }
         }
     }
-
-    m->footerDirty = true;
-    m->headerDirty = true;
 }
 
 void renderMenuTop() {
@@ -177,8 +186,12 @@ void renderMenuTop() {
         _printHeader(m);
 
     gfxConSetPos(m->x, m->y);
+
+    const u32 maxLength = m->w / gfxCon.fntsz;
+
+    m->entries[m->cursorIndex].highlighted = true;
     for (u32 i = 0; i < m->count || m->entries[i].type != ENTRY_END; i++) {
-        _printEntry(m->entries[i]);
+        _printEntry(m->entries[i], maxLength);
         gfxPutC('\n');
     }
 
