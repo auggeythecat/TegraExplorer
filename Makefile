@@ -28,7 +28,7 @@ VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     
 OBJS  = start exception_handlers main heap gfx menu testMenu
 
 OBJS += hw_init di vic joycon touch se bpmp clock fuse gpio i2c pinmux pmc uart timer mc minerva sdram \
-        bq24193 max7762x regulator_5v fan tmp451 util irq hid btn utils sprintf
+        bq24193 max7762x regulator_5v fan tmp451 util irq hid btn utils sprintf math
 
 OBJS += ff ffsystem diskio nx_emmc_bis ramdisk emmc sdmmc sdmmc_driver sd
 

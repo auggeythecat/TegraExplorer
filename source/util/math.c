@@ -16,17 +16,21 @@
  — along with this program.  If not, see <http://www.gnu.org/licenses/>.      —
  —————————————————————————————————————————————————————————————————————————————*/
 
-#ifndef _MATH_H
-#define _MATH_H
+#include "math.h"
 
-#include <utils/types.h>
+u32 log10Approximation(u32 n) {
+   // (n >= 1000000000) ? 9 :
+   //  (n >= 100000000) ? 8 :
+   //   (n >= 10000000) ? 7 :
+   //    (n >= 1000000) ? 6 :
+   //     (n >= 100000) ? 5 :
+   //      (n >= 10000) ? 4 :
 
-#define    CLAMP(val, min, max) ((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
-#define CLAMPMIN(val, min)      ((val) < (min) ? (min) :  (val))
-#define CLAMPMAX(val, max)                               ((val) > (max) ? (max) : (val))
-
-#define ABS(val) (((val) < 0) ? (-val) : (val))
-
-u32 log10Approximation(u32 n);
-
-#endif //_MATH_H
+    // Currently, this is only being used where
+    // the max input would be 1024. If needed,
+    // the other conditions can be added back.
+    return (n >= 1000) ? 3 :
+            (n >= 100) ? 2 :
+             (n >= 10) ? 1 :
+                         0 ;
+}

@@ -27,6 +27,7 @@
 
 #include "gfx.h"
 #include "../util/hid.h"
+#include "../util/math.h"
 #include "../util/utils.h"
 
 #ifdef USE_VIC
@@ -69,7 +70,7 @@ static void _printEntry(menuEntry_t entry, u32 maxLen) {
         }
 
         if (entry.showSize) {
-            // TODO: log stuff to find length of numbers?
+            u32 numLength = log10Approximation(entry.fileSize);
         } else
             gfxPutSLimit(entry.caption, maxLen);
 
