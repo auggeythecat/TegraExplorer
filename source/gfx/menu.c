@@ -53,6 +53,14 @@ void pushMenu(const menu_t m) {
     menuManager.stack[menuManager.top] = m;
 }
 
+// TODO: Decide on how I should format this.
+static char* fileSize[4] = {
+    "B",   // "B", or "  B", or " B", or something else
+    "KiB", // "K", or "KiB", or "KB", or something else
+    "MiB", // "M", or "MiB", or "MB", or something else
+    "GiB"  // "G", or "GiB", or "GB", or something else
+};
+
 static void _printEntry(menuEntry_t entry, u32 maxLen) {
     if (entry.renderDirty) {
              if (entry.highlighted) SETCOLOR(INVERTCOLOR(entry.color), INVERTCOLOR(COLOR_BG));
@@ -70,7 +78,13 @@ static void _printEntry(menuEntry_t entry, u32 maxLen) {
         }
 
         if (entry.showSize) {
-            u32 numLength = log10Approximation(entry.fileSize);
+            const u32 numLength = log10Approximation(entry.fileSize);
+            const u32 sizeLength = strlen(fileSize[entry.fileSizeIndex]);
+
+            maxLen -= (numLength*fontSize) + (sizeLength*fontSize);
+
+            gfxPutSLimit(entry.caption, maxLen);
+            gfxPrintF("%d%s", entry.fileSize, fileSize[entry.fileSizeIndex]);
         } else
             gfxPutSLimit(entry.caption, maxLen);
 
@@ -188,10 +202,11 @@ void renderMenuTop() {
 
     gfxConSetPos(m->x, m->y);
 
-    const u32 maxLength = m->w / gfxCon.fntsz;
+    const u32 maxLength = m->w;
 
     m->entries[m->cursorIndex].highlighted = true;
-    for (u32 i = 0; i < m->count || m->entries[i].type != ENTRY_END; i++) {
+    for (u32 i = 0; i < m->count; i++) {
+        if (m->entries[i].type == ENTRY_END) break;
         _printEntry(m->entries[i], maxLength);
         gfxPutC('\n');
     }
