@@ -105,7 +105,7 @@ static void _printHeader(menu_t* m) {
     // but also, it *might* remove the need to redraw the whole box.
     // I guess you would also want to add some padding on the back
     // (ie, add multiple spaces before the text, since that would just throw the bg color into the fb)
-    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0x00);
+    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0xFF);
 
     gfxPrintF("TEGRAEXPLORER %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
 
@@ -122,7 +122,7 @@ static void _printHeader(menu_t* m) {
 }
 
 static void _printFooter(menu_t* m) {
-    gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT - gfxCon.fntsz, 0x00);
+    gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, 0xFF);
     gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
     gfxPrintF("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - m->lastDraw);
