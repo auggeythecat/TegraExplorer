@@ -129,6 +129,31 @@ static const u8 _font[NUM_CHARS][FONT_SIZE] = {
     {0x00, 0x10, 0x30, 0x70, 0x7e, 0x0e, 0x0c, 0x08}, // 129 (charge)
 };
 
+// So, currently characters, especially when at a very large size, will
+// render with very rounded corners. I can think of two good solutions
+// for this, (and a couple that aren't good):
+// 1. I've heard Multi-channel sdfs can help to solve this, but that is
+// a lot more computation then needed, especially if I'm not using EDTs.
+// As far as I can tell, these are mostly for an 'expanded feature set'
+// over single channel sdfs. I also can't tell exactly, but the sharp
+// corner benefits that I'm looking for might not work in this case. It
+// seems like MSDFs are made for gpu/shader environments, so even more
+// computation then I want. It's likely just not a good solution.
+//
+// 2. scale up the bitmap font, then make the sdf out of the scaled up
+// version. Looking into it, there are many algorithms that will scale
+// up an 8x8 bitmap font, so there's the hard part gone. EPX, Scale2x,
+// HQ2x, etc, appear that they would be able to help. The theory is as
+// follows: by scaling up the font to 16x16 or maybe even 32x32(?) it
+// would have much sharper and detailed corners that the sdf would have
+// a better time, 'grabbing on to', (sorry if this doesn't make sense).
+//
+// 3. I could force the bitmap font (or even maybe even the generation?)
+// to 'respect' corners more. I could try to make more pronounced corners
+// in the font itself, but I doubt this would work. Maybe I cam detect
+// corners in the generation and attempt to add special cases/behavior
+// to force them to display what I want them to.
+
 void gfxRenderSDF() {
 	for (int i = 0; i < NUM_CHARS; i++) {
 		for (int y = 0; y < SDF_SIZE; y++) {
