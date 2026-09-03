@@ -163,28 +163,32 @@ static void _handleInput(menu_t* m) {
         }
 
         if (RE_INPUT_DETECTION(JOYLDOWN)) {
-            menuEntry_t entry2 = m->entries[m->cursorIndex++];
-            if (entry2.type == ENTRY_END) {
-                m->cursorIndex--;
-                break;
-            }
+            while (m->entries[m->cursorIndex+1].type != ENTRY_END) {
+                m->cursorIndex++;
+                menuEntry_t entry2 = m->entries[m->cursorIndex];
+                if (entry2.skip)
+                    continue;
 
-            if (!entry2.skip) {
-                entry.renderDirty = true;
-                entry2.highlighted = true;
+                entry.renderDirty  = true;
                 entry2.renderDirty = true;
+                entry.highlighted  = false;
+                entry2.highlighted = true;
+                break;
             }
         }
 
         if (RE_INPUT_DETECTION(JOYLUP)) {
-            if (m->cursorIndex == 0) break;
+            while (m->cursorIndex != 0) {
+                m->cursorIndex--;
+                menuEntry_t entry2 = m->entries[m->cursorIndex];
+                if (entry2.skip)
+                    continue;
 
-            entry.renderDirty = true;
-            menuEntry_t entry2 = m->entries[m->cursorIndex--];
-
-            if (!entry2.skip) {
-                entry2.highlighted = true;
+                entry.renderDirty  = true;
                 entry2.renderDirty = true;
+                entry.highlighted  = false;
+                entry2.highlighted = true;
+                break;
             }
         }
     }
