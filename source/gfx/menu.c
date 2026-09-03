@@ -117,8 +117,6 @@ static void _printHeader(menu_t* m) {
     s_printf(temp, " PAGE %d / %d | %d ENTRIES", currentPage, totalPages, m->count);
     gfxConSetPos(SCREEN_WIDTH - (strlen(temp) * gfxCon.fntsz), 0);
     gfxPrintF(temp);
-
-    m->headerDirty = false;
 }
 
 static void _printFooter(menu_t* m) {
@@ -126,8 +124,6 @@ static void _printFooter(menu_t* m) {
     gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
     gfxPrintF("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - m->lastDraw);
-
-    m->footerDirty = false;
 }
 
 static void _handleInput(menu_t* m) {
@@ -205,7 +201,7 @@ void renderMenuTop() {
 
     if (m->printHeader) {
         _printHeader(m);
-        m->headerDirty = true;
+        m->headerDirty = false;
     }
 
     gfxConSetPos(m->x, m->y);
@@ -221,13 +217,21 @@ void renderMenuTop() {
 
     if (m->printFooter) {
         _printFooter(m);
-        m->footerDirty = true;
+        m->footerDirty = false;
     }
 
 #ifdef USE_VIC
     vic_compose();
     vic_wait_idle();
 #endif
+
+    // Until I find a better solution, this is how I will ensure
+    // the footer will always be updated every render. I don't
+    // really like this solution, but I can't think of much better.
+    // Maybe I should just remove render dirtying for the footer
+    // entirely? Maybe add another bool in the bitfield to do this
+    // in case of other footers that don't require constant updating?
+    if (m->printFooter) m->footerDirty = true;
 
     _handleInput(m);
 }
