@@ -194,11 +194,15 @@ void renderMenuTop() {
     menu_t* m = &menuManager.stack[menuManager.top];
     m->lastDraw = get_tmr_us();
 
-    if (m->renderDirty)
+    if (m->renderDirty) {
         gfxClearGrey(0x4F);
+        m->renderDirty = false;
+    }
 
-    if (m->printHeader)
+    if (m->printHeader) {
         _printHeader(m);
+        m->headerDirty = true;
+    }
 
     gfxConSetPos(m->x, m->y);
 
@@ -211,8 +215,10 @@ void renderMenuTop() {
         gfxPutC('\n');
     }
 
-    if (m->printFooter)
+    if (m->printFooter) {
         _printFooter(m);
+        m->footerDirty = true;
+    }
 
 #ifdef USE_VIC
     vic_compose();
@@ -220,10 +226,4 @@ void renderMenuTop() {
 #endif
 
     _handleInput(m);
-
-    m->renderDirty = false;
-
-    m->footerDirty = true;
-    m->headerDirty = true;
-    gfxClearGrey(0x4F);
 }
