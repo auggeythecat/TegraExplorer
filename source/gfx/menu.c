@@ -137,7 +137,7 @@ static void _handleInput(menu_t* m) {
         }
 
         if (RE_INPUT_DETECTION(JOYMINUS)) {
-            if (gfx_con.fntsz > 8 ) gfxConSetFontSize(gfx_con.fntsz -= 1);
+            if (gfx_con.fntsz > 8) gfxConSetFontSize(gfx_con.fntsz -= 1);
             m->renderDirty = true;
             break;
         }
