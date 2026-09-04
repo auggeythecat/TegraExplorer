@@ -93,9 +93,6 @@ static void _printEntry(menuEntry_t entry, u32 maxLen) {
 }
 
 static void _printHeader(menu_t* m) {
-    gfxConSetPos(0,0);
-    gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
-
     // TODO: Check if this makes a major performance difference.
     // If it does, the best path forward might be to make this render with a white background color,
     // (makes character printing faster because no alpha mult first of all)
@@ -103,24 +100,25 @@ static void _printHeader(menu_t* m) {
     // I guess you would also want to add some padding on the back
     // (ie, add multiple spaces before the text, since that would just throw the bg color into the fb)
     gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0xFF);
-
-    gfxPrintF("TEGRAEXPLORER %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
+    gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
+    gfxConSetPos(0,0);
+    gfxPrintF("TegraExplorer version %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
 
     const u16 itemsPerPage = (m->h           / gfxCon.fntsz)    ;
     const u16 totalPages   = (m->count       / itemsPerPage) + 1;
     const u16 currentPage  = (m->cursorIndex / itemsPerPage) + 1;
 
     char temp[40];
-    s_printf(temp, " PAGE %d / %d | %d ENTRIES", currentPage, totalPages, m->count);
+    s_printf(temp, " Page %d / %d | %d entries", currentPage, totalPages, m->count);
     gfxConSetPos(SCREEN_WIDTH - (strlen(temp) * gfxCon.fntsz), 0);
     gfxPrintF(temp);
 }
 
 static void _printFooter(menu_t* m) {
     gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, 0xFF);
-    gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
+    gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
-    gfxPrintF("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - menuManager.lastDraw);
+    gfxPrintF("Time taken for screen draw: %dus ", get_tmr_us() - menuManager.lastDraw);
 }
 
 static void _handleInput(menu_t* m) {
@@ -194,7 +192,7 @@ void renderMenuTop() {
     menuManager.lastDraw = get_tmr_us();
 
     if (m->renderDirty)
-        gfxClearGrey(0x4F);
+        gfxClearGrey(0x1B); // TODO: color to grey conversion so I can just put in COLOR_DEFAULT
 
     gfxConSetPos(m->x, m->y);
 
