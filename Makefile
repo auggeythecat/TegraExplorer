@@ -75,7 +75,7 @@ $(BUILDDIR)/$(TARGET)/$(TARGET).elf: $(OBJS)
 
 $(BUILDDIR)/$(TARGET)/%.o: %.c
 	@mkdir -p "$(@D)"
-	$(CC) $(CFLAGS) $(BDKINC) $(PIKAINC) -c $< -o $@
+	$(CC) $(CFLAGS) $(BDKINC) -c $< -o $@
 
 $(BUILDDIR)/$(TARGET)/%.o: %.S
 	@mkdir -p "$(@D)"
