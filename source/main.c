@@ -52,11 +52,15 @@ static void _displayInit() {
     vic_wait_idle();
 
     display_init_window_a_pitch_vic();
+    gfxInitCtxt((u32 *)NYX_FB2_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH);
 #else
     display_init_window_a_pitch();
+    // For now, this will just render sideways until, maybe if I want to do
+    // software rotation configuration at compile time. I probably will do
+    // that since I should test software rotation vs vic rotation speed anyway.
+    gfxInitCtxt((u32 *)IPL_FB_ADDRESS, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
 #endif
 
-    gfxInitCtxt((u32 *)NYX_FB2_ADDRESS, 1280,720,1280);
     gfxConInit();
 
     display_backlight_pwm_init();
