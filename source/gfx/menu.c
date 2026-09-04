@@ -171,6 +171,7 @@ static void _handleInput(menu_t* m) {
                 entry2.highlighted = true;
                 break;
             }
+            break;
         }
 
         if (RE_INPUT_DETECTION(JOYLUP)) {
@@ -186,6 +187,7 @@ static void _handleInput(menu_t* m) {
                 entry2.highlighted = true;
                 break;
             }
+            break;
         }
     }
 }
