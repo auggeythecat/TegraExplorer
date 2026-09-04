@@ -42,7 +42,7 @@ static void _displayInit() {
     vic_sfc.dst_buf  = NYX_FB_ADDRESS;
     vic_sfc.width    = SCREEN_WIDTH;
     vic_sfc.height   = SCREEN_HEIGHT;
-    vic_sfc.pix_fmt  = VIC_PIX_FORMAT_A8R8G8B8;
+    vic_sfc.pix_fmt  = VIC_PIX_FORMAT_X8R8G8B8;
     vic_sfc.rotation = VIC_ROTATION_270;
 
     vic_init();
