@@ -38,6 +38,14 @@ typedef struct _menuEntry_t {
     u32 type;
     const char* caption;
     u32 color;
+
+    // So...
+    // Using functions with no args as the handler is technically
+    // undefined behavior. (It will be called with the NULL arg).
+    // After further review, it's *probably* fine for this usage,
+    // but its still not something I like. Also, Hekate does use
+    // this exactly, which does make me feel better, but I don't
+    // *really* like this,
     void(*handler)(void*);
     void* data;
 
