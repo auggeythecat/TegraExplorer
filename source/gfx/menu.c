@@ -120,7 +120,7 @@ static void _printFooter(menu_t* m) {
     gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, 0xFF);
     gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
-    gfxPrintF("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - m->lastDraw);
+    gfxPrintF("TIME TAKEN FOR SCREEN DRAW: %dUS ", get_tmr_us() - menuManager.lastDraw);
 }
 
 static void _handleInput(menu_t* m) {
@@ -191,7 +191,7 @@ static void _handleInput(menu_t* m) {
 
 void renderMenuTop() {
     menu_t* m = &menuManager.stack[menuManager.top];
-    m->lastDraw = get_tmr_us();
+    menuManager.lastDraw = get_tmr_us();
 
     if (m->renderDirty)
         gfxClearGrey(0x4F);
