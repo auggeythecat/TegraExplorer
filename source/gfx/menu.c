@@ -143,7 +143,7 @@ static void _handleInput(menu_t* m) {
         }
 
         if (RE_INPUT_DETECTION(JOYA)) {
-            entry->handler();
+            entry->handler(entry->data);
             break;
         }
 
