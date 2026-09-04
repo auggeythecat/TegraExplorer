@@ -89,8 +89,6 @@ typedef struct _menu_t {
             u32 printHeader:1;
             u32 printFooter:1;
 
-            u32 headerDirty:1;
-            u32 footerDirty:1;
             u32 renderDirty:1;
         };
         u32 options;

@@ -56,10 +56,7 @@ static menu_t testMenu = {
     .isOverlay   = false,
     .printHeader = true,
     .printFooter = true,
-    .headerDirty = true,
-    .footerDirty = true,
     .renderDirty = true,
-
 };
 
 void pushTestMenu() {

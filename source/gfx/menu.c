@@ -196,39 +196,25 @@ void renderMenuTop() {
     if (m->renderDirty)
         gfxClearGrey(0x4F);
 
-    if (m->printHeader || m->renderDirty) {
-        _printHeader(m);
-        m->headerDirty = false;
-    }
-
     gfxConSetPos(m->x, m->y);
 
     const u32 maxLength = m->w;
 
-    // m->entries[m->cursorIndex].highlighted = true;
+    m->entries[m->cursorIndex].highlighted = true;
     for (u32 i = 0; i < m->count; i++) {
         if (m->entries[i].type == ENTRY_END) break;
         _printEntry(m->entries[i], maxLength);
         gfxPutC('\n');
     }
 
-    if (m->printFooter || m->renderDirty) {
+    if (m->printFooter)
         _printFooter(m);
-        m->footerDirty = false;
-    }
+    if (m->printHeader)
+        _printHeader(m);
 
 #ifdef USE_VIC
     vic_compose();
-    vic_wait_idle();
 #endif
-
-    // Until I find a better solution, this is how I will ensure
-    // the footer will always be updated every render. I don't
-    // really like this solution, but I can't think of much better.
-    // Maybe I should just remove render dirtying for the footer
-    // entirely? Maybe add another bool in the bitfield to do this
-    // in case of other footers that don't require constant updating?
-    if (m->printFooter) m->footerDirty = true;
 
     m->renderDirty = false;
 
