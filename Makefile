@@ -45,8 +45,8 @@ CUSTOMDEFINES += -DGFX_INC=$(GFX_INC)
 
 WARNINGS := -Wall -Wextra -Wno-implicit-fallthrough
 
-ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork $(WARNINGS)
-CFLAGS  = $(ARCH) -Os -g -gdwarf-4 -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -std=gnu11 $(CUSTOMDEFINES)
+ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
+CFLAGS  = $(ARCH) -Os -g -gdwarf-4 -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -std=gnu11 $(CUSTOMDEFINES) $(WARNINGS)
 LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
 
 ################################################################################
