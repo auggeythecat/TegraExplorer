@@ -24,4 +24,6 @@ void rebootRCM();
 void rebootFuseBypass();
 void rebootOFW();
 
+void launchPayload(const char* path);
+
 #endif //_UTILS_H
