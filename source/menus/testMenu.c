@@ -16,7 +16,6 @@
  — along with this program.  If not, see <http://www.gnu.org/licenses/>.      —
  —————————————————————————————————————————————————————————————————————————————*/
 
-
 #include "testMenu.h"
 
 #include "../gfx/menu.h"
@@ -24,28 +23,29 @@
 #include "../util/utils.h"
 
 static menuEntry_t testMenuEntries[] = {
-    ENT_SEPERATOR(                                                                       ),
-      ENT_CAPTION(COLOR_WHITE ,  "---| BROWSE |---"                                      ),
-   ENT_HANDLER_EX(COLOR_GREEN , "BROWSE SD",                        "sd:", powerOff      ),
-      ENT_HANDLER(COLOR_GREEN , "BROWSE SYSMMC",                           rebootRCM     ),
-      ENT_HANDLER(COLOR_BLUE  , "BROWSE EMUMMC",                           rebootOFW     ),
-
-      ENT_CAPTION(COLOR_WHITE ,  "---| EXIT |---"                                        ),
-      ENT_HANDLER(COLOR_VIOLET, "POWER OFF",                               powerOff      ),
-      ENT_HANDLER(COLOR_VIOLET, "REBOOT TO RCM",                           rebootRCM     ),
-      ENT_HANDLER(COLOR_VIOLET, "REBOOT TO OFW",                           rebootOFW     ),
-//      ENT_HANDLER(COLOR_VIOLET, "REBOOT TO bootloader/update.bin",         powerOff      ),
-//      ENT_HANDLER(COLOR_VIOLET, "REBOOT TO atmosphere/reboot_payload.bin", powerOff      ),
-          ENT_END(                                                                       )
-   // MainTools,
-   // MainPartitionSd,
-   // MainViewKeys,
-   // MainViewCredits,
+    ENT_SEPERATOR(                                                                  ),
+      ENT_CAPTION(COLOR_WHITE ,  "---| BROWSE |---"                                 ),
+      ENT_HANDLER(COLOR_GREEN , "Browse SD",                                powerOff),
+      ENT_HANDLER(COLOR_GREEN , "Browse sysMMC",                            powerOff),
+      ENT_HANDLER(COLOR_BLUE  , "Browse emuMMC",                            powerOff),
+    ENT_SEPERATOR(                                                                  ),
+      ENT_CAPTION(COLOR_WHITE ,  "---| EXIT |---"                                   ),
+      ENT_HANDLER(COLOR_VIOLET, "Power off",                                powerOff),
+      ENT_HANDLER(COLOR_VIOLET, "Reboot to RCM",                           rebootRCM),
+      ENT_HANDLER(COLOR_VIOLET, "Reboot to OFW",                           rebootOFW),
+      ENT_HANDLER(COLOR_VIOLET, "Reboot to hekate",                         powerOff),
+      ENT_HANDLER(COLOR_VIOLET, "Reboot to atmosphere",                     powerOff),
+    ENT_SEPERATOR(                                                                  ),
+      ENT_CAPTION(COLOR_WHITE , "---| TOOLS |---"                                   ),
+      ENT_HANDLER(COLOR_GREEN , "Partition sd",                             powerOff),
+      ENT_HANDLER(COLOR_GREEN , "View dumped keys",                         powerOff),
+      ENT_HANDLER(COLOR_GREEN , "View credits",                             powerOff),
+          ENT_END(                                                                  )
 
 };
 
 static menu_t testMenu = {
-    .title = "TegraExplorer",
+    .title   = "TegraExplorer",
     .entries = testMenuEntries,
     .count   = ARRAY_SIZE(testMenuEntries),
     .cursorIndex = 0,
