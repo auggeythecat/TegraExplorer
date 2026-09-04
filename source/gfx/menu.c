@@ -124,7 +124,7 @@ static void _printFooter(menu_t* m) {
 }
 
 static void _handleInput(menu_t* m) {
-    menuEntry_t entry = m->entries[m->cursorIndex];
+    menuEntry_t* entry = &m->entries[m->cursorIndex];
 
     while (hidRead()) {
         if (RE_INPUT_DETECTION(JOYPLUS)) {
@@ -145,27 +145,27 @@ static void _handleInput(menu_t* m) {
         }
 
         if (RE_INPUT_DETECTION(JOYA)) {
-            entry.handler();
+            entry->handler();
             break;
         }
 
         if (RE_INPUT_DETECTION(JOYX)) {
-            if (entry.selectable) entry.selected = ~entry.selected;
-            entry.renderDirty = true;
+            if (entry->selectable) entry->selected = ~entry->selected;
+            entry->renderDirty = true;
             break;
         }
 
         if (RE_INPUT_DETECTION(JOYLDOWN)) {
             while (m->entries[m->cursorIndex+1].type != ENTRY_END) {
                 m->cursorIndex++;
-                menuEntry_t entry2 = m->entries[m->cursorIndex];
-                if (entry2.skip)
+                menuEntry_t* entry2 = &m->entries[m->cursorIndex];
+                if (entry2->skip)
                     continue;
 
-                entry.renderDirty  = true;
-                entry2.renderDirty = true;
-                entry.highlighted  = false;
-                entry2.highlighted = true;
+                entry->renderDirty  = true;
+                entry2->renderDirty = true;
+                entry->highlighted  = false;
+                entry2->highlighted = true;
                 break;
             }
             break;
@@ -174,14 +174,14 @@ static void _handleInput(menu_t* m) {
         if (RE_INPUT_DETECTION(JOYLUP)) {
             while (m->cursorIndex != 0) {
                 m->cursorIndex--;
-                menuEntry_t entry2 = m->entries[m->cursorIndex];
-                if (entry2.skip)
+                menuEntry_t *entry2 = &m->entries[m->cursorIndex];
+                if (entry2->skip)
                     continue;
 
-                entry.renderDirty  = true;
-                entry2.renderDirty = true;
-                entry.highlighted  = false;
-                entry2.highlighted = true;
+                entry->renderDirty  = true;
+                entry2->renderDirty = true;
+                entry->highlighted  = false;
+                entry2->highlighted = true;
                 break;
             }
             break;
@@ -205,7 +205,7 @@ void renderMenuTop() {
 
     const u32 maxLength = m->w;
 
-    m->entries[m->cursorIndex].highlighted = true;
+    // m->entries[m->cursorIndex].highlighted = true;
     for (u32 i = 0; i < m->count; i++) {
         if (m->entries[i].type == ENTRY_END) break;
         _printEntry(m->entries[i], maxLength);
