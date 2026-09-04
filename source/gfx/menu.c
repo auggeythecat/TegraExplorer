@@ -193,10 +193,8 @@ void renderMenuTop() {
     menu_t* m = &menuManager.stack[menuManager.top];
     m->lastDraw = get_tmr_us();
 
-    if (m->renderDirty) {
+    if (m->renderDirty)
         gfxClearGrey(0x4F);
-        m->renderDirty = false;
-    }
 
     if (m->printHeader || m->renderDirty) {
         _printHeader(m);
@@ -231,6 +229,8 @@ void renderMenuTop() {
     // entirely? Maybe add another bool in the bitfield to do this
     // in case of other footers that don't require constant updating?
     if (m->printFooter) m->footerDirty = true;
+
+    m->renderDirty = false;
 
     _handleInput(m);
 }
