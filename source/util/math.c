@@ -18,19 +18,19 @@
 
 #include "math.h"
 
-u32 log10Approximation(u32 n) {
-   // (n >= 1000000000) ? 9 :
-   //  (n >= 100000000) ? 8 :
-   //   (n >= 10000000) ? 7 :
-   //    (n >= 1000000) ? 6 :
-   //     (n >= 100000) ? 5 :
-   //      (n >= 10000) ? 4 :
+u32 log10Approximation(const u32 n) {
+   // n >= 1000000000 ? 9 :
+   //  n >= 100000000 ? 8 :
+   //   n >= 10000000 ? 7 :
+   //    n >= 1000000 ? 6 :
+   //     n >= 100000 ? 5 :
+   //      n >= 10000 ? 4 :
 
     // Currently, this is only being used where
     // the max input would be 1024. If needed,
     // the other conditions can be added back.
-    return (n >= 1000) ? 3 :
-            (n >= 100) ? 2 :
-             (n >= 10) ? 1 :
-                         0 ;
+    return n >= 1000 ? 3 :
+            n >= 100 ? 2 :
+             n >= 10 ? 1 :
+                       0 ;
 }
