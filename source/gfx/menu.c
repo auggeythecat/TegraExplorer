@@ -93,9 +93,6 @@ static void _printEntry(menuEntry_t entry, u32 maxLen) {
 }
 
 static void _printHeader(menu_t* m) {
-    if (!m->headerDirty)
-        return;
-
     gfxConSetPos(0,0);
     gfxConSetCol(RGBTOCOLOR(0xFF, 0x8E, 0x07), FILLBG, RGBTOCOLOR(0xEF, 0xDC, 0xD3));
 
@@ -201,7 +198,7 @@ void renderMenuTop() {
         m->renderDirty = false;
     }
 
-    if (m->printHeader) {
+    if (m->printHeader || m->renderDirty) {
         _printHeader(m);
         m->headerDirty = false;
     }
@@ -217,7 +214,7 @@ void renderMenuTop() {
         gfxPutC('\n');
     }
 
-    if (m->printFooter) {
+    if (m->printFooter || m->renderDirty) {
         _printFooter(m);
         m->footerDirty = false;
     }
