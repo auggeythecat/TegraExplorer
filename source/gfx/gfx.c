@@ -559,8 +559,8 @@ void gfxLine(int x0, int y0, const int x1, const int y1, const u32 color) {
 }
 
 void gfxBoxGrey(const u32 x0, const u32 y0, const u32 x1, const u32 y1, const u8 shade) {
-    for (u32 y = y0; y < y1 + 1; y++)
-        memset(gfxCtxt.fb + (y0 * gfxCtxt.stride), shade, x1 - x0);
+    for (u32 y = y0; y <= y1; y++)
+        memset(gfxCtxt.fb + (y * gfxCtxt.stride), shade, (x1 - x0) * 4);
 }
 
 void gfxBoxARGB(const u32 x0, const u32 y0, const u32 x1, const u32 y1, const u32 color) {
