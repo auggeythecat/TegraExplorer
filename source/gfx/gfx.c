@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdarg.h>
 
+#ifdef BITMAP_FONT
 // Lifted from https://github.com/epto/epto-fonts/ directly
 // I just love the capital letters especially from figo1
 // Do note: The font had to be horizontally mirrored.
@@ -128,7 +129,9 @@ static const u8 _font[NUM_CHARS][FONT_SIZE] = {
     {0x00, 0x70, 0x48, 0x44, 0x44, 0x44, 0x7c, 0x00}, // 128   (file)
     {0x00, 0x10, 0x30, 0x70, 0x7e, 0x0e, 0x0c, 0x08}, // 129 (charge)
 };
+#endif
 
+#ifdef SDF_FONT
 // So, currently characters, especially when at a very large size, will
 // render with very rounded corners. I can think of two good solutions
 // for this, (and a couple that aren't good):
@@ -157,10 +160,10 @@ static const u8 _font[NUM_CHARS][FONT_SIZE] = {
 void gfxRenderSDF() {
 	for (int i = 0; i < NUM_CHARS; i++) {
 		for (int y = 0; y < SDF_SIZE; y++) {
-			const int vy = ((y - PADDING) * FONT_SIZE / INNER_SIZE);
+			const int vy = ((y - SDF_PADDING) * FONT_SIZE / INNER_SIZE);
 
 			for (int x = 0; x < SDF_SIZE; x++) {
-				const int vx = ((x - PADDING) * FONT_SIZE / INNER_SIZE);
+				const int vx = ((x - SDF_PADDING) * FONT_SIZE / INNER_SIZE);
 
 				bool inside = false;
 
@@ -170,10 +173,10 @@ void gfxRenderSDF() {
 				u32 minDistance = 1000000;
 
 				for (int sy = 0; sy < SDF_SIZE; sy++) {
-					const int svy = ((sy - PADDING) * FONT_SIZE / INNER_SIZE);
+					const int svy = ((sy - SDF_PADDING) * FONT_SIZE / INNER_SIZE);
 
 					for (int sx = 0; sx < SDF_SIZE; sx++) {
-						const int svx = ((sx - PADDING) * FONT_SIZE / INNER_SIZE);
+						const int svx = ((sx - SDF_PADDING) * FONT_SIZE / INNER_SIZE);
 
 						bool sinside = false;
 
@@ -268,6 +271,7 @@ void gfxBakeAtlas(const u32 fontSize) {
 		}
 	}
 }
+#endif
 
 gfxCtxt_t gfxCtxt;
 gfxCon_t gfxCon;
@@ -324,6 +328,7 @@ void gfxConSetPos(const u32 x, const u32 y) {
     gfxCon.x = x;
 }
 
+#ifdef SDF_FONT
 void __attribute__((target("arm"))) gfxPutC(const char c) {
     if unlikely(c <= 31 || c >= 130) {
         if (c == '\n') {
@@ -366,6 +371,7 @@ void __attribute__((target("arm"))) gfxPutC(const char c) {
     }
     gfxCon.x += sz;
 }
+#endif
 
 void gfxPutS(const char *s) {
     if (!s || !gfxConInitDone || gfxCon.mute)

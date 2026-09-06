@@ -24,6 +24,7 @@
 #include <stdarg.h>
 
 #include "colors.h"
+#include "../configuration.h"
 
 #define     EPRINTF(text         ) gfx_printf("%k"text"%k\n", COLOR_RED,          COLOR_DEFAULT)
 #define EPRINTFARGS(text, args...) gfx_printf("%k"text"%k\n", COLOR_RED,    args, COLOR_DEFAULT)
@@ -34,25 +35,30 @@
 #define SCREEN_WIDTH  1280
 #define SCREEN_HEIGHT 720
 
+#ifdef BITMAP_FONT
 #define FONT_SIZE   8
-#define PADDING     1
-#define SDF_SIZE    (FONT_SIZE + (PADDING * 2))
-#define INNER_SIZE  (SDF_SIZE  - (PADDING * 2))
+#endif
 
+#ifdef SDF_FONT
+#define SDF_PADDING     1
+#define SDF_SIZE    (FONT_SIZE + (SDF_PADDING * 2))
+#define INNER_SIZE  (SDF_SIZE  - (SDF_PADDING * 2))
 #define MAX_ATLASES 16 + 1
-#define NUM_CHARS   98
+#endif
 
-#define SDF_BUFFER  NYX_RES_ADDR
+#define NUM_CHARS   98
 
 #define GFX_CHAR_SPACE    0
 #define GFX_CHAR_FOLDER   127
 #define GFX_CHAR_FILE     128
 #define GFX_CHAR_CHARGING 129
 
+#ifdef SDF_FONT
 typedef struct _sdfAtlas_t {
     u32 size;
     u8* data;
 } sdfAtlas_t;
+#endif
 
 typedef struct _gfxCtxt_t {
     u32 *fb;
@@ -80,8 +86,10 @@ extern gfxCon_t  gfxCon;
 extern gfxCtxt_t gfx_ctxt;
 extern gfxCon_t  gfx_con;
 
+#ifdef SDF_FONT
 void gfxRenderSDF();
 void gfxBakeAtlas(u32 fontSize);
+#endif
 void gfxInitCtxt(u32 *fb, u32 width, u32 height, u32 stride);
 void gfxConInit();
 void gfxConSetCol(u32 fgcol, int fillbg, u32 bgcol);

@@ -66,7 +66,10 @@ static void _displayInit() {
     display_backlight_pwm_init();
     display_backlight_brightness(80, 1000);
 
+#ifdef SDF_FONT
     gfxBakeAtlas(8);
+#endif
+
 }
 
 extern void pivot_stack(u32 stack_top);

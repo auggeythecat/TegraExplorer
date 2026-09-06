@@ -19,9 +19,19 @@
 #ifndef _CONFIGURATION_H
 #define _CONFIGURATION_H
 
-#define USE_VIC
+#define USE_VIC 1
 #define COLOR_FG COLOR_WHITE
 #define COLOR_BG COLOR_DARKER_GREY
 
+#define BITMAP_FONT 1
+#define SDF_FONT 1
+
+#ifdef SDF_FONT
+#undef BITMAP_FONT
+#define BITMAP_FONT 1
+
+#define SDF_BUFFER NYX_RES_ADDR
+#define SDF_PADDING 1
+#endif
 
 #endif //_CONFIGURATION_H
