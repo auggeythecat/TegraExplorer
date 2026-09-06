@@ -22,6 +22,12 @@
 
 // Utils, but using builtins instead.
 
+#define RET_IF_ERROR(expression)  {     \
+    int res = (expression);             \
+    if (res != R_OK)                    \
+        return res;                     \
+}
+
 static inline uint32_t countBit(const uint32_t val) {
     return val == 0 ? 0 : 32 - __builtin_clz(val);
 }
@@ -31,16 +37,14 @@ static inline uint32_t countBit(const uint32_t val) {
 //     return bit_count == 0 ? 0 : __builtin_bitreverse32(bits) >> (32 - bit_count);
 // }
 
-static inline uint32_t bitsReverse(uint32_t bits, uint32_t bit_count) {
-    if (bit_count == 0) return 0;
-
-    bits = ((bits >> 1) & 0x55555555U) | ((bits & 0x55555555U) << 1);
-    bits = ((bits >> 2) & 0x33333333U) | ((bits & 0x33333333U) << 2);
-    bits = ((bits >> 4) & 0x0F0F0F0FU) | ((bits & 0x0F0F0F0FU) << 4);
-    bits = ((bits >> 8) & 0x00FF00FFU) | ((bits & 0x00FF00FFU) << 8);
-    bits = (bits >> 16) | (bits << 16);
-
-    return bits >> (32 - bit_count);
+static uint32_t bitsReverse (uint32_t bits, uint32_t bit_count) {
+    uint32_t revbits = 0;
+    for (; bit_count>0; bit_count--) {
+        revbits <<= 1;
+        revbits |= (bits & 1);
+        bits >>= 1;
+    }
+    return revbits;
 }
 
 // Range encoder stuff
@@ -669,12 +673,44 @@ static int lzmaEncode (const uint8_t *p_src, size_t src_len, uint8_t *p_dst, siz
 // #define   LZMA_DIC_LEN                             ((LZ_DIST_MAX_PLUS1>LZMA_DIC_MIN) ? LZ_DIST_MAX_PLUS1 : LZMA_DIC_MIN)
 #define LZMA_DIC_LEN 131072
 
-int tinyLzmaCompress (const uint8_t *p_src, const size_t src_len, uint8_t *p_dst, size_t *p_dst_len) {
-    size_t cmprs_len = *p_dst_len;                                          // set available space for compressed data length
+#define   LZMA_HEADER_LEN                          13
 
-    lzmaEncode(p_src, src_len, p_dst, &cmprs_len, 1);           // do compression
+static int writeLzmaHeader (uint8_t *p_dst, size_t *p_dst_len, size_t uncompressed_len, uint8_t uncompressed_len_known) {
+    uint32_t i;
 
-    *p_dst_len = cmprs_len;                                                 // the final output data length = LZMA file header len + compressed data len
+    if (*p_dst_len < LZMA_HEADER_LEN)
+        return R_ERR_OUTPUT_OVERFLOW;
+
+    *p_dst_len = LZMA_HEADER_LEN;
+
+    *(p_dst++) = LCLPPB_BYTE;
+
+    for (i=0; i<4; i++)
+        *(p_dst++) = (uint8_t)(LZMA_DIC_LEN >> (i*8));
+
+    for (i=0; i<8; i++) {
+        if (uncompressed_len_known) {
+            *(p_dst++) = (uint8_t)uncompressed_len;
+            uncompressed_len >>= 8;
+        } else {
+            *(p_dst++) = 0xFF;
+        }
+    }
+
+    return R_OK;
+}
+
+
+int tinyLzmaCompress (const uint8_t *p_src, size_t src_len, uint8_t *p_dst, size_t *p_dst_len) {
+    size_t hdr_len = *p_dst_len;                                                           // set available space for header length
+
+    RET_IF_ERROR( writeLzmaHeader(p_dst, &hdr_len, src_len, 1) );     //
+
+    size_t cmprs_len = *p_dst_len - hdr_len;                                               // set available space for compressed data length
+
+    RET_IF_ERROR( lzmaEncode(p_src, src_len, p_dst+hdr_len, &cmprs_len, 1) );  // do compression
+
+    *p_dst_len = hdr_len + cmprs_len;                                                      // the final output data length = LZMA file header len + compressed data len
 
     return R_OK;
 }
