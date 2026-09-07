@@ -29,14 +29,14 @@
 #include "menus/testMenu.h"
 #include "util/hid.h"
 
-#ifdef USE_VIC
+#if USE_VIC
 #include <display/vic.h>
 #endif
 
 static void _displayInit() {
     display_init();
 
-#ifdef USE_VIC
+#if USE_VIC
     vic_surface_t      vic_sfc;
     vic_sfc.src_buf  = NYX_FB2_ADDRESS;
     vic_sfc.dst_buf  = NYX_FB_ADDRESS;
@@ -66,10 +66,9 @@ static void _displayInit() {
     display_backlight_pwm_init();
     display_backlight_brightness(80, 1000);
 
-#ifdef SDF_FONT
+#if SDF_FONT
     gfxBakeAtlas(8);
 #endif
-
 }
 
 extern void pivot_stack(u32 stack_top);

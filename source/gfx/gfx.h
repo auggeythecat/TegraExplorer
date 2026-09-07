@@ -35,12 +35,11 @@
 #define SCREEN_WIDTH  1280
 #define SCREEN_HEIGHT 720
 
-#ifdef BITMAP_FONT
+#if BITMAP_FONT
 #define FONT_SIZE   8
 #endif
 
-#ifdef SDF_FONT
-#define SDF_PADDING     1
+#if SDF_FONT
 #define SDF_SIZE    (FONT_SIZE + (SDF_PADDING * 2))
 #define INNER_SIZE  (SDF_SIZE  - (SDF_PADDING * 2))
 #define MAX_ATLASES 16 + 1
@@ -53,7 +52,7 @@
 #define GFX_CHAR_FILE     128
 #define GFX_CHAR_CHARGING 129
 
-#ifdef SDF_FONT
+#if SDF_FONT
 typedef struct _sdfAtlas_t {
     u32 size;
     u8* data;
@@ -86,7 +85,7 @@ extern gfxCon_t  gfxCon;
 extern gfxCtxt_t gfx_ctxt;
 extern gfxCon_t  gfx_con;
 
-#ifdef SDF_FONT
+#if SDF_FONT
 void gfxRenderSDF();
 void gfxBakeAtlas(u32 fontSize);
 #endif

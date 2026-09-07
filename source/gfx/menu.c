@@ -30,7 +30,7 @@
 #include "../util/math.h"
 #include "../util/utils.h"
 
-#ifdef USE_VIC
+#if USE_VIC
 #include <display/vic.h>
 #endif
 
@@ -210,7 +210,7 @@ void renderMenuTop() {
     if (m->printHeader)
         _printHeader(m);
 
-#ifdef USE_VIC
+#if USE_VIC
     vic_compose();
 #endif
 

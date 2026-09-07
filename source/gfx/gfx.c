@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#ifdef BITMAP_FONT
+#if BITMAP_FONT
 // Lifted from https://github.com/epto/epto-fonts/ directly
 // I just love the capital letters especially from figo1
 // Do note: The font had to be horizontally mirrored.
@@ -131,7 +131,7 @@ static const u8 _font[NUM_CHARS][FONT_SIZE] = {
 };
 #endif
 
-#ifdef SDF_FONT
+#if SDF_FONT
 // So, currently characters, especially when at a very large size, will
 // render with very rounded corners. I can think of two good solutions
 // for this, (and a couple that aren't good):
@@ -328,7 +328,7 @@ void gfxConSetPos(const u32 x, const u32 y) {
     gfxCon.x = x;
 }
 
-#ifdef SDF_FONT
+#if SDF_FONT
 void __attribute__((target("arm"))) gfxPutC(const char c) {
     if unlikely(c <= 31 || c >= 130) {
         if (c == '\n') {

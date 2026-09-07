@@ -26,7 +26,7 @@
 #define BITMAP_FONT 1
 #define SDF_FONT 1
 
-#ifdef SDF_FONT
+#if SDF_FONT
 #undef BITMAP_FONT
 #define BITMAP_FONT 1
 
