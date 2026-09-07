@@ -1,0 +1,14 @@
+<component name="CopyrightManager">
+  <settings default="TegraExplorer">
+    <module2copyright>
+      <element module="TegraExplorer source" copyright="TegraExplorer" />
+    </module2copyright>
+    <LanguageOptions name="C/C++">
+      <option name="fileTypeOverride" value="3" />
+      <option name="separateBefore" value="true" />
+      <option name="separateAfter" value="true" />
+      <option name="box" value="true" />
+      <option name="filler" value="—" />
+    </LanguageOptions>
+  </settings>
+</component>

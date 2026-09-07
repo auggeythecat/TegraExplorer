@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="TegraExplorer source" pattern="file[v3_Tegraexplorer]:source//*" />
+</component>
