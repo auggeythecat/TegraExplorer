@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     fclose(in_file);
 
-    size_t nbytes;
+    size_t nbytes = out_size;
     strcpy(filename + filename_len, ".lzma");
 
     tinyLzmaCompress(in_buf, in_size, out_buf, &nbytes);

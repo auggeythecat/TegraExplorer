@@ -10,7 +10,7 @@ all: tinyLZMA
 	@echo > /dev/null
 
 clean:
-	@rm -f LZMA
+	@rm -f tinyLZMA
 
 tinyLZMA: TinyLZMACompress.c tinyLZMA.c
 	@$(NATIVE_CC) -o $@ TinyLZMACompress.c tinyLZMA.c
