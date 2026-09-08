@@ -24,6 +24,11 @@ BDKINC    := -I./$(BDKDIR)
 DECOMPDIR := decompressor
 DECOMPINC := -I./$(DECOMPDIR)
 
+LDRDIR    := $(wildcard loader)
+TOOLSLZMA := $(wildcard tools/tinyLZMA)
+TOOLSB2C  := $(wildcard tools/bin2c)
+TOOLS     := $(TOOLSLZMA) $(TOOLSB2C)
+
 VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  $(dir $(wildcard ./$(SOURCEDIR)/*/*/))
 VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
 VPATH += $(dir $(wildcard ./$(DECOMPDIR)/))
@@ -55,22 +60,36 @@ LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defs
 
 ################################################################################
 
-.PHONY: all clean
+.PHONY: all clean $(LDRDIR) $(TOOLS)
 
-all: $(OUTPUTDIR)/$(TARGET).bin
+all: $(OUTPUTDIR)/$(TARGET)Big.bin $(LDRDIR)
 	@echo "--------------------------------------"
+	$(eval BIN_SIZE = $(shell wc -c < $(OUTPUTDIR)/$(TARGET)Big.bin))
+	@if [ ${BIN_SIZE} -gt 140288 ]; then echo "\e[1;33mUncompr size exceeds limit!\e[0m"; fi
+	@echo -n "Uncompressed size: "
+	@echo $(BIN_SIZE)" Bytes"
 	$(eval BIN_SIZE = $(shell wc -c < $(OUTPUTDIR)/$(TARGET).bin))
-	@echo "Payload size is $(BIN_SIZE)"
-
-	@echo "Max size is 126296 Bytes."
+	@echo -n "Compressed size:   "
+	@echo $(BIN_SIZE)" Bytes"
 	@if [ ${BIN_SIZE} -gt 126296 ]; then echo -e "\e[1;33m Payload size exceeds limit!\e[0m"; fi
 	@echo "--------------------------------------"
 
 clean:
 	@rm -rf $(BUILDDIR)
 	@rm -rf $(OUTPUTDIR)
+	@$(MAKE) --no-print-directory -C $(LDRDIR) $(MAKECMDGOALS) -$(MAKEFLAGS)
 
-$(OUTPUTDIR)/$(TARGET).bin: $(BUILDDIR)/$(TARGET)/$(TARGET).elf
+$(LDRDIR): $(OUTPUTDIR)/$(TARGET)Big.bin $(TOOLS)
+	@$(TOOLSLZMA)/tinyLZMA $(OUTPUTDIR)/$(TARGET)Big.bin
+	@mv $(OUTPUTDIR)/$(TARGET)Big.bin.lzma payload
+	@$(TOOLSB2C)/bin2c payload > $(LDRDIR)/payload.h
+	@rm payload
+	@$(MAKE) --no-print-directory -C $@ $(MAKECMDGOALS) -$(MAKEFLAGS) PAYLOAD_NAME=$(TARGET)
+
+$(TOOLS):
+	@$(MAKE) --no-print-directory -C $@ $(MAKECMDGOALS) -$(MAKEFLAGS)
+
+$(OUTPUTDIR)/$(TARGET)Big.bin: $(BUILDDIR)/$(TARGET)/$(TARGET).elf
 	@mkdir -p "$(@D)"
 	$(OBJCOPY) -S -O binary $< $@
 
