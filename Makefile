@@ -21,14 +21,17 @@ OUTPUTDIR := output
 SOURCEDIR  = source
 BDKDIR    := bdk
 BDKINC    := -I./$(BDKDIR)
+DECOMPDIR := decompressor
+DECOMPINC := -I./$(DECOMPDIR)
 
 VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  $(dir $(wildcard ./$(SOURCEDIR)/*/*/))
 VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
+VPATH += $(dir $(wildcard ./$(DECOMPDIR)/))
 
 OBJS  = start exception_handlers main heap gfx menu testMenu sdMenu
 
 OBJS += hw_init di vic joycon touch se bpmp clock fuse gpio i2c pinmux pmc uart timer mc minerva sdram \
-        bq24193 max7762x regulator_5v fan tmp451 util irq hid btn utils sprintf math vector
+        bq24193 max7762x regulator_5v fan tmp451 util irq hid btn utils sprintf math vector unlzma_tiny
 
 OBJS += ff ffsystem ffunicode diskio nx_emmc_bis ramdisk emmc sdmmc sdmmc_driver sd
 
@@ -76,7 +79,7 @@ $(BUILDDIR)/$(TARGET)/$(TARGET).elf: $(OBJS)
 
 $(BUILDDIR)/$(TARGET)/%.o: %.c
 	@mkdir -p "$(@D)"
-	$(CC) $(CFLAGS) $(BDKINC) -c $< -o $@
+	$(CC) $(CFLAGS) $(BDKINC) $(DECOMPINC) -c $< -o $@
 
 $(BUILDDIR)/$(TARGET)/%.o: %.S
 	@mkdir -p "$(@D)"
