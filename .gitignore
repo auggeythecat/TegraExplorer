@@ -8,3 +8,5 @@ output
 
 tools/bin2c/bin2c
 tools/tinyLZMA/tinyLZMA
+
+loader/payload.h
