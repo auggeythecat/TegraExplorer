@@ -24,7 +24,7 @@
 
 typedef enum _entryType_t {
     ENTRY_END = 0,
-    ENTRY_SEPERATOR,
+    ENTRY_SEPARATOR,
     ENTRY_CAPTION,
     ENTRY_HANDLER,
     ENTRY_HANDLER_EX,
@@ -74,15 +74,25 @@ typedef struct _menuEntry_t {
     };
 } menuEntry_t;
 
-#define        ENT_END(                             ) { ENTRY_END       , 0      , COLOR_NONE, NULL   , NULL, { .renderDirty = 1, .skip = 1, .hide = 1           } }
-#define  ENT_SEPERATOR(                             ) { ENTRY_SEPERATOR , 0      , COLOR_NONE, NULL   , NULL, { .renderDirty = 1, .skip = 1, .hide = 1           } }
-#define    ENT_CAPTION(color, caption               ) { ENTRY_CAPTION   , caption, color     , NULL   , NULL, { .renderDirty = 1, .skip = 1                      } }
-#define    ENT_HANDLER(color, caption,       handler) { ENTRY_HANDLER   , caption, color     , handler, NULL, { .renderDirty = 1                                 } }
-#define ENT_HANDLER_EX(color, caption, data, handler) { ENTRY_HANDLER_EX, caption, color     , handler, data, { .renderDirty = 1,                                } }
-#define       ENT_MENU(color, caption, data, handler) { ENTRY_MENU      , caption, color     , handler, data, { .renderDirty = 1,                                } }
-#define  ENT_DIRECTORY(color, caption, data, handler) { ENTRY_DIRECTORY , caption, color     , NULL   , data, { .renderDirty = 1, .selectable = 1                } }
-#define       ENT_FILE(color, caption, data, handler) { ENTRY_FILE      , caption, color     , NULL   , data, { .renderDirty = 1, .selectable = 1, .showSize = 1 } }
-#define       ENT_BACK(color, caption               ) { ENTRY_BACK      , caption, color     , NULL   , NULL, { .renderDirty = 1                                 } }
+#define        ENT_END_OPTIONS { .renderDirty = 1, .skip = 1, .hide = 1                      }
+#define  ENT_SEPARATOR_OPTIONS { .renderDirty = 1, .skip = 1, .hide = 1                      }
+#define    ENT_CAPTION_OPTIONS { .renderDirty = 1, .skip = 1,                                }
+#define    ENT_HANDLER_OPTIONS { .renderDirty = 1,                                           }
+#define ENT_HANDLER_EX_OPTIONS { .renderDirty = 1,                                           }
+#define       ENT_MENU_OPTIONS { .renderDirty = 1,                                           }
+#define  ENT_DIRECTORY_OPTIONS { .renderDirty = 1, .showIcon = 1, .icon = 0, .selectable = 1 }
+#define       ENT_FILE_OPTIONS { .renderDirty = 1, .showIcon = 1, .icon = 1, .selectable = 1 }
+#define       ENT_BACK_OPTIONS { .renderDirty = 1,                                           }
+
+#define        ENT_END(                             ) { ENTRY_END       , 0      , COLOR_NONE, NULL   , NULL, ENT_END_OPTIONS        }
+#define  ENT_SEPARATOR(                             ) { ENTRY_SEPARATOR , 0      , COLOR_NONE, NULL   , NULL, ENT_SEPARATOR_OPTIONS  }
+#define    ENT_CAPTION(color, caption               ) { ENTRY_CAPTION   , caption, color     , NULL   , NULL, ENT_CAPTION_OPTIONS    }
+#define    ENT_HANDLER(color, caption,       handler) { ENTRY_HANDLER   , caption, color     , handler, NULL, ENT_HANDLER_OPTIONS    }
+#define ENT_HANDLER_EX(color, caption, data, handler) { ENTRY_HANDLER_EX, caption, color     , handler, data, ENT_HANDLER_EX_OPTIONS }
+#define       ENT_MENU(color, caption, data, handler) { ENTRY_MENU      , caption, color     , handler, data, ENT_MENU_OPTIONS       }
+#define  ENT_DIRECTORY(color, caption, data, handler) { ENTRY_DIRECTORY , caption, color     , NULL   , data, ENT_DIRECTORY_OPTIONS  }
+#define       ENT_FILE(color, caption, data, handler) { ENTRY_FILE      , caption, color     , NULL   , data, ENT_FILE_OPTIONS       }
+#define       ENT_BACK(color, caption               ) { ENTRY_BACK      , caption, color     , NULL   , NULL, ENT_BACK_OPTIONS       }
 
 typedef struct _menu_t {
     const char* title;
