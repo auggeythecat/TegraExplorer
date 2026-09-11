@@ -50,7 +50,7 @@ static menu_t testMenu = {
     .title   = "TegraExplorer",
     .entries = testMenuEntries,
     .count   = ARRAY_SIZE(testMenuEntries),
-    .cursorIndex = 0,
+    .cursorIndex = 1,
     .x     = 0,    .y = 0,
     .w     = SCREEN_WIDTH,
     .h     = SCREEN_HEIGHT,

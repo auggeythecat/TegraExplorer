@@ -20,16 +20,14 @@
 
 #include <libs/fatfs/ff.h>
 #include <mem/heap.h>
+#include <storage/sd.h>
 #include <string.h>
 #include <utils/sprintf.h>
+#include <utils/types.h>
 
-#include "../gfx/gfx.h"
 #include "../gfx/menu.h"
-#include "../util/utils.h"
+#include "../gfx/gfx.h"
 #include "../util/vector.h"
-#include "display/vic.h"
-#include "soc/timer.h"
-#include "storage/sd.h"
 
 static vector_t _listDirs(const char* path) {
     int res = 0;
@@ -42,16 +40,8 @@ static vector_t _listDirs(const char* path) {
     sd_mount();
 
     res = f_opendir(&dir, path);
-    if (res) {
-        gfxPrintF("%d", res);
-
-        vic_compose();
-        vic_wait_idle();
-
-        usleep(5000000);
-
+    if (res)
         goto out;
-    }
 
     for (;;) {
         res = f_readdir(&dir, &fno);
@@ -78,14 +68,15 @@ void pushsdMenu(void* data) {
     FILINFO* files = _listDirs(path);
     if (!files) return;
 
-    menuEntry_t* entries = (menuEntry_t*)malloc(sizeof(menuEntry_t)*(vecGetCount(files)+3));
+    menuEntry_t* entries = (menuEntry_t*)malloc(sizeof(menuEntry_t) * (vecGetCount(files)+3));
     if (!entries) goto out;
 
     entries[i++] = ENT_SEPARATOR();
     entries[i++] = ENT_BACK(COLOR_ORANGE, "<- Back");
 
     for (u32 j = 0; j < vecGetCount(files); i++, j++) {
-        char* fullPath = malloc(strlen(path) + strlen(files[j].fname));
+                                // First %s      /                  Second %s
+        char* fullPath = malloc(strlen(path) + (sizeof(char*)*1) + strlen(files[j].fname));
         s_printf(fullPath, "%s/%s", path, files[j].fname);
 
         entries[i] = files[j].fattrib & AM_DIR ?
@@ -96,10 +87,10 @@ void pushsdMenu(void* data) {
     entries[i] = ENT_END();
 
     const menu_t sdMenu = {
-        .title   = "SD Menu",
-        .entries = entries,
-        .count   = i,
-        .cursorIndex = 0,
+        .title       = "SD Menu",
+        .entries     = entries,
+        .count       = i,
+        .cursorIndex = 1,
         .x     = 0,    .y = 0,
         .w     = SCREEN_WIDTH,
         .h     = SCREEN_HEIGHT,
