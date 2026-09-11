@@ -47,10 +47,14 @@ GFX_INC   := '"../$(SOURCEDIR)/gfx/gfx.h"'
 FFCFG_INC := '"../$(SOURCEDIR)/libs/fatfs/ffconf.h"'
 
 ################################################################################
-
 CUSTOMDEFINES := -DIPL_LOAD_ADDR=$(IPL_LOAD_ADDR) -DTE_MAGIC=$(IPL_MAGIC)
 CUSTOMDEFINES += -DTE_VER_MJ=$(TEVERSION_MAJOR) -DTE_VER_MN=$(TEVERSION_MINOR) -DTE_VER_HF=$(TEVERSION_BUGFX) -DTE_VER=$(TEVERSION)
 CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC)
+
+# UART Logging: Max baudrate 12.5M.
+# DEBUG_UART_PORT - 0: UART_A, 1: UART_B, 2: UART_C.
+CUSTOMDEFINES += -DDEBUG_UART_BAUDRATE=115200 -DDEBUG_UART_INVERT=1 -DDEBUG_UART_PORT=0
+
 
 WARNINGS := -Wall -Wextra -Wno-implicit-fallthrough
 
