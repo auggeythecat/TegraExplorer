@@ -22,10 +22,12 @@
 #include "../gfx/gfx.h"
 #include "../util/utils.h"
 
+#include "sdMenu.h"
+
 static menuEntry_t testMenuEntries[] = {
     ENT_SEPERATOR(                                                                  ),
       ENT_CAPTION(COLOR_WHITE ,  "---| BROWSE |---"                                 ),
-      ENT_HANDLER(COLOR_GREEN , "Browse SD",                                powerOff),
+   ENT_HANDLER_EX(COLOR_GREEN , "Browse SD",                     "sd:/",  pushsdMenu),
       ENT_HANDLER(COLOR_GREEN , "Browse sysMMC",                            powerOff),
       ENT_HANDLER(COLOR_BLUE  , "Browse emuMMC",                            powerOff),
     ENT_SEPERATOR(                                                                  ),
