@@ -81,19 +81,19 @@ void pushsdMenu(void* data) {
     menuEntry_t* entries = (menuEntry_t*)malloc(sizeof(menuEntry_t)*(vecGetCount(files)+3));
     if (!entries) goto out;
 
-    entries[i++] = (menuEntry_t)ENT_SEPERATOR();
-    entries[i++] = (menuEntry_t)ENT_BACK(COLOR_ORANGE, "<- Back");
+    entries[i++] = ENT_SEPARATOR();
+    entries[i++] = ENT_BACK(COLOR_ORANGE, "<- Back");
 
     for (u32 j = 0; j < vecGetCount(files); i++, j++) {
         char* fullPath = malloc(strlen(path) + strlen(files[j].fname));
         s_printf(fullPath, "%s/%s", path, files[j].fname);
 
         entries[i] = files[j].fattrib & AM_DIR ?
-        (menuEntry_t) ENT_DIRECTORY(COLOR_VIOLET, files[j].fname, fullPath, pushsdMenu) :
-        (menuEntry_t) ENT_FILE(     COLOR_VIOLET, files[j].fname, fullPath, pushsdMenu) ;
+        ENT_DIRECTORY(COLOR_GREEN, files[j].fname, fullPath, pushsdMenu) :
+        ENT_FILE(     COLOR_BLUE, files[j].fname, fullPath, powerOff) ;
     }
 
-    entries[i] = (menuEntry_t)ENT_END();
+    entries[i] = ENT_END();
 
     const menu_t sdMenu = {
         .title   = "SD Menu",
