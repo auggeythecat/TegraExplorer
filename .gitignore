@@ -1,8 +1,15 @@
 build
 output
 
+# I do want to keep copyrighting in git.
+!.idea/copyright
+!.idea/scopes
+
+# I don't care for any of these being shared.
 .idea/shelf
+.idea/codeStyles
 .idea/workspace.xml
+.idea/Project.xml
 .idea/editor.xml
 .idea/misc.xml
 
