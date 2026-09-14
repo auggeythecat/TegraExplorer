@@ -18,8 +18,6 @@
 
 #include "menu.h"
 
-#include "../configuration.h"
-
 #include <string.h>
 #include <mem/heap.h>
 #include <soc/timer.h>
@@ -121,6 +119,16 @@ static void _printFooter(menu_t* m) {
     gfxPrintF("Time taken for screen draw: %dus ", get_tmr_us() - menuManager.lastDraw);
 }
 
+static void _handleHandler(menuEntry_t* entry) {
+#if UB_FUNCTION_POINTER_HACK
+    entry->handler(entry->data);
+#else
+    entry->handleWithArgs ?
+    entry->__handler.handler_with_arg(entry->data) :
+    entry->__handler.handler_no_arg  (           ) ;
+#endif
+}
+
 static void _handleInput(menu_t* m) {
     menuEntry_t* entry = &m->entries[m->cursorIndex];
 
@@ -143,7 +151,7 @@ static void _handleInput(menu_t* m) {
         }
 
         if (RE_INPUT_DETECTION(JOYA)) {
-            entry->handler(entry->data);
+            _handleHandler(entry);
             break;
         }
 

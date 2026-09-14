@@ -20,6 +20,7 @@
 #define _MENU_H
 
 #include <utils/types.h>
+#include "../configuration.h"
 #include "colors.h"
 
 typedef enum _entryType_t {
@@ -39,6 +40,7 @@ typedef struct _menuEntry_t {
     const char* caption;
     u32 color;
 
+#if UB_FUNCTION_POINTER_HACK
     // So...
     // Using functions with no args as the handler is technically
     // undefined behavior. (It will be called with the NULL arg).
@@ -47,6 +49,12 @@ typedef struct _menuEntry_t {
     // this exactly, which does make me feel better, but I don't
     // *really* like this,
     void(*handler)(void*);
+#else
+    union {
+        void (*handler_no_arg)(void);
+        void (*handler_with_arg)(void*);
+    } __handler;
+#endif
     void* data;
 
     union {
@@ -68,21 +76,38 @@ typedef struct _menuEntry_t {
             // It only needs to be 10, since the max value is 4GiB,
             // and the longest value would be 1023M/K/iB
 
+#if UB_FUNCTION_POINTER_HACK
             u32 reserved:12;
+#else
+            u32 handleWithArgs:1;
+            u32 reserved:11;
+#endif
         };
         u32 options;
     };
 } menuEntry_t;
 
-#define        ENT_END_OPTIONS { .renderDirty = 1, .skip = 1, .hide = 1                      }
-#define  ENT_SEPARATOR_OPTIONS { .renderDirty = 1, .skip = 1, .hide = 1                      }
-#define    ENT_CAPTION_OPTIONS { .renderDirty = 1, .skip = 1,                                }
-#define    ENT_HANDLER_OPTIONS { .renderDirty = 1,                                           }
-#define ENT_HANDLER_EX_OPTIONS { .renderDirty = 1,                                           }
-#define       ENT_MENU_OPTIONS { .renderDirty = 1,                                           }
-#define  ENT_DIRECTORY_OPTIONS { .renderDirty = 1, .showIcon = 1, .icon = 0, .selectable = 1                }
-#define       ENT_FILE_OPTIONS { .renderDirty = 1, .showIcon = 1, .icon = 1, .selectable = 1, .showSize = 1, .fileSize = 20, .fileSizeIndex = 2 }
-#define       ENT_BACK_OPTIONS { .renderDirty = 1,                                           }
+#ifdef UB_FUNCTION_POINTER_HACK
+# define        ENT_END_OPTIONS { .renderDirty = 1, .skip = 1, .hide = 1                                     }
+# define  ENT_SEPARATOR_OPTIONS { .renderDirty = 1, .skip = 1, .hide = 1                                     }
+# define    ENT_CAPTION_OPTIONS { .renderDirty = 1, .skip = 1,                                               }
+# define    ENT_HANDLER_OPTIONS { .renderDirty = 1,                                                          }
+# define ENT_HANDLER_EX_OPTIONS { .renderDirty = 1,                                                          }
+# define       ENT_MENU_OPTIONS { .renderDirty = 1,                                                          }
+# define  ENT_DIRECTORY_OPTIONS { .renderDirty = 1, .showIcon = 1, .icon = 0, .selectable = 1                }
+# define       ENT_FILE_OPTIONS { .renderDirty = 1, .showIcon = 1, .icon = 1, .selectable = 1, .showSize = 1 }
+# define       ENT_BACK_OPTIONS { .renderDirty = 1,                                                          }
+#else
+# define        ENT_END_OPTIONS { .renderDirty = 1,                     .skip = 1, .hide = 1                                     }
+# define  ENT_SEPARATOR_OPTIONS { .renderDirty = 1,                     .skip = 1, .hide = 1                                     }
+# define    ENT_CAPTION_OPTIONS { .renderDirty = 1,                     .skip = 1,                                               }
+# define    ENT_HANDLER_OPTIONS { .renderDirty = 1, handleWithArgs = 0                                                           }
+# define ENT_HANDLER_EX_OPTIONS { .renderDirty = 1, handleWithArgs = 1                                                           }
+# define       ENT_MENU_OPTIONS { .renderDirty = 1, handleWithArgs = 1                                                           }
+# define  ENT_DIRECTORY_OPTIONS { .renderDirty = 1, handleWithArgs = 1, .showIcon = 1, .icon = 0, .selectable = 1                }
+# define       ENT_FILE_OPTIONS { .renderDirty = 1, handleWithArgs = 1, .showIcon = 1, .icon = 1, .selectable = 1, .showSize = 1 }
+# define       ENT_BACK_OPTIONS { .renderDirty = 1,                                                                              }
+#endif
 
 #define        ENT_END(                             ) (menuEntry_t) { ENTRY_END       , 0      , COLOR_NONE, NULL   , NULL, ENT_END_OPTIONS        }
 #define  ENT_SEPARATOR(                             ) (menuEntry_t) { ENTRY_SEPARATOR , 0      , COLOR_NONE, NULL   , NULL, ENT_SEPARATOR_OPTIONS  }

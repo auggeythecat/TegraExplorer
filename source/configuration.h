@@ -34,4 +34,6 @@
 #define SDF_PADDING 1
 #endif
 
+#define UB_FUNCTION_POINTER_HACK 1
+
 #endif //_CONFIGURATION_H
