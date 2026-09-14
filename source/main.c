@@ -24,11 +24,10 @@
 #include <soc/bpmp.h>
 #include <soc/uart.h>
 
-#include "gfx/gfx.h"
 #include "configuration.h"
+#include "gfx/gfx.h"
 #include "gfx/menu.h"
 #include "menus/testMenu.h"
-#include "soc/timer.h"
 #include "util/hid.h"
 
 #if USE_VIC
@@ -82,12 +81,12 @@ void iplMain() {
 
     heap_init((void*)IPL_HEAP_START);
 
-    _displayInit();
-
 #ifdef DEBUG_UART_PORT
-    uart_send(DEBUG_UART_PORT, (u8 *)"Something here\n", 15);
+    uart_send(DEBUG_UART_PORT, (u8 *)"TegraExplorer!\n", 15);
     uart_wait_xfer(DEBUG_UART_PORT, UART_TX_IDLE);
 #endif
+
+    _displayInit();
 
     pushTestMenu();
 
