@@ -69,13 +69,13 @@ LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defs
 all: $(OUTPUTDIR)/$(TARGET)Big.bin $(LDRDIR)
 	@echo "--------------------------------------"
 	$(eval BIN_SIZE = $(shell wc -c < $(OUTPUTDIR)/$(TARGET)Big.bin))
-	@if [ ${BIN_SIZE} -gt 140288 ]; then echo "\e[1;33mUncompr size exceeds limit!\e[0m"; fi
+	@if [ ${BIN_SIZE} -gt 140288 ]; then echo -e "\e[1;33mUncompressed Payload size exceeds limit!\e[0m"; fi
 	@echo -n "Uncompressed size: "
 	@echo $(BIN_SIZE)" Bytes"
 	$(eval BIN_SIZE = $(shell wc -c < $(OUTPUTDIR)/$(TARGET).bin))
 	@echo -n "Compressed size:   "
 	@echo $(BIN_SIZE)" Bytes"
-	@if [ ${BIN_SIZE} -gt 126296 ]; then echo -e "\e[1;33m Payload size exceeds limit!\e[0m"; fi
+	@if [ ${BIN_SIZE} -gt 126296 ]; then echo -e "\e[1;33mCompressed Payload size exceeds limit!\e[0m"; fi
 	@echo "--------------------------------------"
 
 clean:
