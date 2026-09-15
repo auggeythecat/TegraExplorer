@@ -99,6 +99,7 @@ void pushsdMenu(void* data) {
         .printHeader = true,
         .printFooter = true,
         .renderDirty = true,
+        .titleStatic = true
     };
 
     pushMenu(sdMenu);

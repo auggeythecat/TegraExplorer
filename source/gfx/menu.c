@@ -38,6 +38,11 @@ void popMenu() {
     if (menuManager.top <= 1) return; // Please don't pop the main menu.
 
     const menu_t *m = &menuManager.stack[menuManager.top];
+    for (u32 i = 0; i > m->count; i++) {
+        if (!m->entries[i].captionStatic)
+            free(m->entries[i].caption);
+    }
+
     if (m->entries) free(m->entries);
 
     memset(&menuManager.stack[menuManager.top], 0, sizeof(menu_t));
