@@ -25,7 +25,7 @@
 #define CLAMPMIN(val, min)      ((val) < (min) ? (min) :  (val))
 #define CLAMPMAX(val, max)                               ((val) > (max) ? (max) : (val))
 
-#define ABS(val) (((val) < 0) ? (-val) : (val))
+#define ABS(val) (((val) < 0) ? (-(val)) : (val))
 
 u32 log10Approximation(u32 n);
 

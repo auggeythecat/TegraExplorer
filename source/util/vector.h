@@ -52,7 +52,7 @@ typedef void* vector_t;
 #define vecPopBack(vec) (vecPop(vec))
 
 #define vecForEach(type, varName, vecPtr) for (type varName = vecPtr; \
-    ((u8*) (varName) - (u8*) (vecPtr)) < (vecHeader(vecPtr)->count); (varName++))
+    ((u8*) (varName) - (u8*) (vecPtr)) < (vecHeader(vecPtr)->count); ((varName)++))
 
 #define  vecFree(vec) free(vec); (vec) = NULL;
 #define vecClear(vec) (vecHeader(vec)->count = 0)

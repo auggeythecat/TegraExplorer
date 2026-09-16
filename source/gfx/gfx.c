@@ -193,7 +193,7 @@ void gfxRenderSDF() {
 				}
 				const u64 dist   = 1 + sqrt64(minDistance * 256);
 				const u32 index  = SDF_SIZE*SDF_SIZE*i + SDF_SIZE*y + x;
-				const int offset = dist - 8;
+				const int offset = (int)dist - 8;
 				((u8*)SDF_BUFFER)[index] = inside ? CLAMPMAX(128 + offset, 255) : CLAMPMIN(128 - offset, 0);
 			}
 		}
@@ -216,7 +216,7 @@ static u8* _gfxGetAtlas(const u32 size) {
 		u8* startPtr  = (u8*)atlasPointer;
 		atlasPointer += (muhBytes + 3) & ~3;
 
-		atlases[atlasCount++] = (sdfAtlas_t) {size, startPtr};
+		atlases[atlasCount++] = (sdfAtlas_t) { .size = size, .data = startPtr };
 		return startPtr;
 	}
 	return NULL;

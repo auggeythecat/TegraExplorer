@@ -82,7 +82,7 @@ static RangeEncoder_t newRangeEncoder (uint8_t *dest, const size_t destLength) {
     return coder;
 }
 
-static inline void rangeEncodeOutByte (RangeEncoder_t *e, uint8_t byte) {
+static inline void rangeEncodeOutByte (RangeEncoder_t *e, const uint8_t byte) {
     if (e->p_dst != e->p_dst_limit)
         *(e->p_dst++) = byte;
     else
@@ -126,7 +126,7 @@ static void rangeEncodeTerminate (RangeEncoder_t *e) {
     rangeEncodeNormalize(e);
 }
 
-static void rangeEncodeIntByFixedProb (RangeEncoder_t *e, uint32_t val, uint32_t bit_count) {
+static void rangeEncodeIntByFixedProb (RangeEncoder_t *e, const uint32_t val, uint32_t bit_count) {
     for (; bit_count>0; bit_count--) {
         uint8_t bit = 1 & (val >> (bit_count-1));
         rangeEncodeNormalize(e);
@@ -159,7 +159,7 @@ static void rangeEncodeBit (RangeEncoder_t *e, uint16_t *p_prob, const uint8_t b
     }
 }
 
-static void rangeEncodeInt (RangeEncoder_t *e, uint16_t *p_prob, uint32_t val, uint32_t bit_count) {
+static void rangeEncodeInt (RangeEncoder_t *e, uint16_t *p_prob, const uint32_t val, uint32_t bit_count) {
     uint32_t treepos = 1;
     for (; bit_count>0; bit_count--) {
         uint8_t bit = (uint8_t)(1 & (val >> (bit_count-1)));
@@ -203,16 +203,16 @@ static void rangeEncodeByteMatched (RangeEncoder_t *e, uint16_t *p_prob, uint32_
 #define    INIT_HASH_TABLE(hash_table) {              \
     for (uint32_t i = 0; i < HASH_SIZE; i++)          \
         for (uint32_t j = 0; j < HASH_LEVEL; j++)     \
-            hash_table[i][j] = INVALID_HASH_ITEM;      \
+            (hash_table[i][j]) = INVALID_HASH_ITEM;   \
 }
 
 
 static uint32_t getHash (const uint8_t *p_src, const size_t src_len, const size_t pos) {
     if (pos >= src_len || pos+1 == src_len || pos+2 == src_len)
         return 0 ;
-    else
+
 #if HASH_N < 24
-        return ((p_src[pos+2]<<16) + (p_src[pos+1]<<8) + p_src[pos]) & HASH_MASK;
+    return ((p_src[pos+2]<<16) + (p_src[pos+1]<<8) + p_src[pos]) & HASH_MASK;
 #else
         return ((p_src[pos+2]<<16) + (p_src[pos+1]<<8) + p_src[pos]);
 #endif
@@ -259,8 +259,8 @@ static uint32_t lenDistScore (const uint32_t len, const uint32_t dist, const uin
         return 8 + 5;
     else if (len == 2)
         return 8 + score + 1;
-    else
-        return 8 + score + len;
+
+    return 8 + score + len;
 }
 
 
@@ -353,7 +353,7 @@ typedef enum {          // packet_type
 } PACKET_t;
 
 
-static uint8_t stateTransition (uint8_t state, PACKET_t type) {
+static uint8_t stateTransition (const uint8_t state, const PACKET_t type) {
     switch (state) {
         case  0 : return (type==PKT_LIT) ?  0 : (type==PKT_MATCH) ?  7 : (type==PKT_SHORTREP) ?  9 :  8;
         case  1 : return (type==PKT_LIT) ?  0 : (type==PKT_MATCH) ?  7 : (type==PKT_SHORTREP) ?  9 :  8;
@@ -675,7 +675,7 @@ static int lzmaEncode (const uint8_t *p_src, size_t src_len, uint8_t *p_dst, siz
 
 #define   LZMA_HEADER_LEN                          13
 
-static int writeLzmaHeader (uint8_t *p_dst, size_t *p_dst_len, size_t uncompressed_len, uint8_t uncompressed_len_known) {
+static int writeLzmaHeader (uint8_t *p_dst, size_t *p_dst_len, size_t uncompressed_len, const uint8_t uncompressed_len_known) {
     uint32_t i;
 
     if (*p_dst_len < LZMA_HEADER_LEN)

@@ -282,7 +282,7 @@ lzma_inflate(const uint8_t * in_ptr, size_t in_size, uint8_t *restrict buffer, s
 	rc_init(rc, in_ptr, in_size); /*, RC_BUFFER_SIZE); */
 
 	while (buffer_pos < dst_size) {
-		int pos_state = buffer_pos & pos_state_mask;
+		int pos_state = (int)buffer_pos & pos_state_mask;
 		uint16_t *prob = p + LZMA_IS_MATCH + (state << LZMA_NUM_POS_BITS_MAX) + pos_state;
 
 #ifndef UNSAFE_TRUNCATED_INPUT

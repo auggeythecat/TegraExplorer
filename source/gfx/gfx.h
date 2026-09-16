@@ -42,7 +42,7 @@
 #if SDF_FONT
 #define SDF_SIZE    (FONT_SIZE + (SDF_PADDING * 2))
 #define INNER_SIZE  (SDF_SIZE  - (SDF_PADDING * 2))
-#define MAX_ATLASES 16 + 1
+#define MAX_ATLASES (16 + 1)
 #endif
 
 #define NUM_CHARS   98

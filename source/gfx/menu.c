@@ -95,7 +95,7 @@ static void _printEntry(menuEntry_t entry, u32 maxLen) {
     }
 }
 
-static void _printHeader(menu_t* m) {
+static void _printHeader(const menu_t* m) {
     // TODO: Check if this makes a major performance difference.
     // If it does, the best path forward might be to make this render with a white background color,
     // (makes character printing faster because no alpha mult first of all)
@@ -117,7 +117,8 @@ static void _printHeader(menu_t* m) {
     gfxPrintF(temp);
 }
 
-static void _printFooter(menu_t* m) {
+static void _printFooter(const menu_t* m) {
+    (void)m;
     gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, 0xFF);
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);

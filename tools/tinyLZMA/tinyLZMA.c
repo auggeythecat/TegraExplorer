@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
         goto error;
 
     strcpy(filename, argv[1]);
-    filename_len = strlen(filename);
+    filename_len = (int)strlen(filename);
 
     const uint32_t in_size  = statbuf.st_size;
     const uint32_t out_size = statbuf.st_size + 257;
