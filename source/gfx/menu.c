@@ -95,7 +95,9 @@ static void _printEntry(menuEntry_t entry, u32 maxLen) {
     }
 }
 
-static void _printHeader(const menu_t* m) {
+static void _printHeader() {
+    menu_t *m = &menuManager.stack[menuManager.top];
+
     // TODO: Check if this makes a major performance difference.
     // If it does, the best path forward might be to make this render with a white background color,
     // (makes character printing faster because no alpha mult first of all)
@@ -117,25 +119,15 @@ static void _printHeader(const menu_t* m) {
     gfxPrintF(temp);
 }
 
-static void _printFooter(const menu_t* m) {
-    (void)m;
+static void _printFooter() {
     gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, 0xFF);
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
     gfxPrintF("Time taken for screen draw: %dus ", get_tmr_us() - menuManager.lastDraw);
 }
 
-static void _handleHandler(menuEntry_t* entry) {
-#if UB_FUNCTION_POINTER_HACK
-    entry->handler(entry->data);
-#else
-    entry->handleWithArgs ?
-    entry->__handler.handler_with_arg(entry->data) :
-    entry->__handler.handler_no_arg  (           ) ;
-#endif
-}
-
-static void _handleInput(menu_t* m) {
+static void _handleInput() {
+    menu_t *m = &menuManager.stack[menuManager.top];
     menuEntry_t* entry = &m->entries[m->cursorIndex];
 
     while (hidRead()) {
@@ -157,7 +149,13 @@ static void _handleInput(menu_t* m) {
         }
 
         if (RE_INPUT_DETECTION(JOYA)) {
-            _handleHandler(entry);
+#if UB_FUNCTION_POINTER_HACK
+            entry->handler(entry->data);
+#else
+            entry->handleWithArgs ?
+            entry->__handler.handler_with_arg(entry->data) :
+            entry->__handler.handler_no_arg  (           ) ;
+#endif
             break;
         }
 
@@ -220,9 +218,9 @@ void renderMenuTop() {
     }
 
     if (m->printFooter)
-        _printFooter(m);
+        _printFooter();
     if (m->printHeader)
-        _printHeader(m);
+        _printHeader();
 
 #if USE_VIC
     vic_compose();
@@ -230,5 +228,5 @@ void renderMenuTop() {
 
     m->renderDirty = false;
 
-    _handleInput(m);
+    _handleInput();
 }

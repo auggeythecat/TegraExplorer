@@ -48,6 +48,7 @@ typedef struct _menuEntry_t {
     // but its still not something I like. Also, Hekate does use
     // this exactly, which does make me feel better, but I don't
     // *really* like this,
+    void* data;
     void(*handler)(void*);
 #else
     union {
@@ -55,7 +56,6 @@ typedef struct _menuEntry_t {
         void (*handler_with_arg)(void*);
     } __handler;
 #endif
-    void* data;
 
     union {
         struct {
@@ -110,15 +110,15 @@ typedef struct _menuEntry_t {
 # define       ENT_BACK_OPTIONS { .renderDirty = 1, .captionStatic = 1,                                                                              }
 #endif
 
-#define        ENT_END(                             ) (menuEntry_t) { ENTRY_END       , 0      , COLOR_NONE, NULL   , NULL, ENT_END_OPTIONS        }
-#define  ENT_SEPARATOR(                             ) (menuEntry_t) { ENTRY_SEPARATOR , 0      , COLOR_NONE, NULL   , NULL, ENT_SEPARATOR_OPTIONS  }
-#define    ENT_CAPTION(color, caption               ) (menuEntry_t) { ENTRY_CAPTION   , caption, color     , NULL   , NULL, ENT_CAPTION_OPTIONS    }
-#define    ENT_HANDLER(color, caption,       handler) (menuEntry_t) { ENTRY_HANDLER   , caption, color     , handler, NULL, ENT_HANDLER_OPTIONS    }
-#define ENT_HANDLER_EX(color, caption, data, handler) (menuEntry_t) { ENTRY_HANDLER_EX, caption, color     , handler, data, ENT_HANDLER_EX_OPTIONS }
-#define       ENT_MENU(color, caption, data, handler) (menuEntry_t) { ENTRY_MENU      , caption, color     , handler, data, ENT_MENU_OPTIONS       }
-#define  ENT_DIRECTORY(color, caption, data, handler) (menuEntry_t) { ENTRY_DIRECTORY , caption, color     , NULL   , data, ENT_DIRECTORY_OPTIONS  }
-#define       ENT_FILE(color, caption, data, handler) (menuEntry_t) { ENTRY_FILE      , caption, color     , NULL   , data, ENT_FILE_OPTIONS       }
-#define       ENT_BACK(color, caption               ) (menuEntry_t) { ENTRY_BACK      , caption, color     , NULL   , NULL, ENT_BACK_OPTIONS       }
+#define        ENT_END(                             ) (menuEntry_t) { ENTRY_END       , 0      , COLOR_NONE, NULL, NULL   , ENT_END_OPTIONS        }
+#define  ENT_SEPARATOR(                             ) (menuEntry_t) { ENTRY_SEPARATOR , 0      , COLOR_NONE, NULL, NULL   , ENT_SEPARATOR_OPTIONS  }
+#define    ENT_CAPTION(color, caption               ) (menuEntry_t) { ENTRY_CAPTION   , caption, color     , NULL, NULL   , ENT_CAPTION_OPTIONS    }
+#define    ENT_HANDLER(color, caption,       handler) (menuEntry_t) { ENTRY_HANDLER   , caption, color     , NULL, handler, ENT_HANDLER_OPTIONS    }
+#define ENT_HANDLER_EX(color, caption, data, handler) (menuEntry_t) { ENTRY_HANDLER_EX, caption, color     , data, handler, ENT_HANDLER_EX_OPTIONS }
+#define       ENT_MENU(color, caption, data, handler) (menuEntry_t) { ENTRY_MENU      , caption, color     , data, handler, ENT_MENU_OPTIONS       }
+#define  ENT_DIRECTORY(color, caption, data, handler) (menuEntry_t) { ENTRY_DIRECTORY , caption, color     , data, NULL   , ENT_DIRECTORY_OPTIONS  }
+#define       ENT_FILE(color, caption, data, handler) (menuEntry_t) { ENTRY_FILE      , caption, color     , data, NULL   , ENT_FILE_OPTIONS       }
+#define       ENT_BACK(color, caption               ) (menuEntry_t) { ENTRY_BACK      , caption, color     , NULL, NULL   , ENT_BACK_OPTIONS       }
 
 typedef struct _menu_t {
     const char* title;

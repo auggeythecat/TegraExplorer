@@ -43,14 +43,13 @@ static menuEntry_t testMenuEntries[] = {
       ENT_HANDLER(COLOR_GREEN , "View dumped keys",                powerOff),
       ENT_HANDLER(COLOR_GREEN , "View credits",                    powerOff),
           ENT_END(                                                         )
-
 };
 
 static menu_t testMenu = {
     .title   = "TegraExplorer",
     .entries = testMenuEntries,
     .count   = ARRAY_SIZE(testMenuEntries),
-    .cursorIndex = 1,
+    .cursorIndex = 2,
     .x     = 0,    .y = 0,
     .w     = SCREEN_WIDTH,
     .h     = SCREEN_HEIGHT,
