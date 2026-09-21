@@ -33,12 +33,23 @@ VPATH  = $(dir ./$(SOURCEDIR)/)           $(dir $(wildcard ./$(SOURCEDIR)/*/))  
 VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     $(dir $(wildcard ./$(BDKDIR)/*/*/))
 VPATH += $(dir $(wildcard ./$(DECOMPDIR)/))
 
-OBJS  = start exception_handlers main heap gfx menu testMenu sdMenu
+# Start/essential
+OBJS  = start exception_handlers main heap hw_init
 
-OBJS += hw_init di vic joycon touch se bpmp clock fuse gpio i2c pinmux pmc uart timer mc minerva sdram \
-        bq24193 max7762x regulator_5v fan tmp451 util irq hid btn utils sprintf math vector unlzma_tiny
+# BDK/hardware
+OBJS += se bpmp clock fuse gpio i2c pinmux pmc mc minerva sdram uart timer bq24193 max7762x regulator_5v fan tmp451 irq
 
+# Menus and display
+OBJS += di vic gfx menu testMenu sdMenu
+
+# Input
+OBJS += joycon touch btn hid
+
+# Disk and filesystem
 OBJS += ff ffsystem ffunicode diskio nx_emmc_bis ramdisk emmc sdmmc sdmmc_driver sd
+
+# Math and utils
+OBJS += utils sprintf math vector unlzma_tiny util
 
 OBJS := $(addsuffix .o, $(OBJS))
 OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
@@ -47,6 +58,7 @@ GFX_INC   := '"../$(SOURCEDIR)/gfx/gfx.h"'
 FFCFG_INC := '"../$(SOURCEDIR)/libs/fatfs/ffconf.h"'
 
 ################################################################################
+
 CUSTOMDEFINES := -DIPL_LOAD_ADDR=$(IPL_LOAD_ADDR) -DTE_MAGIC=$(IPL_MAGIC)
 CUSTOMDEFINES += -DTE_VER_MJ=$(TEVERSION_MAJOR) -DTE_VER_MN=$(TEVERSION_MINOR) -DTE_VER_HF=$(TEVERSION_BUGFX) -DTE_VER=$(TEVERSION)
 CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC)
