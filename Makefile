@@ -56,7 +56,7 @@ CUSTOMDEFINES += -DGFX_INC=$(GFX_INC) -DFFCFG_INC=$(FFCFG_INC)
 CUSTOMDEFINES += -DDEBUG_UART_BAUDRATE=115200 -DDEBUG_UART_INVERT=1 -DDEBUG_UART_PORT=0
 
 
-WARNINGS := -Wall -Wextra -Wno-implicit-fallthrough
+WARNINGS := -Wall -Wextra -Wno-implicit-fallthrough -Wno-missing-braces -Wno-missing-field-initializers
 
 ARCH   := -march=armv4t -mtune=arm7tdmi -mthumb -mthumb-interwork
 CFLAGS  = $(ARCH) -Os -g -gdwarf-4 -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -std=gnu11 $(CUSTOMDEFINES) $(WARNINGS)

@@ -21,6 +21,6 @@
 
 #include <utils/types.h>
 
-void pushsdMenu(void* data);
+void pushsdMenu(char* path);
 
 #endif //_SDMENU_H

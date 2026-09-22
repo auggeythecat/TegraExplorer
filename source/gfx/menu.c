@@ -153,8 +153,8 @@ static void _handleInput() {
             entry->handler(entry->data);
 #else
             entry->handleWithArgs ?
-            entry->__handler.handler_with_arg(entry->data) :
-            entry->__handler.handler_no_arg  (           ) ;
+            entry->__handler.with_arg(entry->data) :
+            entry->__handler.no_arg  (           ) ;
 #endif
             break;
         }

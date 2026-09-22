@@ -28,6 +28,7 @@
 #include "../gfx/menu.h"
 #include "../gfx/gfx.h"
 #include "../util/vector.h"
+#include "../util/utils.h"
 
 static vector_t _listDirs(const char* path) {
     int res = 0;
@@ -61,9 +62,8 @@ out:
     return NULL;
 }
 
-void pushsdMenu(void* data) {
+void pushsdMenu(char* path) {
     u32 i = 0;
-    char* path = (char*)data;
 
     FILINFO* files = _listDirs(path);
     if (!files) return;
@@ -80,8 +80,8 @@ void pushsdMenu(void* data) {
         s_printf(fullPath, "%s/%s", path, files[j].fname);
 
         entries[i] = files[j].fattrib & AM_DIR ?
-        ENT_DIRECTORY(COLOR_GREEN, files[j].fname, fullPath, pushsdMenu) :
-        ENT_FILE(     COLOR_BLUE, files[j].fname, fullPath, powerOff) ;
+        ENT_DIRECTORY(COLOR_GREEN, files[j].fname, pushsdMenu, fullPath) :
+        ENT_FILE(     COLOR_BLUE , files[j].fname, powerOff  , fullPath) ;
     }
 
     entries[i] = ENT_END();
