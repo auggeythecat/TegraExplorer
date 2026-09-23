@@ -159,6 +159,11 @@ static void _handleInput() {
             break;
         }
 
+        if (RE_INPUT_DETECTION(JOYB)) {
+            popMenu();
+            break;
+        }
+
         if (RE_INPUT_DETECTION(JOYX)) {
             if (entry->selectable) entry->selected = ~entry->selected;
             entry->renderDirty = true;

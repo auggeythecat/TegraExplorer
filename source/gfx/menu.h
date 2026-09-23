@@ -109,7 +109,7 @@ typedef struct _menuEntry_t {
 #define       ENT_MENU(color, caption, handler, data) (menuEntry_t) { ENTRY_MENU      , caption, color     , ARG_HANDLER_TYPE handler, data, ENT_MENU_OPTIONS       }
 #define  ENT_DIRECTORY(color, caption, handler, data) (menuEntry_t) { ENTRY_DIRECTORY , caption, color     , ARG_HANDLER_TYPE handler, data, ENT_DIRECTORY_OPTIONS  }
 #define       ENT_FILE(color, caption, handler, data) (menuEntry_t) { ENTRY_FILE      , caption, color     , ARG_HANDLER_TYPE handler, data, ENT_FILE_OPTIONS       }
-#define       ENT_BACK(color, caption               ) (menuEntry_t) { ENTRY_BACK      , caption, color     , NULL                    , NULL, ENT_BACK_OPTIONS       }
+#define       ENT_BACK(color, caption               ) (menuEntry_t) { ENTRY_BACK      , caption, color     , ARG_HANDLER_TYPE popMenu, NULL, ENT_BACK_OPTIONS       }
 
 #else
 # define ARG_HANDLER_TYPE (void(*)(void*))
