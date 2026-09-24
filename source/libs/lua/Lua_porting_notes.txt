@@ -1,0 +1,8 @@
+1: Stripping runtime-compilation.
+
+Remove llex (lua lexer), lparser (lua parser), and lcode (lua code generator).
+
+The only llex function that is used outside of these objects is 'luaX_init', used inside 'lstate'. It needs to be stubbed out. 'LUAI_FUNC void luaX_init (lua_State *L) { UNUSED(L); }' works fine.
+The lparser exposes 'luaY_parser', which is called by 'ldo'. It has a struct* argument that is a large chained struct defined in lparser.h. This must be preserved, while the function can just be stubbed.
+Do note: everything in lcode can be removed, but the header must exist for ldebug to include.
+
