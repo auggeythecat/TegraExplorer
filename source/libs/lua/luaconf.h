@@ -545,7 +545,82 @@
 ** without modifying the main part of the file.
 */
 
+/* undef all relevant */
+#undef LUA_VDIR
+#undef LUA_ROOT
+#undef LUA_LDIR
+#undef LUA_CDIR
+#undef LUA_PATH_DEFAULT
+#undef LUA_CPATH_DEFAULT
 
+#undef luai_writestring
+#undef luai_writeline
+#undef luai_writestringerror
+
+#undef LUA_INT32
+#undef LUAI_UMEM
+#undef LUAI_MEM
+
+#undef LUA_NUMBER_DOUBLE
+#undef LUA_NUMBER
+#undef LUAI_UACNUMBER
+
+#undef LUA_NUMBER_SCAN
+#undef LUA_NUMBER_FMT
+#undef lua_number2str
+#undef LUAI_MAXNUMBER2STR
+
+#undef lua_str2number
+#undef lua_strx2number
+
+#undef luai_nummod
+#undef luai_numpow
+
+#undef LUA_INTEGER
+#undef LUA_UNSIGNED
+
+/* redefine all relevant */
+#define LUA_VDIR	LUA_VERSION_MAJOR "." LUA_VERSION_MINOR "/"
+#define LUA_ROOT	"sd:/tegraexplorer/lua"
+#define LUA_LDIR	LUA_ROOT "libs" LUA_VDIR
+#define LUA_CDIR	LUA_ROOT "modules" LUA_VDIR
+#define LUA_PATH_DEFAULT  \
+		LUA_LDIR "?.lua;"  LUA_LDIR "?/init.lua;" \
+		LUA_CDIR "?.lua;"  LUA_CDIR "?/init.lua;" "./?.lua"
+#define LUA_CPATH_DEFAULT \
+		LUA_CDIR"?.bso;" LUA_CDIR"loadall.bso;" "./?.bso"
+
+#include "../../gfx/gfx.h"
+#define luai_writestring(s,l)      (gfxPutS(s))
+#define luai_writeline()	       (gfxPutC('\n'))
+#define luai_writestringerror(s,p) (EPRINTFARGS(s, p))
+
+#include <utils/types.h>
+#define LUA_INT32 int // s32 doesn't work here. I wonder why...
+#define LUAI_UMEM u32
+#define LUAI_MEM  s32
+
+// Don't define this, but it felt wrong to not have it here.
+// #define LUA_NUMBER_DOUBLE
+#define LUA_NUMBER     u32
+#define LUAI_UACNUMBER u32
+
+#include <utils/sprintf.h>
+#define LUA_NUMBER_SCAN		"%u" // This won't be used, but... whatever.
+#define LUA_NUMBER_FMT		"%.14d" // This also won't be used.
+#define lua_number2str(s,n)	({s_printf((s), LUA_NUMBER_FMT, (n)); u32 len = strlen((s)); len;})
+#define LUAI_MAXNUMBER2STR	32 /* 16 digits, sign, point, and \0 */
+
+#include <utils/util.h>
+#define lua_str2number(s, p)  strtol((s), (p), 10)
+#define lua_strx2number(s, p) strtol((s), (p), 16)
+
+#include "../../util/math.h"
+#define luai_nummod(L, a, b) ((a) % (b))
+#define luai_numpow(L, a, b) (uintPow((a), (b)))
+
+#define LUA_INTEGER  s32
+#define LUA_UNSIGNED u32
 
 #endif
 
