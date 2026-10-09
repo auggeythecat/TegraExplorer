@@ -27,6 +27,8 @@
 #include "configuration.h"
 #include "gfx/gfx.h"
 #include "gfx/menu.h"
+#include "libs/lua/lua.h"
+#include "libs/lua/lualib.h"
 #include "menus/testMenu.h"
 #include "util/hid.h"
 
@@ -91,6 +93,9 @@ void iplMain() {
     pushTestMenu();
 
     hidInit();
+
+    volatile lua_State* luastate = lua_newstate(NULL, NULL);
+    luaL_openlibs(luastate);
 
     while (true)
         renderMenuTop();

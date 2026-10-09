@@ -54,6 +54,9 @@ OBJS += utils sprintf math vector unlzma_tiny util
 # Lua core
 OBJS += lapi lctype ldebug ldo ldump lfunc lgc linit lmem loadlib lobject lopcodes lstate lstring ltable ltm lundump lvm lzio
 
+# Lua libs
+OBJS += lauxlib lbaselib lbitlib ltablib lstrlib
+
 OBJS := $(addsuffix .o, $(OBJS))
 OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
 
