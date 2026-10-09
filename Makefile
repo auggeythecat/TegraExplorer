@@ -52,7 +52,7 @@ OBJS += ff ffsystem ffunicode diskio nx_emmc_bis ramdisk emmc sdmmc sdmmc_driver
 OBJS += utils sprintf math vector unlzma_tiny util
 
 # Lua core
-OBJS += lcode lctype ldebug ldo ldump lfunc lgc linit llex lmem loadlib lopcodes lparser lstate lstring ltable ltm
+OBJS += lapi lctype ldebug ldo ldump lfunc lgc linit lmem loadlib lobject lopcodes lstate lstring ltable ltm lundump lvm lzio
 
 OBJS := $(addsuffix .o, $(OBJS))
 OBJS := $(addprefix $(BUILDDIR)/$(TARGET)/, $(OBJS))
