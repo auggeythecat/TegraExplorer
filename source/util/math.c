@@ -34,3 +34,15 @@ u32 log10Approximation(const u32 n) {
              n >= 10 ? 1 :
                        0 ;
 }
+
+u64 uintPow(u32 b, u32 e) {
+    u64 result = 1;
+    while (e != 0) {
+        if ((e & 1) == 1)
+            result *= b;
+        e >>= 1;
+        b *= b;
+    }
+
+    return result;
+}

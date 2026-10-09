@@ -28,5 +28,6 @@
 #define ABS(val) (((val) < 0) ? (-(val)) : (val))
 
 u32 log10Approximation(u32 n);
+u64 uintPow(u32 b, u32 e);
 
 #endif //_MATH_H
