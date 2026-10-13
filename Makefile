@@ -34,7 +34,7 @@ VPATH += $(dir $(wildcard ./$(BDKDIR)/))  $(dir $(wildcard ./$(BDKDIR)/*/))     
 VPATH += $(dir $(wildcard ./$(DECOMPDIR)/))
 
 # Start/essential
-OBJS  = start exception_handlers main heap hw_init
+OBJS  = start exception_handlers setjump main heap hw_init
 
 # BDK/hardware
 OBJS += se bpmp clock fuse gpio i2c pinmux pmc mc minerva sdram uart timer bq24193 max7762x regulator_5v fan tmp451 irq

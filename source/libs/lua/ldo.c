@@ -5,7 +5,6 @@
 */
 
 
-#include <setjmp.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -63,9 +62,13 @@
 
 #else
 /* default handling with long jumps */
-#define LUAI_THROW(L,c)		longjmp((c)->b, 1)
-#define LUAI_TRY(L,c,a)		if (setjmp((c)->b) == 0) { a }
-#define luai_jmpbuf		jmp_buf
+typedef u32 jumpbuff[10];
+extern void lngjump(jumpbuff, int);
+extern int  setjump(jumpbuff);
+
+#define LUAI_THROW(L,c)	lngjump((c)->b, 1)
+#define LUAI_TRY(L,c,a)	if (setjump((c)->b) == 0) { a }
+#define luai_jmpbuf		  jumpbuff
 
 #endif
 
