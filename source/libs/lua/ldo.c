@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <soc/bpmp.h>
 
 #define ldo_c
 #define LUA_CORE
@@ -119,7 +120,8 @@ l_noret luaD_throw (lua_State *L, int errcode) {
         lua_unlock(L);
         G(L)->panic(L);  /* call it (last chance to jump out) */
       }
-      abort();
+      while (true)
+        bpmp_halt(); // TODO: better solution.
     }
   }
 }

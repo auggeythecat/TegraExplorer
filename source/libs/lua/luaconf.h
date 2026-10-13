@@ -606,7 +606,7 @@
 #define LUAI_UACNUMBER u32
 
 #include <utils/sprintf.h>
-#define LUA_NUMBER_SCAN		"%u" // This won't be used, but... whatever.
+#define LUA_NUMBER_SCAN		"%d" // This won't be used, but... whatever.
 #define LUA_NUMBER_FMT		"%.14d" // This also won't be used.
 #define lua_number2str(s,n)	({s_printf((s), LUA_NUMBER_FMT, (n)); u32 len = strlen((s)); len;})
 #define LUAI_MAXNUMBER2STR	32 /* 16 digits, sign, point, and \0 */
@@ -623,4 +623,3 @@
 #define LUA_UNSIGNED u32
 
 #endif
-

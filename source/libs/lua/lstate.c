@@ -47,8 +47,8 @@
 ** created; the seed is used to randomize hashes.
 */
 #if !defined(luai_makeseed)
-#include <time.h>
-#define luai_makeseed()		cast(unsigned int, time(NULL))
+#include <soc/timer.h>
+#define luai_makeseed() cast(unsigned int, get_tmr_us())
 #endif
 
 
