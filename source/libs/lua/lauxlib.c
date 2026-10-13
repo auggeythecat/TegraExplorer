@@ -5,12 +5,11 @@
 */
 
 
-#include <errno.h>
 #include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
+#include <libs/fatfs/ff.h>
+#include <mem/heap.h>
 
 /* This file uses only the official API of Lua.
 ** Any function declared here could be written as an application function.
@@ -205,19 +204,13 @@ LUALIB_API int luaL_error (lua_State *L, const char *fmt, ...) {
 
 
 LUALIB_API int luaL_fileresult (lua_State *L, int stat, const char *fname) {
-  int en = errno;  /* calls to Lua API may change this value */
   if (stat) {
     lua_pushboolean(L, 1);
     return 1;
   }
   else {
-    lua_pushnil(L);
-    if (fname)
-      lua_pushfstring(L, "%s: %s", fname, strerror(en));
-    else
-      lua_pushstring(L, strerror(en));
-    lua_pushinteger(L, en);
-    return 3;
+      // TODO: better error handling here.
+      return 3;
   }
 }
 
@@ -561,7 +554,7 @@ LUALIB_API void luaL_unref (lua_State *L, int t, int ref) {
 
 typedef struct LoadF {
   int n;  /* number of pre-read characters */
-  FILE *f;  /* file being read */
+  FIL *f;  /* file being read */
   char buff[LUAL_BUFFERSIZE];  /* area for reading file */
 } LoadF;
 
@@ -577,33 +570,35 @@ static const char *getF (lua_State *L, void *ud, size_t *size) {
     /* 'fread' can return > 0 *and* set the EOF flag. If next call to
        'getF' called 'fread', it might still wait for user input.
        The next check avoids this problem. */
-    if (feof(lf->f)) return NULL;
-    *size = fread(lf->buff, 1, sizeof(lf->buff), lf->f);  /* read block */
+    if (f_eof(lf->f)) return NULL;
+    if (f_read(lf->f, lf->buff, sizeof(lf->buff), size)) {  /* read block */
+      // TODO: Error handling
+      return NULL;
+    }
   }
   return lf->buff;
 }
 
 
 static int errfile (lua_State *L, const char *what, int fnameindex) {
-  const char *serr = strerror(errno);
-  const char *filename = lua_tostring(L, fnameindex) + 1;
-  lua_pushfstring(L, "cannot %s %s: %s", what, filename, serr);
-  lua_remove(L, fnameindex);
+  // TODO: Better error handling.
   return LUA_ERRFILE;
 }
 
 
 static int skipBOM (LoadF *lf) {
   const char *p = "\xEF\xBB\xBF";  /* Utf8 BOM mark */
-  int c;
+  char c;
   lf->n = 0;
   do {
-    c = getc(lf->f);
+    f_gets(&c, 1, lf->f);
     if (c == EOF || c != *(const unsigned char *)p++) return c;
     lf->buff[lf->n++] = c;  /* to be read by the parser */
   } while (*p != '\0');
   lf->n = 0;  /* prefix matched; discard it */
-  return getc(lf->f);  /* return next character */
+  char r;
+  f_gets(&r, 1, lf->f);
+  return r;  /* return next character */
 }
 
 
@@ -615,18 +610,22 @@ static int skipBOM (LoadF *lf) {
 ** a first-line comment).
 */
 static int skipcomment (LoadF *lf, int *cp) {
-  int c = *cp = skipBOM(lf);
+  char c = *cp = skipBOM(lf);
   if (c == '#') {  /* first line is a comment (Unix exec. file)? */
     do {  /* skip first line */
-      c = getc(lf->f);
+      if (f_gets(&c, 1, lf->f)) {
+        // TODO: Error handling
+      }
     } while (c != EOF && c != '\n') ;
-    *cp = getc(lf->f);  /* skip end-of-line, if present */
+    if (f_gets((char*)cp, 1, lf->f)) { /* skip end-of-line, if present */
+      // TODO: Error handling
+    }
     return 1;  /* there was a comment */
   }
   else return 0;  /* no comment */
 }
 
-
+// TODO: rewrite to ignore stdin possibilities.
 LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
                                              const char *mode) {
   LoadF lf;
@@ -634,26 +633,26 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   int c;
   int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
   if (filename == NULL) {
-    lua_pushliteral(L, "=stdin");
-    lf.f = stdin;
+    // TODO: Error handling, (no stdin)
   }
   else {
     lua_pushfstring(L, "@%s", filename);
-    lf.f = fopen(filename, "r");
+    if (f_open(lf.f, filename, FA_READ)) { /* TODO: Error handling */ }
     if (lf.f == NULL) return errfile(L, "open", fnameindex);
   }
   if (skipcomment(&lf, &c))  /* read initial portion */
     lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
-  if (c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
-    lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
-    if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
-    skipcomment(&lf, &c);  /* re-read initial portion */
-  }
+  // I don't believe fatfs needs to reopen here.
+  // if (c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
+  //   lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
+  //   if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+  //   skipcomment(&lf, &c);  /* re-read initial portion */
+  // }
   if (c != EOF)
     lf.buff[lf.n++] = c;  /* 'c' is the first character of the stream */
   status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode);
-  readstatus = ferror(lf.f);
-  if (filename) fclose(lf.f);  /* close file (even in case of errors) */
+  readstatus = f_error(lf.f);
+  if (filename) f_close(lf.f);  /* close file (even in case of errors) */
   if (readstatus) {
     lua_settop(L, fnameindex);  /* ignore results from `lua_load' */
     return errfile(L, "read", fnameindex);
@@ -923,7 +922,7 @@ static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
     return NULL;
   }
   else
-    return realloc(ptr, nsize);
+    return malloc(nsize); // TODO: remove realloc better.
 }
 
 
