@@ -12,6 +12,7 @@
 /*
 ** if needed, includes windows header before everything else
 */
+#include "libs/fatfs/ff.h"
 #if defined(_WIN32)
 #include <windows.h>
 #endif
@@ -328,9 +329,10 @@ static int ll_loadlib (lua_State *L) {
 
 
 static int readable (const char *filename) {
-  FILE *f = fopen(filename, "r");  /* try to open file */
-  if (f == NULL) return 0;  /* open failed */
-  fclose(f);
+  FIL *f;
+  int res = f_open(f, filename, FA_READ);  /* try to open file */
+  if (f == NULL || res) return 0;  /* open failed */
+  f_close(f);
   return 1;
 }
 

@@ -842,9 +842,9 @@ static void addquoted (lua_State *L, luaL_Buffer *b, int arg) {
     else if (*s == '\0' || iscntrl(uchar(*s))) {
       char buff[10];
       if (!isdigit(uchar(*(s+1))))
-        sprintf(buff, "\\%d", (int)uchar(*s));
+        s_printf(buff, "\\%d", (int)uchar(*s));
       else
-        sprintf(buff, "\\%03d", (int)uchar(*s));
+        s_printf(buff, "\\%03d", (int)uchar(*s));
       luaL_addstring(b, buff);
     }
     else
@@ -911,7 +911,8 @@ static int str_format (lua_State *L) {
       strfrmt = scanformat(L, strfrmt, form);
       switch (*strfrmt++) {
         case 'c': {
-          nb = sprintf(buff, form, luaL_checkint(L, arg));
+          s_printf(buff, form, luaL_checkint(L, arg));
+          nb = strlen(buff);
           break;
         }
         case 'd': case 'i': {
@@ -921,7 +922,8 @@ static int str_format (lua_State *L) {
           luaL_argcheck(L, -1 < diff && diff < 1, arg,
                         "not a number in proper range");
           addlenmod(form, LUA_INTFRMLEN);
-          nb = sprintf(buff, form, ni);
+          s_printf(buff, form, ni);
+          nb = strlen(buff);
           break;
         }
         case 'o': case 'u': case 'x': case 'X': {
@@ -931,7 +933,8 @@ static int str_format (lua_State *L) {
           luaL_argcheck(L, -1 < diff && diff < 1, arg,
                         "not a non-negative number in proper range");
           addlenmod(form, LUA_INTFRMLEN);
-          nb = sprintf(buff, form, ni);
+          s_printf(buff, form, ni);
+          nb = strlen(buff);
           break;
         }
         case 'e': case 'E': case 'f':
@@ -940,7 +943,8 @@ static int str_format (lua_State *L) {
 #endif
         case 'g': case 'G': {
           addlenmod(form, LUA_FLTFRMLEN);
-          nb = sprintf(buff, form, (LUA_FLTFRM_T)luaL_checknumber(L, arg));
+          s_printf(buff, form, (LUA_FLTFRM_T)luaL_checknumber(L, arg));
+          nb = strlen(buff);
           break;
         }
         case 'q': {
@@ -957,7 +961,8 @@ static int str_format (lua_State *L) {
             break;
           }
           else {
-            nb = sprintf(buff, form, s);
+            s_printf(buff, form, s);
+            nb = strlen(buff);
             lua_pop(L, 1);  /* remove result from 'luaL_tolstring' */
             break;
           }
