@@ -26,18 +26,17 @@
 ** these libs are loaded by lua.c and are readily available to any Lua
 ** program
 */
-static const luaL_Reg loadedlibs[] = {
+static const luaL_Reg loadedlibs[] = { // Size of each library, not truly representative because they might use the same external functions.
   {"_G", luaopen_base},
-  // {LUA_LOADLIBNAME, luaopen_package},
-  // {LUA_COLIBNAME, luaopen_coroutine},
-  {LUA_TABLIBNAME, luaopen_table},
+  {LUA_LOADLIBNAME, luaopen_package}, // 4648 Bytes
+  {LUA_COLIBNAME, luaopen_coroutine}, // 2004 Bytes
+  {LUA_TABLIBNAME, luaopen_table},    // 2392 Bytes
   // {LUA_IOLIBNAME, luaopen_io},
   // {LUA_OSLIBNAME, luaopen_os},
-  {LUA_STRLIBNAME, luaopen_string},
-  {LUA_BITLIBNAME, luaopen_bit32},
-  // {LUA_MATHLIBNAME, luaopen_math},
-  // {LUA_DBLIBNAME, luaopen_debug},
-  {NULL, NULL}
+  {LUA_STRLIBNAME, luaopen_string},   // 6704 Bytes
+  {LUA_BITLIBNAME, luaopen_bit32},    // 1080 Bytes
+  {LUA_DBLIBNAME, luaopen_debug},     // 4328 Bytes
+  {NULL, NULL}                        // 21156 Bytes in total.
 };
 
 

@@ -5,7 +5,6 @@
 */
 
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -355,9 +354,9 @@ static int db_debug (lua_State *L) {
   for (;;) {
     char buffer[250];
     luai_writestringerror("%s", "lua_debug> ");
-    if (fgets(buffer, sizeof(buffer), stdin) == 0 ||
-        strcmp(buffer, "cont\n") == 0)
-      return 0;
+    // if (fgets(buffer, sizeof(buffer), stdin) == 0 ||
+        // strcmp(buffer, "cont\n") == 0)
+      // return 0;
     if (luaL_loadbuffer(L, buffer, strlen(buffer), "=(debug command)") ||
         lua_pcall(L, 0, 0, 0))
       luai_writestringerror("%s\n", lua_tostring(L, -1));
