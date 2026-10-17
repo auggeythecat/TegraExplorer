@@ -31,8 +31,8 @@ static const luaL_Reg loadedlibs[] = { // Size of each library, not truly repres
   {LUA_LOADLIBNAME, luaopen_package}, // 4648 Bytes
   {LUA_COLIBNAME, luaopen_coroutine}, // 2004 Bytes
   {LUA_TABLIBNAME, luaopen_table},    // 2392 Bytes
-  // {LUA_IOLIBNAME, luaopen_io},
-  // {LUA_OSLIBNAME, luaopen_os},
+  // {LUA_FSLIBNAME, luaopen_filesystem},// 0000 Bytes
+  // {LUA_SYSLIBNAME, luaopen_system},   // 0000 Bytes
   {LUA_STRLIBNAME, luaopen_string},   // 6704 Bytes
   {LUA_BITLIBNAME, luaopen_bit32},    // 1080 Bytes
   {LUA_DBLIBNAME, luaopen_debug},     // 4328 Bytes
