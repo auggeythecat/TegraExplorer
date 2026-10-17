@@ -37,8 +37,6 @@ typedef struct _teError_t {
     const char* moduleName;
 } teError_t;
 
-#define GETMACRONAME(name) #name
-
 #define TE_MAKE_ERROR(error_module, error_code, color) \
 ((teError_t) {                                         \
     .module      = (error_module),                     \
@@ -46,6 +44,31 @@ typedef struct _teError_t {
     .accentColor = (color),                            \
     .moduleName  = (error_module##_NAME)               \
 })
+
+#define E_IS_SUCCESS(error) { (error == TE_SUCCESS) || (error.code == 0) }
+#define E_IS_FAILURE(error) { (error != TE_SUCCESS) || (error.code != 0) }
+
+#define      E_DISCARD(expr) { (void)(expr);         }
+#define          E_SUCCESS() { E_RETURN(TE_SUCCESS); }
+
+#define         E_SHOW_UNLESS(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) { drawError(error); } }
+#define       E_RETURN_UNLESS(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) {  E_RETURN(error); } }
+#define              E_ASSERT(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) { drawError(error); } }
+
+#define E_RETURN_ERROR_UNLESS(expr, error) { if ( (expr) ) {  E_RETURN(error); } }
+#define   E_SHOW_ERROR_UNLESS(expr, error) { if ( (expr) ) { drawError(error); } }
+#define        E_ASSERT_ERROR(expr, error) { if ( (expr) ) { drawError(error); } }
+
+#define         E_SHOW_UNLESS_ABORT(expr       ) {         E_SHOW_UNLESS(expr       ); powerOff(); }
+#define       E_RETURN_UNLESS_ABORT(expr       ) {       E_RETURN_UNLESS(expr       ); powerOff(); }
+#define              E_ASSERT_ABORT(expr       ) {              E_ASSERT(expr       ); powerOff(); }
+
+#define E_RETURN_ERROR_UNLESS_ABORT(expr, error) { E_RETURN_ERROR_UNLESS(expr, error); powerOff(); }
+#define   E_SHOW_ERROR_UNLESS_ABORT(expr, error) {   E_SHOW_ERROR_UNLESS(expr, error); powerOff(); }
+#define        E_ASSERT_ERROR_ABORT(expr, error) {        E_ASSERT_ERROR(expr, error); powerOff(); }
+
+
+
 
 /* Success */
 #define TE_SUCCESS 0
@@ -251,14 +274,18 @@ typedef struct _teError_t {
 // The requested payload file is not found.
 # define TE_ERROR_GENERAL_PAYLOAD_TOO_LARGE   TE_MAKE_ERROR(TE_ERROR_GENERAL_MODULE, 4, COLOR_YELLOW_ORANGE) // Module 6, Error code 4
 // The payload file attempted to be launched is too large.
+# define TE_ERROR_GENERAL_VIC_TIMEOUT         TE_MAKE_ERROR(TE_ERROR_GENERAL_MODULE, 5, COLOR_YELLOW_ORANGE) // Module 6, Error code 5
+// Time timeout was reached in VIC wait idle. Wait, how is this going to be displayed?
 
 #define TE_ERROR_TEGRAEXPLORER_MODULE      7 // Module 7, 0x07
 #define TE_ERROR_TEGRAEXPLORER_MODULE_NAME "Tegraexplorer"
 // Offset relative to zero for where TegraExplorer error definitions start.
 # define TE_ERROR_TEGRAEXPLORER_REACHED_BOTTOM_MENU TE_MAKE_ERROR(TE_ERROR_TEGRAEXPLORER_MODULE, 1, COLOR_YELLOW_ORANGE) // Module 7, Error code 1
 // The menu system attempted to render the -1th menu, (is the main menu an overlay?).
-# define TE_ERROR_TEGRAEXPLORER_OUT_OF_MENUS        TE_MAKE_ERROR(TE_ERROR_TEGRAEXPLORER_MODULE, 2, COLOR_YELLOW_ORANGE) // Module 7, Error code 2
+# define TE_ERROR_TEGRAEXPLORER_POP_BOTTOM_MENU     TE_MAKE_ERROR(TE_ERROR_TEGRAEXPLORER_MODULE, 2, COLOR_YELLOW       ) // Module 7, Error code 2
 // The main menu was attempted to be popped.
+# define TE_ERROR_TEGRAEXPLORER_OUT_OF_MENUS        TE_MAKE_ERROR(TE_ERROR_TEGRAEXPLORER_MODULE, 2, COLOR_YELLOW_ORANGE) // Module 7, Error code 3
+// There are too many menus loaded, no more can be.
 
 /* Exceptions */
 #define TE_EXCEPTION_MODULE      255 // Module 255, or 0xFF
@@ -277,6 +304,5 @@ typedef struct _teError_t {
 
 void drawError(teError_t error);
 // TODO: Add more context (ie, pc, stack, etc.)
-// TODO: Add ams-like error handling macros.
 
 #endif //_ERROR_H
