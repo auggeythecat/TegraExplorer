@@ -36,7 +36,6 @@
 
 #define UB_FUNCTION_POINTER_HACK 1
 
-
 #define DEBUG_UART_PORT_A 0
 #define DEBUG_UART_PORT_B 1
 #define DEBUG_UART_PORT_C 2
