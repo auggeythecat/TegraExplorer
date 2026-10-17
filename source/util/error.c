@@ -26,11 +26,10 @@
 #endif
 #include "hid.h"
 
-// TODO: Proper centering.
-#define OUTER_START_X(fontSize) (16 * (fontSize))
-#define OUTER_START_Y(fontSize) (15 * (fontSize))
-#define  OUTER_LENGTH(fontSize) (48 * (fontSize))
-#define  OUTER_HEIGHT(fontSize) (14 * (fontSize))
+#define  OUTER_LENGTH(fontSize) (36 * (fontSize))
+#define  OUTER_HEIGHT(fontSize) (13 * (fontSize))
+#define OUTER_START_X(fontSize) ((SCREEN_WIDTH  - OUTER_LENGTH(fontSize)) / 2)
+#define OUTER_START_Y(fontSize) ((SCREEN_HEIGHT - OUTER_HEIGHT(fontSize)) / 2)
 #define   OUTER_END_X(fontSize) (OUTER_START_X(fontSize) + OUTER_LENGTH(fontSize))
 #define   OUTER_END_Y(fontSize) (OUTER_START_Y(fontSize) + OUTER_HEIGHT(fontSize))
 
@@ -50,24 +49,28 @@
 #define FOOTER_X(fontSize, length) (INNER_START_X(fontSize) + ((INNER_LENGTH(fontSize) - (fontSize * length)) / 2))
 #define FOOTER_Y(fontSize)         (  INNER_END_Y(fontSize) - fontSize*2)
 
-void drawError(const teError_t error, const char* file, const u32 line) {
-    if (error.code == 0) return;
+static __attribute__((always_inline)) u32 _getLR() {
+    u32 lr = 0;
+    asm volatile("mov %[lr], lr\n\t" : [lr]"=&r"(lr) : :);
+    return lr;
+}
 
-    u32 accentColor = COLOR_YELLOW_ORANGE;
-    // Make exceptions stand out.
-    if (error.module == TE_EXCEPTION_MODULE) accentColor = COLOR_RED;
+void drawError(const teError_t error) {
+    if (error.code == 0) return;
 
     const u32 size = gfxCon.fntsz;
 
-    gfxBoxARGB(OUTER_START_X(size), OUTER_START_Y(size), OUTER_END_X(size), OUTER_END_Y(size), accentColor);
-    gfxBoxARGB(INNER_START_X(size), INNER_START_Y(size), INNER_END_X(size), INNER_END_Y(size), COLOR_DEFAULT);
+    gfxBoxARGB(OUTER_START_X(size), OUTER_START_Y(size), OUTER_END_X(size), OUTER_END_Y(size), error.accentColor);
+    gfxBoxARGB(INNER_START_X(size), INNER_START_Y(size), INNER_END_X(size), INNER_END_Y(size), COLOR_BG);
+
+    SETCOLOR(error.accentColor, COLOR_BG);
 
     const char* titleString = "An error occurred!";
     gfxConSetPos(TITLE_X(size, strlen(titleString)), TITLE_Y(size));
     gfxPutS(titleString);
 
     gfxConSetPos(BODY_X(size), BODY_Y(size));
-    gfxPrintF("%NModule: %d%nCode  : %d%nLine  : %d%nFile  : %s", gfxCon.x, error.module, error.code, line, file);
+    gfxPrintF("%NModule: %s (%d)%nCode  : %d%nAddr  : %x", gfxCon.x, error.moduleName, error.module, error.code, _getLR());
 
     const char* footerString = "Press A to continue.";
     gfxConSetPos(FOOTER_X(size, strlen(footerString)), FOOTER_Y(size));
