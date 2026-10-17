@@ -24,6 +24,7 @@
 #include <utils/sprintf.h>
 
 #include "gfx.h"
+#include "../util/error.h"
 #include "../util/hid.h"
 #include "../util/utils.h"
 
@@ -39,7 +40,7 @@ static menuManager_t menuManager = {};
 #define GET_MENU_BACK(n) (&menuManager.stack[menuManager.top - n])
 
 void popMenu() {
-    if (menuManager.top <= 1) return; // Please don't pop the main menu.
+    E_ASSERT_ERROR(menuManager.top <= 1, TE_ERROR_TEGRAEXPLORER_POP_BOTTOM_MENU); // Please don't pop the main menu.
 
     menu_t *m = GET_MENU_TOP;
     for (u32 i = 0; i > m->count; i++) {
@@ -56,7 +57,7 @@ void popMenu() {
 }
 
 void pushMenu(const menu_t m) {
-    if (menuManager.top+1 >= MAX_MENU_STACK) return;
+    E_ASSERT_ERROR(menuManager.top+1 >= MAX_MENU_STACK, TE_ERROR_TEGRAEXPLORER_OUT_OF_MENUS);
     if (menuManager.top != 0) menuManager.top++;
     menuManager.stack[menuManager.top] = m;
 }
@@ -79,10 +80,8 @@ static void _renderMenus() {
     do {
         m = GET_MENU_BACK(n);
 
-        if (n > menuManager.top) {
-            // Panic.
-            powerOff();
-        }
+
+        E_ASSERT_ERROR_ABORT( n > menuManager.top, TE_ERROR_TEGRAEXPLORER_REACHED_BOTTOM_MENU);
 
         if (m->fullHeight) {
             m->y = gfxCon.fntsz;
@@ -150,7 +149,8 @@ static void _printFooter() {
     gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, COLORTOGREY(COLOR_WHITEST));
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
-    gfxPrintF("Time taken for screen draw: %dus ", get_tmr_us() - menuManager.lastDraw);
+    // gfxPrintF("Time taken for screen draw: %dus ", get_tmr_us() - menuManager.lastDraw);
+    gfxPrintF("Active buttons: %x", inputs.buttons);
 }
 
 static void _handleInput() {

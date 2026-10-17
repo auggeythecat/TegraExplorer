@@ -32,12 +32,10 @@ input_t *hidRead() {
     inputs.buttons = 0;
 
 #if QEMU_TESTING
-    while (!inputs.buttons) {
+    // while (!inputs.buttons) {
         uart_wait_xfer(DEBUG_UART_PORT, UART_TX_IDLE);
         uart_recv(DEBUG_UART_PORT, (u8*)&inputs.buttons, 4);
-    }
-
-    uart_send(DEBUG_UART_PORT, "RECV\r\t", 6);
+    // }
 #else
     u16 LbaseX = 0;
     u16 LbaseY = 0;

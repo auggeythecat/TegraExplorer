@@ -30,6 +30,7 @@
 #include "libs/lua/lua.h"
 #include "libs/lua/lualib.h"
 #include "menus/testMenu.h"
+#include "util/error.h"
 #include "util/hid.h"
 
 #if USE_VIC
@@ -51,8 +52,8 @@ static void _displayInit() {
     vic_init();
     vic_set_surface(&vic_sfc);
 
-    vic_compose();
-    vic_wait_idle();
+    E_SHOW_ERROR_UNLESS(vic_compose(),   TE_ERROR_GENERAL_VIC_TIMEOUT);
+    E_SHOW_ERROR_UNLESS(vic_wait_idle(), TE_ERROR_GENERAL_VIC_TIMEOUT);
 
     display_init_window_a_pitch_vic();
     gfxInitCtxt((u32 *)NYX_FB2_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH);
@@ -72,6 +73,8 @@ static void _displayInit() {
 #if SDF_FONT
     gfxBakeAtlas(8);
 #endif
+
+    gfxClearGrey(COLORTOGREY(COLOR_BG));
 }
 
 extern void pivot_stack(u32 stack_top);
