@@ -23,6 +23,8 @@ BDKDIR    := bdk
 BDKINC    := -I./$(BDKDIR)
 DECOMPDIR := decompressor
 DECOMPINC := -I./$(DECOMPDIR)
+CONFIGFIL := $(SOURCEDIR)/configuration.h
+CONFIGINC := -include ./$(CONFIGFIL)
 
 LDRDIR    := $(wildcard loader)
 TOOLSLZMA := $(wildcard tools/tinyLZMA)
@@ -119,7 +121,7 @@ $(BUILDDIR)/$(TARGET)/$(TARGET).elf: $(OBJS)
 
 $(BUILDDIR)/$(TARGET)/%.o: %.c
 	@mkdir -p "$(@D)"
-	$(CC) $(CFLAGS) $(BDKINC) $(DECOMPINC) -c $< -o $@
+	$(CC) $(CFLAGS) $(BDKINC) $(DECOMPINC) $(CONFIGINC) -c $< -o $@
 
 $(BUILDDIR)/$(TARGET)/%.o: %.S
 	@mkdir -p "$(@D)"

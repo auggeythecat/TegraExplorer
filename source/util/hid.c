@@ -19,22 +19,32 @@
 
 #include <input/joycon.h>
 
-#include "utils/btn.h"
+#include <soc/uart.h>
+#include <utils/btn.h>
+
+#include "utils.h"
 
 input_t inputs     = {0};
 input_t lastInputs = {0};
 
-static u16 LbaseX = 0;
-static u16 LbaseY = 0;
-static u16 RbaseX = 0;
-static u16 RbaseY = 0;
-
 input_t *hidRead() {
     lastInputs = inputs;
-    const jc_gamepad_rpt_t *controller = joycon_poll();
-
     inputs.buttons = 0;
 
+#if QEMU_TESTING
+    while (!inputs.buttons) {
+        uart_wait_xfer(DEBUG_UART_PORT, UART_TX_IDLE);
+        uart_recv(DEBUG_UART_PORT, (u8*)&inputs.buttons, 4);
+    }
+
+    uart_send(DEBUG_UART_PORT, "RECV\r\t", 6);
+#else
+    u16 LbaseX = 0;
+    u16 LbaseY = 0;
+    u16 RbaseX = 0;
+    u16 RbaseY = 0;
+
+    const jc_gamepad_rpt_t *controller = joycon_poll();
     if (controller != NULL) {
         inputs.buttons = controller->buttons;
 
@@ -71,6 +81,7 @@ input_t *hidRead() {
     inputs.down    = inputs.down || inputs.volDown;
     inputs.a       = inputs.a    || inputs.power  ;
 
+#endif
     return &inputs;
 }
 
@@ -92,15 +103,7 @@ input_t *hidWaitMask(const u32 mask) {
 }
 
 input_t *hidWait() {
-    input_t *in = hidRead();
-
-    while (in->buttons)
-        in = hidRead();
-
-    while (!in->buttons)
-        in = hidRead();
-
-    return in;
+    return hidWaitMask(0xFFFFFFFF);
 }
 
 bool hidConnected() {

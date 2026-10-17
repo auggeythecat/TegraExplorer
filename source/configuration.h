@@ -27,13 +27,26 @@
 #define SDF_FONT 1
 
 #if SDF_FONT
-#undef BITMAP_FONT
-#define BITMAP_FONT 1
+# undef BITMAP_FONT
+# define BITMAP_FONT 1
 
-#define SDF_BUFFER NYX_RES_ADDR
-#define SDF_PADDING 1
+# define SDF_BUFFER NYX_RES_ADDR
+# define SDF_PADDING 1
 #endif
 
 #define UB_FUNCTION_POINTER_HACK 1
+
+
+#define DEBUG_UART_PORT_A 0
+#define DEBUG_UART_PORT_B 1
+#define DEBUG_UART_PORT_C 2
+
+#define QEMU_TESTING 1
+
+#if QEMU_TESTING
+# define DEBUG_UART_PORT     DEBUG_UART_PORT_A
+# define DEBUG_UART_INVERT   1
+# define DEBUG_UART_BAUDRATE 115200
+#endif
 
 #endif //_CONFIGURATION_H
