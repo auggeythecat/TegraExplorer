@@ -158,45 +158,6 @@ static void _handleInput() {
     menuEntry_t* entry = &m->entries[m->cursorIndex];
 
     while (hidRead()) {
-        if (RE_INPUT_DETECTION(JOYPLUS)) {
-            if (gfx_con.fntsz < 24) gfxConSetFontSize(gfx_con.fntsz += 1);
-            menuManager.fullRedraw = true;
-            break;
-        }
-
-        if (RE_INPUT_DETECTION(JOYMINUS)) {
-            if (gfx_con.fntsz > 8) gfxConSetFontSize(gfx_con.fntsz -= 1);
-            menuManager.fullRedraw = true;
-            break;
-        }
-
-        if (RE_INPUT_DETECTION(JOYHOME)) {
-            launchPayload("sd:/bootloader/update.bin");
-            break;
-        }
-
-        if (RE_INPUT_DETECTION(JOYA)) {
-#if UB_FUNCTION_POINTER_HACK
-            entry->handler(entry->data);
-#else
-            entry->handleWithArgs ?
-            entry->__handler.with_arg(entry->data) :
-            entry->__handler.no_arg  (           ) ;
-#endif
-            break;
-        }
-
-        if (RE_INPUT_DETECTION(JOYB)) {
-            popMenu();
-            break;
-        }
-
-        if (RE_INPUT_DETECTION(JOYX)) {
-            if (entry->selectable) entry->selected = ~entry->selected;
-            entry->renderDirty = true;
-            break;
-        }
-
         if (RE_INPUT_DETECTION(JOYLDOWN)) {
             while (m->entries[m->cursorIndex+1].type != ENTRY_END) {
                 m->cursorIndex++;
@@ -228,7 +189,45 @@ static void _handleInput() {
             }
             break;
         }
-    }
+
+        if (RE_INPUT_DETECTION(JOYA)) {
+#if UB_FUNCTION_POINTER_HACK
+            entry->handler(entry->data);
+#else
+            entry->handleWithArgs ?
+            entry->__handler.with_arg(entry->data) :
+            entry->__handler.no_arg  (           ) ;
+#endif
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYB)) {
+            popMenu();
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYX)) {
+            if (entry->selectable) entry->selected = ~entry->selected;
+            entry->renderDirty = true;
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYPLUS)) {
+            if (gfx_con.fntsz < 24) gfxConSetFontSize(gfx_con.fntsz += 1);
+            menuManager.fullRedraw = true;
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYMINUS)) {
+            if (gfx_con.fntsz > 8) gfxConSetFontSize(gfx_con.fntsz -= 1);
+            menuManager.fullRedraw = true;
+            break;
+        }
+
+        if (RE_INPUT_DETECTION(JOYHOME)) {
+            launchPayload("sd:/bootloader/update.bin");
+            break;
+        }
 }
 
 void renderMenuTop() {
