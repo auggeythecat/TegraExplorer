@@ -71,8 +71,8 @@ typedef struct _teError_t {
 
 
 /* Success */
-#define TE_SUCCESS 0
-//This shouldn't need a comment.
+#define TE_SUCCESS TE_MAKE_ERROR(0, 1, COLOR_GREEN) // Module 0, error 0
+// This shouldn't need a comment.
 
 /* FatFS errors */
 #define TE_ERROR_FATFS_MODULE 0
