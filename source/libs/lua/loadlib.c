@@ -329,7 +329,7 @@ static int ll_loadlib (lua_State *L) {
 
 
 static int readable (const char *filename) {
-  FIL *f;
+  FIL *f = NULL;
   int res = f_open(f, filename, FA_READ);  /* try to open file */
   if (f == NULL || res) return 0;  /* open failed */
   f_close(f);

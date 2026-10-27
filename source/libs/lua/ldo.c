@@ -124,6 +124,8 @@ l_noret luaD_throw (lua_State *L, int errcode) {
         bpmp_halt(); // TODO: better solution.
     }
   }
+
+  __builtin_unreachable();
 }
 
 
