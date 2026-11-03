@@ -591,8 +591,7 @@ static int skipBOM (LoadF *lf) {
   char c;
   lf->n = 0;
   do {
-    f_gets(&c, 1, lf->f);
-    if (c == EOF || c != *(const unsigned char *)p++) return c;
+    if (!f_gets(&c, 1, lf->f) || c != *(const unsigned char *)p++) return c;
     lf->buff[lf->n++] = c;  /* to be read by the parser */
   } while (*p != '\0');
   lf->n = 0;  /* prefix matched; discard it */
@@ -613,11 +612,11 @@ static int skipcomment (LoadF *lf, int *cp) {
   char c = *cp = skipBOM(lf);
   if (c == '#') {  /* first line is a comment (Unix exec. file)? */
     do {  /* skip first line */
-      if (f_gets(&c, 1, lf->f)) {
+      if (!f_gets(&c, 1, lf->f)) {
         // TODO: Error handling
       }
-    } while (c != EOF && c != '\n') ;
-    if (f_gets((char*)cp, 1, lf->f)) { /* skip end-of-line, if present */
+    } while (c != '\n') ;
+    if (!f_gets((char*)cp, 1, lf->f)) { /* skip end-of-line, if present */
       // TODO: Error handling
     }
     return 1;  /* there was a comment */

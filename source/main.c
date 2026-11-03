@@ -95,7 +95,7 @@ void iplMain() {
     hidInit();
 
     volatile lua_State* luastate = lua_newstate(NULL, NULL);
-    luaL_openlibs(luastate);
+    luaL_openlibs((lua_State*)luastate);
 
     while (true)
         renderMenuTop();

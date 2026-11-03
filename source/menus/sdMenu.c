@@ -93,10 +93,11 @@ void pushsdMenu(char* path) {
         char caption[128];
         const u32 numLength = log10Approximation(files[j].fsize);
 
-        s_printf(caption, isDir ? "%c|%s" : "%c|%s %d%c",
+        s_printf(caption,
+            isDir ? "%c|%s" : "%c|%s %d%c",
             isDir ? GFX_CHAR_FOLDER : GFX_CHAR_FILE,
             isDir ? path : path,
-            isDir ? : (u32)(files[j].fsize / uintPow(10, numLength - 1)),
+            isDir ? : (s32)(files[j].fsize / uintPow(10, numLength - 1)),
             isDir ? : fileSize[numLength / 3]
         );
 

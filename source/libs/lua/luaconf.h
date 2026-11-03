@@ -602,7 +602,7 @@
 
 // Don't define this, but it felt wrong to not have it here.
 // #define LUA_NUMBER_DOUBLE
-#define LUA_NUMBER     u32
+#define LUA_NUMBER     s32
 #define LUAI_UACNUMBER u32
 
 #include <utils/sprintf.h>
