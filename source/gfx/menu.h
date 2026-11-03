@@ -146,9 +146,6 @@ typedef struct _menu_t {
     union {
         struct {
             u32 isOverlay:1;
-            u32 printHeader:1;
-            u32 printFooter:1;
-
             u32 renderDirty:1;
             u32 titleStatic:1;
         };

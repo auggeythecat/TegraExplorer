@@ -222,16 +222,12 @@ void renderMenuTop() {
         gfxPutC('\n');
     }
 
-    if (m->printFooter)
-        _printFooter();
-    if (m->printHeader)
-        _printHeader();
+    _printFooter();
+    _printHeader();
 
 #if USE_VIC
     vic_compose();
 #endif
-
-    m->renderDirty = false;
 
     _handleInput();
 }
