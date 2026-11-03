@@ -133,13 +133,13 @@ static void _handleInput() {
     while (hidRead()) {
         if (RE_INPUT_DETECTION(JOYPLUS)) {
             if (gfx_con.fntsz < 24) gfxConSetFontSize(gfx_con.fntsz += 1);
-            m->renderDirty = true;
+            menuManager.fullRedraw = true;
             break;
         }
 
         if (RE_INPUT_DETECTION(JOYMINUS)) {
             if (gfx_con.fntsz > 8) gfxConSetFontSize(gfx_con.fntsz -= 1);
-            m->renderDirty = true;
+            menuManager.fullRedraw = true;
             break;
         }
 
