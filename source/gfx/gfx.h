@@ -99,7 +99,7 @@ void __attribute__((target("arm"))) gfxPutC(char c);
 void gfxPutS(const char *s);
 void gfxPutSSmall(const char *s);
 void gfxCPutS(u32 color, const char *s);
-void gfxPutSLimit(const char *s, u32 limit);
+void gfxPutSLimit(const char *s, u32 charLimit);
 void gfxVPrintF(const char *fmt, va_list ap);
 void gfxPrintF(const char *fmt, ...); void gfx_printf(const char *fmt, ...);
 void gfxSetPixel(u32 x, u32 y, u32 color);

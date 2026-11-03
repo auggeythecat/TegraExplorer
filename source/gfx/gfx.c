@@ -398,12 +398,11 @@ void gfxCPutS(const u32 color, const char *s) {
     gfxCon.fgcol = COLOR_DEFAULT;
 }
 
-void gfxPutSLimit(const char *s, const u32 limit){
+void gfxPutSLimit(const char *s, u32 charLimit) {
     if (!s || gfxCon.mute)
         return;
 
     const u32 len = strlen(s);
-    u32 charLimit = limit / gfxCon.fntsz;
 
     if (charLimit > len) {
         gfxPutS(s);
