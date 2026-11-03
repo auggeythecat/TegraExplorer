@@ -109,7 +109,7 @@ static void _printHeader() {
     // (ie, add multiple spaces before the text, since that would just throw the bg color into the fb)
     gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0xFF);
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
-    gfxConSetPos(0,0);
+    gfxConSetPos(0, 0);
     gfxPrintF("TegraExplorer version %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
 
     const u16 itemsPerPage = (m->h           / gfxCon.fntsz)    ;
