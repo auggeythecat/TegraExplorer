@@ -29,6 +29,15 @@
 #include "../gfx/gfx.h"
 #include "../util/vector.h"
 #include "../util/utils.h"
+#include "../util/math.h"
+
+// TODO: Decide on how I should format this.
+static char fileSize[4] = {
+    'B', // or "B",   or "  B", or " B", or something else
+    'K', // or "KiB", or "KiB", or "KB", or something else
+    'M', // or "MiB", or "MiB", or "MB", or something else
+    'G', // or "GiB", or "GiB", or "GB", or something else
+};
 
 static vector_t _listDirs(const char* path) {
     int res = 0;
@@ -63,25 +72,40 @@ out:
 }
 
 void pushsdMenu(char* path) {
-    u32 i = 0;
-
     FILINFO* files = _listDirs(path);
     if (!files) return;
 
-    menuEntry_t* entries = (menuEntry_t*)malloc(sizeof(menuEntry_t) * (vecGetCount(files)+3));
+    const u32 fileCount = vecGetCount(files);
+
+    menuEntry_t* entries = (menuEntry_t*)malloc((fileCount + 4) * sizeof(menuEntry_t));
     if (!entries) goto out;
 
+    u32 i = 0;
     entries[i++] = ENT_SEPARATOR();
     entries[i++] = ENT_BACK(COLOR_ORANGE, "<- Back");
+    entries[i++] = ENT_HANDLER(COLOR_LIGHT_GREY, "Special function button", powerOff);
 
     for (u32 j = 0; j < vecGetCount(files); i++, j++) {
-                                // First %s      /                  Second %s
-        char* fullPath = malloc(strlen(path) + (sizeof(char*)*1) + strlen(files[j].fname));
+        bool isDir = files[j].fattrib & AM_DIR;
+        char fullPath[FF_MAX_LFN + 10]; // I think sd:/ wouldn't be counted, so I'm just going to add 10 to be safe.
         s_printf(fullPath, "%s/%s", path, files[j].fname);
 
-        entries[i] = files[j].fattrib & AM_DIR ?
-        ENT_DIRECTORY(COLOR_GREEN, files[j].fname, pushsdMenu, fullPath) :
-        ENT_FILE(     COLOR_BLUE , files[j].fname, powerOff  , fullPath) ;
+        char caption[128];
+        const u32 numLength = log10Approximation(files[j].fsize);
+
+        s_printf(caption, isDir ? "%c|%s" : "%c|%s %d%c",
+            isDir ? GFX_CHAR_FOLDER : GFX_CHAR_FILE,
+            isDir ? path : path,
+            isDir ? : (u32)(files[j].fsize / uintPow(10, numLength - 1)),
+            isDir ? : fileSize[numLength / 3]
+        );
+
+        entries[i] = ENT_HANDLER_EX(
+            isDir ? COLOR_GREEN : COLOR_BLUE,
+            caption,
+            isDir ? CAST_HANDLER(pushsdMenu) : CAST_HANDLER(powerOff), // TODO:
+            fullPath
+        );
     }
 
     entries[i] = ENT_END();
@@ -96,10 +120,9 @@ void pushsdMenu(char* path) {
         .h     = SCREEN_HEIGHT,
 
         .isOverlay   = false,
-        .printHeader = true,
-        .printFooter = true,
         .renderDirty = true,
-        .titleStatic = true
+        .titleStatic = true,
+        .fullHeight  = true
     };
 
     pushMenu(sdMenu);

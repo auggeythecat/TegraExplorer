@@ -67,15 +67,6 @@ typedef struct _menuEntry_t {
             u32 selectable:1;
             u32 highlighted:1;
 
-            u32 showIcon:1;
-            u32 icon:1;
-
-            u32 showSize:1;
-            u32 fileSizeIndex:2;
-            u32 fileSize:10;
-            // It only needs to be 10, since the max value is 4GiB,
-            // and the longest value would be 1023M/K/iB
-
             u32 captionStatic:1;
 #if UB_FUNCTION_POINTER_HACK
             u32 reserved:11;
@@ -90,6 +81,7 @@ typedef struct _menuEntry_t {
 
 #if UB_FUNCTION_POINTER_HACK
 # define ARG_HANDLER_TYPE (void(*)(void*))
+# define CAST_HANDLER(x) ARG_HANDLER_TYPE(x)
 
 # define        ENT_END_OPTIONS { .renderDirty = 1, .captionStatic = 1, .skip = 1, .hide = 1                                     }
 # define  ENT_SEPARATOR_OPTIONS { .renderDirty = 1, .captionStatic = 1, .skip = 1, .hide = 1                                     }
@@ -97,8 +89,6 @@ typedef struct _menuEntry_t {
 # define    ENT_HANDLER_OPTIONS { .renderDirty = 1, .captionStatic = 1,                                                          }
 # define ENT_HANDLER_EX_OPTIONS { .renderDirty = 1, .captionStatic = 1,                                                          }
 # define       ENT_MENU_OPTIONS { .renderDirty = 1, .captionStatic = 1,                                                          }
-# define  ENT_DIRECTORY_OPTIONS { .renderDirty = 1, .captionStatic = 0, .showIcon = 1, .icon = 0, .selectable = 1                }
-# define       ENT_FILE_OPTIONS { .renderDirty = 1, .captionStatic = 0, .showIcon = 1, .icon = 1, .selectable = 1, .showSize = 1 }
 # define       ENT_BACK_OPTIONS { .renderDirty = 1, .captionStatic = 1,                                                          }
 
 #define        ENT_END(                             ) (menuEntry_t) { ENTRY_END       , 0      , COLOR_NONE, NULL                    , NULL, ENT_END_OPTIONS        }
@@ -107,8 +97,6 @@ typedef struct _menuEntry_t {
 #define    ENT_HANDLER(color, caption, handler      ) (menuEntry_t) { ENTRY_HANDLER   , caption, color     , ARG_HANDLER_TYPE handler, NULL, ENT_HANDLER_OPTIONS    }
 #define ENT_HANDLER_EX(color, caption, handler, data) (menuEntry_t) { ENTRY_HANDLER_EX, caption, color     , ARG_HANDLER_TYPE handler, data, ENT_HANDLER_EX_OPTIONS }
 #define       ENT_MENU(color, caption, handler, data) (menuEntry_t) { ENTRY_MENU      , caption, color     , ARG_HANDLER_TYPE handler, data, ENT_MENU_OPTIONS       }
-#define  ENT_DIRECTORY(color, caption, handler, data) (menuEntry_t) { ENTRY_DIRECTORY , caption, color     , ARG_HANDLER_TYPE handler, data, ENT_DIRECTORY_OPTIONS  }
-#define       ENT_FILE(color, caption, handler, data) (menuEntry_t) { ENTRY_FILE      , caption, color     , ARG_HANDLER_TYPE handler, data, ENT_FILE_OPTIONS       }
 #define       ENT_BACK(color, caption               ) (menuEntry_t) { ENTRY_BACK      , caption, color     , ARG_HANDLER_TYPE popMenu, NULL, ENT_BACK_OPTIONS       }
 
 #else
@@ -121,8 +109,6 @@ typedef struct _menuEntry_t {
 # define    ENT_HANDLER_OPTIONS { .renderDirty = 1, .captionStatic = 1, .handleWithArgs = 0                                                           }
 # define ENT_HANDLER_EX_OPTIONS { .renderDirty = 1, .captionStatic = 1, .handleWithArgs = 1                                                           }
 # define       ENT_MENU_OPTIONS { .renderDirty = 1, .captionStatic = 1, .handleWithArgs = 1                                                           }
-# define  ENT_DIRECTORY_OPTIONS { .renderDirty = 1, .captionStatic = 0, .handleWithArgs = 1, .showIcon = 1, .icon = 0, .selectable = 1                }
-# define       ENT_FILE_OPTIONS { .renderDirty = 1, .captionStatic = 0, .handleWithArgs = 1, .showIcon = 1, .icon = 1, .selectable = 1, .showSize = 1 }
 # define       ENT_BACK_OPTIONS { .renderDirty = 1, .captionStatic = 1,                                                                               }
 
 #define        ENT_END(                             ) (menuEntry_t) { ENTRY_END       , 0      , COLOR_NONE, { NULL                                 }, NULL, ENT_END_OPTIONS        }
@@ -131,8 +117,6 @@ typedef struct _menuEntry_t {
 #define    ENT_HANDLER(color, caption, handler      ) (menuEntry_t) { ENTRY_HANDLER   , caption, color     , { .no_arg   =     HANDLER_TYPE handler }, NULL, ENT_HANDLER_OPTIONS    }
 #define ENT_HANDLER_EX(color, caption, handler, data) (menuEntry_t) { ENTRY_HANDLER_EX, caption, color     , { .with_arg = ARG_HANDLER_TYPE handler }, data, ENT_HANDLER_EX_OPTIONS }
 #define       ENT_MENU(color, caption, handler, data) (menuEntry_t) { ENTRY_MENU      , caption, color     , { .with_arg = ARG_HANDLER_TYPE handler }, data, ENT_MENU_OPTIONS       }
-#define  ENT_DIRECTORY(color, caption, handler, data) (menuEntry_t) { ENTRY_DIRECTORY , caption, color     , { .with_arg = ARG_HANDLER_TYPE handler }, data, ENT_DIRECTORY_OPTIONS  }
-#define       ENT_FILE(color, caption, handler, data) (menuEntry_t) { ENTRY_FILE      , caption, color     , { .with_arg = ARG_HANDLER_TYPE handler }, data, ENT_FILE_OPTIONS       }
 #define       ENT_BACK(color, caption               ) (menuEntry_t) { ENTRY_BACK      , caption, color     , { NULL                                 }, NULL, ENT_BACK_OPTIONS       }
 
 #endif
@@ -148,6 +132,7 @@ typedef struct _menu_t {
             u32 isOverlay:1;
             u32 renderDirty:1;
             u32 titleStatic:1;
+            u32 fullHeight:1; // Bad name, but I can't think of anything better.
         };
         u32 options;
     };

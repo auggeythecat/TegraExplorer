@@ -56,43 +56,16 @@ void pushMenu(const menu_t m) {
     menuManager.stack[menuManager.top] = m;
 }
 
-// TODO: Decide on how I should format this.
-static char* fileSize[4] = {
-    "B",   // "B", or "  B", or " B", or something else
-    "KiB", // "K", or "KiB", or "KB", or something else
-    "MiB", // "M", or "MiB", or "MB", or something else
-    "GiB"  // "G", or "GiB", or "GB", or something else
-};
+static void _printEntry(menuEntry_t entry, const u32 maxLenChars) {
+    if (!menuManager.fullRedraw && !menuManager.stack[menuManager.top].renderDirty && !entry.renderDirty)
+        return;
 
-static void _printEntry(menuEntry_t entry, u32 maxLen) {
-    if (entry.renderDirty) {
-             if (entry.highlighted) SETCOLOR(INVERTCOLOR(entry.color), INVERTCOLOR(COLOR_BG));
-        else if (entry.selected)    SETCOLOR(            entry.color , INVERTCOLOR(COLOR_BG));
-        else                        SETCOLOR(            entry.color ,             COLOR_BG );
+    const u32 fgColor = entry.highlighted ? INVERTCOLOR(entry.color) : entry.color;
+    const u32 bgColor = entry.selected    ? INVERTCOLOR(COLOR_BG   ) : COLOR_BG;
+    SETCOLOR(fgColor, bgColor);
 
-        const u32 fontSize = gfxCon.fntsz;
-
-        if (entry.showIcon) {
-            // TODO: Is there an actual way to concat characters better then this?
-            gfxPutC(entry.icon);
-            gfxPutC('|');
-
-            maxLen -= 2*fontSize;
-        }
-
-        if (entry.showSize) {
-            const u32 numLength = log10Approximation(entry.fileSize);
-            const u32 sizeLength = strlen(fileSize[entry.fileSizeIndex]);
-
-            maxLen -= (numLength*fontSize) + (sizeLength*fontSize);
-
-            gfxPutSLimit(entry.caption, maxLen);
-            gfxPrintF("%d%s", entry.fileSize, fileSize[entry.fileSizeIndex]);
-        } else
-            gfxPutSLimit(entry.caption, maxLen);
-
-        entry.renderDirty = false;
-    }
+    gfxPutSLimit(entry.caption, maxLenChars);
+    entry.renderDirty = false;
 }
 
 static void _renderMenus() {

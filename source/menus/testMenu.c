@@ -55,8 +55,7 @@ static menu_t testMenu = {
     .h     = SCREEN_HEIGHT,
 
     .isOverlay   = false,
-    .printHeader = true,
-    .printFooter = true,
+    .fullHeight  = true,
     .renderDirty = true,
     .titleStatic = true
 };
