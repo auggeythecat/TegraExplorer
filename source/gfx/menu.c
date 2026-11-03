@@ -95,6 +95,36 @@ static void _printEntry(menuEntry_t entry, u32 maxLen) {
     }
 }
 
+static void _renderMenus() {
+    menu_t* m;
+    s32 n = -1;
+    do {
+        ++n;
+        m = &menuManager.stack[menuManager.top - n];
+
+        if (m->fullHeight) {
+            m->y = gfxCon.fntsz;
+            m->h = SCREEN_HEIGHT - (2 * gfxCon.fntsz);
+        }
+
+        if (m->renderDirty)
+            gfxBoxGrey(m->x, m->y, m->w, m->h, 0x1B);
+
+        gfxConSetPos(m->x, m->y);
+
+        const u32 maxLengthCharacters = m->w / gfxCon.fntsz;
+
+        m->entries[m->cursorIndex].highlighted = true;
+        for (u32 i = 0; i < m->count; i++) {
+            if (m->entries[i].type == ENTRY_END) break;
+            _printEntry(m->entries[i], maxLengthCharacters);
+            gfxPutC('\n');
+        }
+
+        m->renderDirty = false;
+    } while (m->isOverlay);
+}
+
 static void _printHeader() {
     menu_t *m = &menuManager.stack[menuManager.top];
 
@@ -205,22 +235,12 @@ static void _handleInput() {
 }
 
 void renderMenuTop() {
-    menu_t* m = &menuManager.stack[menuManager.top];
     menuManager.lastDraw = get_tmr_us();
 
-    if (m->renderDirty)
+    if (menuManager.fullRedraw)
         gfxClearGrey(0x1B); // TODO: color to grey conversion so I can just put in COLOR_DEFAULT
 
-    gfxConSetPos(m->x, m->y);
-
-    const u32 maxLength = m->w;
-
-    m->entries[m->cursorIndex].highlighted = true;
-    for (u32 i = 0; i < m->count; i++) {
-        if (m->entries[i].type == ENTRY_END) break;
-        _printEntry(m->entries[i], maxLength);
-        gfxPutC('\n');
-    }
+    _renderMenus();
 
     _printFooter();
     _printHeader();
