@@ -25,7 +25,6 @@
 
 #include "gfx.h"
 #include "../util/hid.h"
-#include "../util/math.h"
 #include "../util/utils.h"
 
 #if USE_VIC
@@ -34,10 +33,15 @@
 
 static menuManager_t menuManager = {};
 
+#define     MENU_TOP     ( menuManager.stack[menuManager.top    ])
+#define GET_MENU_TOP     (&menuManager.stack[menuManager.top    ])
+#define GET_MENU(n)      (&menuManager.stack[                  n])
+#define GET_MENU_BACK(n) (&menuManager.stack[menuManager.top - n])
+
 void popMenu() {
     if (menuManager.top <= 1) return; // Please don't pop the main menu.
 
-    const menu_t *m = &menuManager.stack[menuManager.top];
+    menu_t *m = GET_MENU_TOP;
     for (u32 i = 0; i > m->count; i++) {
         if (!m->entries[i].captionStatic)
             free(m->entries[i].caption);
@@ -45,19 +49,19 @@ void popMenu() {
 
     if (m->entries) free(m->entries);
 
-    memset(&menuManager.stack[menuManager.top], 0, sizeof(menu_t));
+    memset(m, 0, sizeof(menu_t));
     menuManager.top--;
 
-    menuManager.stack[menuManager.top].renderDirty = true;
+    MENU_TOP.renderDirty = true;
 }
 
 void pushMenu(const menu_t m) {
     if (menuManager.top++ >= MAX_MENU_STACK) return;
-    menuManager.stack[menuManager.top] = m;
+    MENU_TOP = m;
 }
 
 static void _printEntry(menuEntry_t entry, const u32 maxLenChars) {
-    if (!menuManager.fullRedraw && !menuManager.stack[menuManager.top].renderDirty && !entry.renderDirty)
+    if (!menuManager.fullRedraw && !MENU_TOP.renderDirty && !entry.renderDirty)
         return;
 
     const u32 fgColor = entry.highlighted ? INVERTCOLOR(entry.color) : entry.color;
@@ -70,10 +74,14 @@ static void _printEntry(menuEntry_t entry, const u32 maxLenChars) {
 
 static void _renderMenus() {
     menu_t* m;
-    s32 n = -1;
+    u32 n = 0;
     do {
-        ++n;
-        m = &menuManager.stack[menuManager.top - n];
+        m = GET_MENU_BACK(n);
+
+        if (n > menuManager.top) {
+            // Panic.
+            powerOff();
+        }
 
         if (m->fullHeight) {
             m->y = gfxCon.fntsz;
@@ -81,7 +89,7 @@ static void _renderMenus() {
         }
 
         if (m->renderDirty)
-            gfxBoxGrey(m->x, m->y, m->w, m->h, 0x1B);
+            gfxBoxGrey(m->x, m->y, m->w, m->h, COLORTOGREY(COLOR_DEFAULT));
 
         gfxConSetPos(m->x, m->y);
 
@@ -95,11 +103,12 @@ static void _renderMenus() {
         }
 
         m->renderDirty = false;
+        n++;
     } while (m->isOverlay);
 }
 
 static void _printHeader() {
-    menu_t *m = &menuManager.stack[menuManager.top];
+    menu_t *m = GET_MENU_TOP;
 
     // TODO: Check if this makes a major performance difference.
     // If it does, the best path forward might be to make this render with a white background color,
@@ -107,7 +116,7 @@ static void _printHeader() {
     // but also, it *might* remove the need to redraw the whole box.
     // I guess you would also want to add some padding on the back
     // (ie, add multiple spaces before the text, since that would just throw the bg color into the fb)
-    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, 0xFF);
+    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, COLORTOGREY(COLOR_BLACK));
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, 0);
     gfxPrintF("TegraExplorer version %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
@@ -122,15 +131,29 @@ static void _printHeader() {
     gfxPrintF(temp);
 }
 
+/*
+ * TODO: Add a fill parameter to entries and make header/footer entries?
+ * Though, how will this work with pagination? Maybe have a certain
+ * amount that can be scrolled? This would also be nice for the file
+ * browser, which would let you have file/folder/back options at the top
+ * always. But how would vertical scrolling work in that case? Go up to
+ * the entries that can't move, and then it will scroll the ones below
+ * it? This will increase binary size...
+ *
+ * But this won't work with menus that aren't full-width. Should it be
+ * another menu overlayed on top of the others? No, that introduces more
+ * problems, and removes the benefit of the previous suggestion.
+ */
+
 static void _printFooter() {
-    gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, 0xFF);
+    gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, COLORTOGREY(COLOR_BLACK));
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
     gfxPrintF("Time taken for screen draw: %dus ", get_tmr_us() - menuManager.lastDraw);
 }
 
 static void _handleInput() {
-    menu_t *m = &menuManager.stack[menuManager.top];
+    menu_t *m = GET_MENU_TOP;
     menuEntry_t* entry = &m->entries[m->cursorIndex];
 
     while (hidRead()) {
@@ -211,7 +234,7 @@ void renderMenuTop() {
     menuManager.lastDraw = get_tmr_us();
 
     if (menuManager.fullRedraw)
-        gfxClearGrey(0x1B); // TODO: color to grey conversion so I can just put in COLOR_DEFAULT
+        gfxClearGrey(COLORTOGREY(COLOR_DEFAULT));
 
     _renderMenus();
 

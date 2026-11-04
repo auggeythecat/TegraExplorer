@@ -46,6 +46,10 @@
 #define INVERTCOLOR(color)  (~(color & 0x00FFFFFF))
 #define SETCOLOR(fg, bg)    gfxConSetCol(fg, 1, bg)
 #define RESETCOLOR          SETCOLOR(COLOR_WHITE, COLOR_DEFAULT);
+#define COLORTOGREY(color)  ((( (color & 0x00FF0000) >> 16 ) + \
+                              ( (color & 0x0000FF00) >>  8 ) + \
+                              ( (color & 0x000000FF) >>  0 ))  \
+                              / (3))
 
 #define FILLBG   1
 #define NOFILLBG 0
