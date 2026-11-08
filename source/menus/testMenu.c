@@ -25,24 +25,23 @@
 #include "sdMenu.h"
 
 static menuEntry_t testMenuEntries[] = {
-    ENT_SEPARATOR(                                                         ),
-      ENT_CAPTION(COLOR_WHITE ,  "---| BROWSE |---"                        ),
-   ENT_HANDLER_EX(COLOR_GREEN , "Browse SD",                     pushsdMenu, "sd:/"),
-      ENT_HANDLER(COLOR_GREEN , "Browse sysMMC",                   powerOff),
-      ENT_HANDLER(COLOR_BLUE  , "Browse emuMMC",                   powerOff),
-    ENT_SEPARATOR(                                                         ),
-      ENT_CAPTION(COLOR_WHITE ,  "---| EXIT |---"                          ),
-      ENT_HANDLER(COLOR_VIOLET, "Power off",                       powerOff),
-      ENT_HANDLER(COLOR_VIOLET, "Reboot to RCM",                  rebootRCM),
-      ENT_HANDLER(COLOR_VIOLET, "Reboot to OFW",                  rebootOFW),
-   ENT_HANDLER_EX(COLOR_VIOLET, "Reboot to hekate",           launchPayload, "sd:/bootloader/update.bin"),
-      ENT_HANDLER(COLOR_VIOLET, "Reboot to atmosphere",            powerOff),
-    ENT_SEPARATOR(                                                         ),
-      ENT_CAPTION(COLOR_WHITE , "---| TOOLS |---"                          ),
-      ENT_HANDLER(COLOR_GREEN , "Partition sd",                    powerOff),
-      ENT_HANDLER(COLOR_GREEN , "View dumped keys",                powerOff),
-      ENT_HANDLER(COLOR_GREEN , "View credits",                    powerOff),
-          ENT_END(                                                         )
+      ENT_CAPTION(COLOR_WHITE ,  "---| BROWSE |---"                          ),
+   ENT_HANDLER_EX(COLOR_GREEN , "Browse SD",               pushsdMenu, "sd:/"),
+      ENT_HANDLER(COLOR_GREEN , "Browse sysMMC",             powerOff        ),
+      ENT_HANDLER(COLOR_BLUE  , "Browse emuMMC",             powerOff        ),
+    ENT_SEPARATOR(                                                           ),
+      ENT_CAPTION(COLOR_WHITE ,  "---| EXIT |---"                            ),
+      ENT_HANDLER(COLOR_VIOLET, "Power off",                 powerOff        ),
+      ENT_HANDLER(COLOR_VIOLET, "Reboot to RCM",            rebootRCM        ),
+      ENT_HANDLER(COLOR_VIOLET, "Reboot to OFW",            rebootOFW        ),
+   ENT_HANDLER_EX(COLOR_VIOLET, "Reboot to hekate",     launchPayload, "sd:/bootloader/update.bin"),
+      ENT_HANDLER(COLOR_VIOLET, "Reboot to atmosphere",      powerOff        ),
+    ENT_SEPARATOR(                                                           ),
+      ENT_CAPTION(COLOR_WHITE , "---| TOOLS |---"                            ),
+      ENT_HANDLER(COLOR_GREEN , "Partition sd",              powerOff        ),
+      ENT_HANDLER(COLOR_GREEN , "View dumped keys",          powerOff        ),
+      ENT_HANDLER(COLOR_GREEN , "View credits",              powerOff        ),
+          ENT_END(                                                           )
 };
 
 static menu_t testMenu = {
@@ -55,9 +54,9 @@ static menu_t testMenu = {
     .h     = SCREEN_HEIGHT,
 
     .isOverlay   = false,
-    .fullHeight  = true,
     .renderDirty = true,
-    .titleStatic = true
+    .titleStatic = true,
+    .fullHeight  = true
 };
 
 void pushTestMenu() {
