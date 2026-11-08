@@ -56,8 +56,9 @@ void popMenu() {
 }
 
 void pushMenu(const menu_t m) {
-    if (menuManager.top++ >= MAX_MENU_STACK) return;
-    MENU_TOP = m;
+    if (menuManager.top+1 >= MAX_MENU_STACK) return;
+    if (menuManager.top != 0) menuManager.top++;
+    menuManager.stack[menuManager.top] = m;
 }
 
 static void _printEntry(menuEntry_t entry, const u32 maxLenChars) {
@@ -89,7 +90,7 @@ static void _renderMenus() {
         }
 
         if (m->renderDirty)
-            gfxBoxGrey(m->x, m->y, m->w, m->h, COLORTOGREY(COLOR_DEFAULT));
+            gfxBoxGrey(m->x, m->y, m->x + m->w, m->y + m->h, COLORTOGREY(COLOR_BG));
 
         gfxConSetPos(m->x, m->y);
 
@@ -116,7 +117,7 @@ static void _printHeader() {
     // but also, it *might* remove the need to redraw the whole box.
     // I guess you would also want to add some padding on the back
     // (ie, add multiple spaces before the text, since that would just throw the bg color into the fb)
-    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, COLORTOGREY(COLOR_BLACK));
+    gfxBoxGrey(0, 0, SCREEN_WIDTH, gfxCon.fntsz, COLORTOGREY(COLOR_WHITEST));
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, 0);
     gfxPrintF("TegraExplorer version %d.%d.%d", TE_VER_MJ, TE_VER_MN, TE_VER_HF);
@@ -146,7 +147,7 @@ static void _printHeader() {
  */
 
 static void _printFooter() {
-    gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, COLORTOGREY(COLOR_BLACK));
+    gfxBoxGrey(0, SCREEN_HEIGHT - gfxCon.fntsz, SCREEN_WIDTH, SCREEN_HEIGHT, COLORTOGREY(COLOR_WHITEST));
     gfxConSetCol(COLOR_DEFAULT, NOFILLBG, COLOR_WHITEST);
     gfxConSetPos(0, SCREEN_HEIGHT - gfxCon.fntsz);
     gfxPrintF("Time taken for screen draw: %dus ", get_tmr_us() - menuManager.lastDraw);
@@ -170,7 +171,7 @@ static void _handleInput() {
         }
 
         if (RE_INPUT_DETECTION(JOYHOME)) {
-            powerOff();
+            launchPayload("sd:/bootloader/update.bin");
             break;
         }
 
