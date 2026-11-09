@@ -19,26 +19,27 @@
 #ifndef _COLORS_H
 #define _COLORS_H
 
-#define COLOR_TRANSPARENT  0x00000000
-#define COLOR_NONE         COLOR_TRANSPARENT
+#define COLOR_TRANSPARENT   0x00000000
+#define COLOR_NONE          COLOR_TRANSPARENT
 
-#define COLOR_RED          0xFFE70000
-#define COLOR_ORANGE       0xFFFF8C00
-#define COLOR_YELLOW       0xFFFFFF40
-#define COLOR_GREEN        0xFF40FF00
-#define COLOR_BLUE         0xFF00DDFF
-#define COLOR_VIOLET       0xFF8040FF
+#define COLOR_RED           0xFFE70000
+#define COLOR_ORANGE        0xFFFF8C00
+#define COLOR_YELLOW_ORANGE 0xFFFFB500
+#define COLOR_YELLOW        0xFFFFFF40
+#define COLOR_GREEN         0xFF40FF00
+#define COLOR_BLUE          0xFF00DDFF
+#define COLOR_VIOLET        0xFF8040FF
 
-#define COLOR_WHITEST      0xFFFFFFFF
-#define COLOR_WHITE        0xFFF0F0F0
-#define COLOR_LIGHTER_GREY 0xFFD0D0D0
-#define COLOR_LIGHT_GREY   0xFFA0A0A0
-#define COLOR_GREY         0xFF808080
-#define COLOR_DARK_GREY    0xFF606060
-#define COLOR_DARKER_GREY  0xFF303030
-#define COLOR_BLACK        0xFF000000
+#define COLOR_WHITEST       0xFFFFFFFF
+#define COLOR_WHITE         0xFFF0F0F0
+#define COLOR_LIGHTER_GREY  0xFFD0D0D0
+#define COLOR_LIGHT_GREY    0xFFA0A0A0
+#define COLOR_GREY          0xFF808080
+#define COLOR_DARK_GREY     0xFF606060
+#define COLOR_DARKER_GREY   0xFF303030
+#define COLOR_BLACK         0xFF000000
 
-#define COLOR_DEFAULT      0xFF1B1B1B
+#define COLOR_DEFAULT       0xFF1B1B1B
 
 #define RGBTOCOLOR(r, g, b) (b << 16 | g << 8 | r << 0)
 #define GREYTOCOLOR(s)      (s << 16 | s << 8 | s << 0)
