@@ -49,7 +49,7 @@ OBJS += joycon touch btn hid
 OBJS += ff ffsystem ffunicode diskio nx_emmc_bis ramdisk emmc sdmmc sdmmc_driver sd
 
 # Math and utils
-OBJS += utils sprintf math vector unlzma_tiny util
+OBJS += utils sprintf math vector unlzma_tiny util error
 
 # Lua core
 OBJS += lapi lctype ldebug ldo ldump lfunc lgc linit lmem loadlib lobject lopcodes lstate lstring ltable ltm lundump lvm lzio

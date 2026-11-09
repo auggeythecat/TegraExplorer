@@ -26,7 +26,7 @@ typedef struct _teError_t {
     u32 code:24;
 } teError_t;
 
-#define TE_MAKE_ERROR(module, code) { .module = (module), .code = (code) }
+#define TE_MAKE_ERROR(error_module, error_code) ((teError_t){ .module = (error_module), .code = (error_code) })
 
 /* Success */
 #define TE_SUCCESS 0
@@ -246,5 +246,8 @@ typedef struct _teError_t {
 // The requested memory access could not be fulfilled.
 # define TE_EXCEPTION_PREFETCH_ABORT     TE_MAKE_ERROR(TE_EXCEPTION_MODULE, 5) // Module 255, Error code 5
 // Failed to fetch the next instruction.
+
+void drawError(teError_t error, const char* file, u32 line);
+// TODO: add ams-like error handling macros.
 
 #endif //_ERROR_H
