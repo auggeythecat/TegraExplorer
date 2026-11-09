@@ -19,7 +19,14 @@
 #ifndef _ERROR_H
 #define _ERROR_H
 
-#define TE_MAKE_ERROR(module, code) ((module << 24) & code)
+#include <utils/types.h>
+
+typedef struct _teError_t {
+    u32 module:8;
+    u32 code:24;
+} teError_t;
+
+#define TE_MAKE_ERROR(module, code) { .module = (module), .code = (code) }
 
 /* Success */
 #define TE_SUCCESS 0
