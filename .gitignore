@@ -13,7 +13,12 @@ output
 .idea/editor.xml
 .idea/misc.xml
 
+# Binaries for tools
 tools/bin2c/bin2c
 tools/tinyLZMA/tinyLZMA
 
+# The payload binary in C includable form. Maybe #embed later?
 loader/payload.h
+
+# Linker maps
+*.map

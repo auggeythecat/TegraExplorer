@@ -79,7 +79,7 @@ WARNINGS := -Wall -Wextra -Wno-implicit-fallthrough -Wno-missing-braces -Wno-mis
 
 ARCH   := -march=armv4t -mtune=arm7tdmi-s -mthumb -mthumb-interwork
 CFLAGS  = $(ARCH) -Os -g -gdwarf-4 -nostdlib -ffunction-sections -fdata-sections -fomit-frame-pointer -std=gnu11 $(CUSTOMDEFINES) $(WARNINGS)
-LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
+LDFLAGS = $(ARCH) -nostartfiles -lgcc -Wl,--nmagic,--gc-sections,-Map=$(BUILDDIR)/output.map -Xlinker --defsym=IPL_LOAD_ADDR=$(IPL_LOAD_ADDR)
 
 ################################################################################
 
