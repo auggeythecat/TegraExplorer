@@ -22,7 +22,7 @@
 # define EVP_COP_SOFTWARE_VECTOR       0x208
 # define EVP_COP_PREFETCH_ABORT_VECTOR 0x20C
 # define EVP_COP_DATA_ABORT_VECTOR     0x210
-# define EVP_COP_RESET_VECTOR          0x214
+# define EVP_COP_RESERVED_VECTOR       0x214
 # define EVP_COP_IRQ_VECTOR            0x218
 # define EVP_COP_FIQ_VECTOR            0x21C
 
@@ -153,14 +153,13 @@ _fiqHandler:
 .globl excp_reset
 .type excp_reset, %function
 excp_reset:
-    B excpReset
+    B exceptionReset
 
-excpReset:
+exceptionReset:
     LDR R0, =EXCEPTION_ENABLE_ADDRESS
     LDR R1, [R0]
     ADD R1, R1, #0x01
     AND R1, R1, #0xFF
-    BIC R1, R1, #0xFF
     LDR R2, =EXCEPTION_MAGIC
     ORR R1, R1, R2
     STR R1, [R0]
@@ -178,25 +177,25 @@ _resetHandler:
 	LDR R0, =EXCEPTION_TYPE_ADDRESS
 	LDR R1, =RST
 	STR R1, [R0]
-	B excpReset
+	B exceptionReset
 
 _undefinedHandler:
 	LDR R0, =EXCEPTION_TYPE_ADDRESS
 	LDR R1, =UNDF
 	STR R1, [R0]
-	B excpReset
+	B exceptionReset
 
 _prefetchAbortHandler:
 	LDR R0, =EXCEPTION_TYPE_ADDRESS
 	LDR R1, =PABT
 	STR R1, [R0]
-	B excpReset
+	B exceptionReset
 
 _dataAbortHandler:
 	LDR R0, =EXCEPTION_TYPE_ADDRESS
 	LDR R1, =DABT
 	STR R1, [R0]
-	B excpReset
+	B exceptionReset
 
 setupVectors:
 	/* Setup vectors */

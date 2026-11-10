@@ -54,6 +54,8 @@ typedef struct _teError_t {
 #define         E_SHOW_UNLESS(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) { drawError(error); } }
 #define       E_RETURN_UNLESS(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) {  E_RETURN(error); } }
 
+#define E_RETURN_ERROR_UNLESS(expr, error) { if (                 (expr) )                      {  E_RETURN(error); } }
+#define   E_SHOW_ERROR_UNLESS(expr, error) { if (                 (expr) )                      { drawError(error); } }
 
 #define         E_SHOW_UNLESS_ABORT(expr       ) {         E_SHOW_UNLESS(expr       ); powerOff(); }
 #define       E_RETURN_UNLESS_ABORT(expr       ) {       E_RETURN_UNLESS(expr       ); powerOff(); }
@@ -295,6 +297,10 @@ typedef struct _teError_t {
 // The requested memory access could not be fulfilled.
 # define TE_EXCEPTION_PREFETCH_ABORT     TE_MAKE_ERROR(TE_EXCEPTION_MODULE, 5, COLOR_RED) // Module 255, Error code 5
 // Failed to fetch the next instruction.
+# define TE_EXCEPTION_WATCHDOG           TE_MAKE_ERROR(TE_EXCEPTION_MODULE, 6, COLOR_RED) // Module 255, Error code 6
+// Watchdog fired. Timeout?
+# define TE_EXCEPTION_UNKNOWN            TE_MAKE_ERROR(TE_EXCEPTION_MODULE, 7, COLOR_RED) // Module 255, Error code 7
+// Exception magic was found, but the type was not specified. Shouldn't be possible.
 
 void drawError(teError_t error);
 // TODO: Add more context (ie, pc, stack, etc.)

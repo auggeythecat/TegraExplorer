@@ -32,6 +32,7 @@
 #include "menus/testMenu.h"
 #include "util/error.h"
 #include "util/hid.h"
+#include "util/utils.h"
 
 #if USE_VIC
 #include <display/vic.h>
@@ -77,8 +78,35 @@ static void _displayInit() {
     gfxClearGrey(COLORTOGREY(COLOR_BG));
 }
 
-static void _showErrors() {
 
+#define EXCEPTION_LR_ADDRESS     0x4003FF14
+#define EXCEPTION_TYPE_ADDRESS   0x4003FF18
+# define  RST 0x00545352
+# define UNDF 0x46444e55
+# define PABT 0x54424150
+# define DABT 0x54424144
+# define  WDT 0x00544457
+#define EXCEPTION_ENABLE_ADDRESS 0x4003FF1C
+# define EVP_            0x50564500
+# define EXCEPTION_MAGIC EVP_
+
+static void _showErrors() {
+    if ((*(vu32*)EXCEPTION_ENABLE_ADDRESS & 0xFFFFFF00) != EXCEPTION_MAGIC)
+        return;
+
+    const u8 count = (*(u32*)EXCEPTION_ENABLE_ADDRESS & 0x000000FF);
+    if (count >= 10) {
+        powerOff(); // TODO: attempt an IRAM mode?
+    }
+
+    switch (*(vu32*)EXCEPTION_TYPE_ADDRESS) {
+    case  RST: drawError(TE_EXCEPTION_RESET);          break;
+    case UNDF: drawError(TE_EXCEPTION_UNDEFINED);      break;
+    case PABT: drawError(TE_EXCEPTION_PREFETCH_ABORT); break;
+    case DABT: drawError(TE_EXCEPTION_DATA_ABORT);     break;
+    case  WDT: drawError(TE_EXCEPTION_WATCHDOG);       break;
+      default: drawError(TE_EXCEPTION_UNKNOWN);        break;
+    }
 }
 
 extern void pivotStack(u32 stack_top);
