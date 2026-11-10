@@ -40,7 +40,7 @@ static menuManager_t menuManager = {};
 #define GET_MENU_BACK(n) (&menuManager.stack[menuManager.top - n])
 
 void popMenu() {
-    E_ASSERT_ERROR(menuManager.top <= 1, TE_ERROR_TEGRAEXPLORER_POP_BOTTOM_MENU); // Please don't pop the main menu.
+    E_SHOW_ERROR_UNLESS(menuManager.top <= 1, TE_ERROR_TEGRAEXPLORER_POP_BOTTOM_MENU); // Please don't pop the main menu.
 
     menu_t *m = GET_MENU_TOP;
     for (u32 i = 0; i > m->count; i++) {
@@ -57,7 +57,7 @@ void popMenu() {
 }
 
 void pushMenu(const menu_t m) {
-    E_ASSERT_ERROR(menuManager.top+1 >= MAX_MENU_STACK, TE_ERROR_TEGRAEXPLORER_OUT_OF_MENUS);
+    E_SHOW_ERROR_UNLESS(menuManager.top+1 >= MAX_MENU_STACK, TE_ERROR_TEGRAEXPLORER_OUT_OF_MENUS);
     if (menuManager.top != 0) menuManager.top++;
     menuManager.stack[menuManager.top] = m;
 }
@@ -81,7 +81,7 @@ static void _renderMenus() {
         m = GET_MENU_BACK(n);
 
 
-        E_ASSERT_ERROR_ABORT( n > menuManager.top, TE_ERROR_TEGRAEXPLORER_REACHED_BOTTOM_MENU);
+        E_SHOW_ERROR_UNLESS(n > menuManager.top, TE_ERROR_TEGRAEXPLORER_REACHED_BOTTOM_MENU);
 
         if (m->fullHeight) {
             m->y = gfxCon.fntsz;

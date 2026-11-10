@@ -53,19 +53,13 @@ typedef struct _teError_t {
 
 #define         E_SHOW_UNLESS(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) { drawError(error); } }
 #define       E_RETURN_UNLESS(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) {  E_RETURN(error); } }
-#define              E_ASSERT(expr       ) { if ( const error e = (expr); E_IS_FAILURE(error) ) { drawError(error); } }
 
-#define E_RETURN_ERROR_UNLESS(expr, error) { if ( (expr) ) {  E_RETURN(error); } }
-#define   E_SHOW_ERROR_UNLESS(expr, error) { if ( (expr) ) { drawError(error); } }
-#define        E_ASSERT_ERROR(expr, error) { if ( (expr) ) { drawError(error); } }
 
 #define         E_SHOW_UNLESS_ABORT(expr       ) {         E_SHOW_UNLESS(expr       ); powerOff(); }
 #define       E_RETURN_UNLESS_ABORT(expr       ) {       E_RETURN_UNLESS(expr       ); powerOff(); }
-#define              E_ASSERT_ABORT(expr       ) {              E_ASSERT(expr       ); powerOff(); }
 
 #define E_RETURN_ERROR_UNLESS_ABORT(expr, error) { E_RETURN_ERROR_UNLESS(expr, error); powerOff(); }
 #define   E_SHOW_ERROR_UNLESS_ABORT(expr, error) {   E_SHOW_ERROR_UNLESS(expr, error); powerOff(); }
-#define        E_ASSERT_ERROR_ABORT(expr, error) {        E_ASSERT_ERROR(expr, error); powerOff(); }
 
 
 
