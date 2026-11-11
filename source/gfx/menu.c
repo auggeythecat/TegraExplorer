@@ -228,6 +228,7 @@ static void _handleInput() {
             launchPayload("sd:/bootloader/update.bin");
             break;
         }
+    }
 }
 
 void renderMenuTop() {
