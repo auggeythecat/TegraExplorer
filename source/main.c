@@ -82,7 +82,7 @@ static void _showErrors() {
 }
 
 extern void pivotStack(u32 stack_top);
-void ipl_main() __attribute__((alias("iplMain")));
+
 void iplMain() {
     hw_init();
 

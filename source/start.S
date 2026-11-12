@@ -23,8 +23,8 @@
 .extern memset
 .type memset, %function
 
-.extern _irq_setup
-.type _irq_setup, %function
+.extern _irqSetup
+.type _irqSetup, %function
 
 .globl _start
 .type _start, %function
@@ -68,7 +68,8 @@ _realStart:
 	LDR R2, =__bssEnd
 	SUB R2, R2, R0
 	BL memset
-	BL _irq_setup
+ 	BL _irqSetup
+    BL iplMain
 	B .
 
 .globl pivotStack
