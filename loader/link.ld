@@ -1,8 +1,8 @@
 ENTRY(_start)
 
 SECTIONS {
-	PROVIDE(__ipl_start = LDR_LOAD_ADDR);
-	. = __ipl_start;
+	PROVIDE(__iplStart = LDR_LOAD_ADDR);
+	. = __iplStart;
 	.text : {
 		*(.text._start);
 		*(.text*);
@@ -17,10 +17,10 @@ SECTIONS {
 		 * miss-align binary size to account for version info.
 		 * !If version text is not appended, then use ". = ALIGN(4)"!
 		 */
-		 data_end_ua = .;
-		 . = ((data_end_ua + 0x6 + 4 - 1) & ~(4 - 1)) - 6;
+		 dataEndUa = .;
+		 . = ((dataEndUa + 0x6 + 4 - 1) & ~(4 - 1)) - 6;
 	}
-	__ldr_end = .;
+	__ldrEnd = .;
 	. = ALIGN(0x10);
-	__ipl_end = .;
+	__iplEnd = .;
 }

@@ -34,7 +34,7 @@
 #define IPL_PATCHED_RELOC_SZ 0x94
 #define IPL_VERSION_RCFG_OFF 0x120
 
-void loader_main()
+void loaderMain()
 {
 	// Preliminary BPMP clocks init.
 	CLOCK(CLK_RST_CONTROLLER_CLK_SYSTEM_RATE)    = 0x10;       // Set HCLK div to 2 and PCLK div to 1.
@@ -51,13 +51,13 @@ void loader_main()
 	ARB_PRI(ARB_PRIO_DMA_PRIORITY) = 0x320369B;
 
 	// Get Payload size.
-	u32 payload_size  = sizeof(payload);        // Actual payload size.
-	payload_size      = ALIGN(payload_size, 4); // Align size to 4 bytes.
-	u32 *payload_addr = (u32 *)payload;
+	u32 payloadSize  = sizeof(payload);        // Actual payload size.
+	payloadSize      = ALIGN(payloadSize, 4); // Align size to 4 bytes.
+	u32 *payloadAddr = (u32 *)payload;
 
 	// Relocate payload to a safer place.
-	u32 words = payload_size >> 2;
-	u32 *src  = payload_addr + words - 1;
+	u32 words = payloadSize >> 2;
+	u32 *src  = payloadAddr + words - 1;
 	u32 *dst  = (u32 *)(IPL_RELOC_TOP - 4);
 	while (words)
 	{
@@ -68,14 +68,14 @@ void loader_main()
 	}
 
 	// Set source address of the first part.
-	u8 *src_addr = (void *)(IPL_RELOC_TOP - payload_size);
+	u8 *srcAddr = (void *)(IPL_RELOC_TOP - payloadSize);
 
 	// Uncompress first part.
-	lzma_inflate((const u8 *)src_addr, sizeof(payload), (u8 *)IPL_LOAD_ADDR, SZ_128K);
+	lzma_inflate((const u8 *)srcAddr, sizeof(payload), (u8 *)IPL_LOAD_ADDR, SZ_128K);
 
 	// Chainload into uncompressed payload.
-	void (*ipl_ptr)() = (void *)IPL_LOAD_ADDR;
-	(*ipl_ptr)();
+	void (*iplPtr)() = (void *)IPL_LOAD_ADDR;
+	(*iplPtr)();
 
 	// Halt if we managed to get out of execution.
 	while (true)

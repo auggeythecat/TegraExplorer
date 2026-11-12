@@ -17,8 +17,8 @@
 .section .text._start
 .arm
 
-.extern _reloc_ipl
-.type _reloc_ipl, %function
+.extern _relocIpl
+.type _relocIpl, %function
 
 .extern memset
 .type memset, %function
@@ -30,49 +30,49 @@
 .type _start, %function
 _start:
 	ADR R0, _start
-	LDR R1, =__ipl_start
+	LDR R1, =__iplStart
 	CMP R0, R1
-	BEQ _real_start
+	BEQ _realStart
 
 	/* If we are not in the right location already, copy a relocator to upper IRAM. */
-	ADR R2, _reloc_ipl
+	ADR R2, _relocIpl
 	LDR R3, =0x4003FF00
-	MOV R4, #(_real_start - _reloc_ipl)
-_copy_loop:
+	MOV R4, #(_realStart - _relocIpl)
+_copyLoop:
 	LDMIA R2!, {R5}
 	STMIA R3!, {R5}
 	SUBS R4, #4
-	BNE _copy_loop
+	BNE _copyLoop
 
 	/* Use the relocator to copy ourselves into the right place. */
-	LDR R2, =__ipl_end
+	LDR R2, =__iplEnd
 	SUB R2, R2, R1
-	LDR R3, =_real_start
+	LDR R3, =_realStart
 	LDR R4, =0x4003FF00
 	BX R4
 
-_reloc_ipl:
+_relocIpl:
 	LDMIA R0!, {R4-R7}
 	STMIA R1!, {R4-R7}
 	SUBS R2, #0x10
-	BNE _reloc_ipl
+	BNE _relocIpl
 	/* Jump to the relocated entry. */
 	BX R3
 
-_real_start:
+_realStart:
 	/* Initially, we place our stack under relocator but will move it to under the payload. */
 	/* This depends on application scope. */
 	LDR SP, =0x4003FF00
-	LDR R0, =__bss_start
+	LDR R0, =__bssStart
 	EOR R1, R1, R1
-	LDR R2, =__bss_end
+	LDR R2, =__bssEnd
 	SUB R2, R2, R0
 	BL memset
 	BL _irq_setup
 	B .
 
-.globl pivot_stack
-.type pivot_stack, %function
-pivot_stack:
+.globl pivotStack
+.type pivotStack, %function
+pivotStack:
 	MOV SP, R0
 	BX LR

@@ -77,12 +77,16 @@ static void _displayInit() {
     gfxClearGrey(COLORTOGREY(COLOR_BG));
 }
 
-extern void pivot_stack(u32 stack_top);
+static void _showErrors() {
+
+}
+
+extern void pivotStack(u32 stack_top);
 void ipl_main() __attribute__((alias("iplMain")));
 void iplMain() {
     hw_init();
 
-    pivot_stack(IPL_LOAD_ADDR);
+    pivotStack(IPL_LOAD_ADDR);
 
     heap_init((void*)IPL_HEAP_START);
 
@@ -93,12 +97,14 @@ void iplMain() {
 
     _displayInit();
 
-    pushTestMenu();
-
     hidInit();
 
-    // lua_State* luastate = lua_newstate(NULL, NULL);
-    // luaL_openlibs(luastate);
+    _showErrors();
+
+    pushTestMenu();
+
+    lua_State* luastate = lua_newstate(NULL, NULL);
+    luaL_openlibs(luastate);
 
     while (true)
         renderMenuTop();

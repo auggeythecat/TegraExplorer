@@ -1,12 +1,12 @@
 ENTRY(_start)
 
 SECTIONS {
-	PROVIDE(__ipl_start = IPL_LOAD_ADDR);
-	. = __ipl_start;
+	PROVIDE(__iplStart = IPL_LOAD_ADDR);
+	. = __iplStart;
 	.text : {
 		*(.text._start);
-		KEEP(*(._ipl_version));
-		*(.text._irq_setup);
+		KEEP(*(._iplVersion));
+		*(.text._irqSetup);
 		*(.text*);
 	}
 	.data : {
@@ -14,11 +14,11 @@ SECTIONS {
 		*(.rodata*);
 	}
 	. = ALIGN(0x10);
-	__ipl_end = .;
+	__iplEnd = .;
 	.bss : {
-		__bss_start = .;
+		__bssStart = .;
 		*(COMMON)
 		*(.bss*)
-		__bss_end = .;
+		__bssEnd = .;
 	}
 }
