@@ -303,8 +303,10 @@ void gfxConInit() {
 
 	gfxConInitDone   = true;
 
+#if SDF_FONT
 	gfxRenderSDF();
 	gfxBakeAtlas(gfxCon.fntsz);
+#endif
 }
 
 void gfxConSetCol(const u32 fgcol, const int fillbg, const u32 bgcol) {
@@ -315,7 +317,9 @@ void gfxConSetCol(const u32 fgcol, const int fillbg, const u32 bgcol) {
 
 void gfxConSetFontSize(const u32 fontSize) {
     gfxCon.fntsz = fontSize;
+#if SDF_FONT
     gfxBakeAtlas(fontSize);
+#endif
 }
 
 void gfxConGetPos(u32 *x, u32 *y) {
@@ -372,6 +376,8 @@ void __attribute__((target("arm"))) gfxPutC(const char c) {
     gfxCon.x += sz;
 }
 #endif
+
+// TODO: gfxPutC for no sdf.
 
 void gfxPutS(const char *s) {
     if (!s || !gfxConInitDone || gfxCon.mute)
