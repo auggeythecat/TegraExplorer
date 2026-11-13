@@ -49,7 +49,7 @@
 #define FOOTER_X(fontSize, length) (INNER_START_X(fontSize) + ((INNER_LENGTH(fontSize) - (fontSize * length)) / 2))
 #define FOOTER_Y(fontSize)         (  INNER_END_Y(fontSize) - fontSize*2)
 
-static __attribute__((always_inline)) u32 _getLR() {
+static u32 _getLR() {
     u32 lr = 0;
     asm volatile("mov %[lr], lr\n\t" : [lr]"=&r"(lr) : :);
     return lr;
